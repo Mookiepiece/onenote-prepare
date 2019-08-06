@@ -1,0 +1,13 @@
+#user-input {
+    width: 100px;
+    height: 100px
+}
+
+#result-outer,#result-inner {
+    background: #f4f4f4;
+    font: 8pt 'Arial';
+}
+
+#center-tr {
+    font: 11pt '等线';
+}
