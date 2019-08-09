@@ -1,92 +1,114 @@
 import React from "react";
-import { render } from "react-dom"; 
+import { render } from "react-dom";
 import './default.css';
-import select from './index2';
+import select from 'select';
 
-window.onload=()=>{
-    render(<Colorful />, root);
+window.onload = () => {
+    render(<ControlPanel />, root);
 }
 
-class Colorful extends React.Component{
-    constructor(){
+class ControlPanel extends React.Component {
+
+
+    constructor() {
         super();
-        this.state={
-            str:"A".repeat(20),
+        this.state = {
+            str: "A".repeat(20),
+            mode: "grapefruit",
         };
-        this.resultDivRef=React.createRef();
+        this.resultDivRef = React.createRef();
     }
 
-    handleChange(e){
+    handleSourceChange(e) {
         this.setState({
-            str:e.target.value.trim(),
+            str: e.target.value.trim(),
         })
-        console.log(e.target.value)
     }
 
-    handleClick(e){
-        let r=this.resultDivRef.current;
+    handleModeChange(e) {
+        this.setState({
+            mode: e.target.value,
+        })
+    }
+
+    handleClick(e) {
+        let r = this.resultDivRef.current;
         select(r);
         document.execCommand('Copy');
     }
 
-    render(){
-        let spaceTD=<td>{'\u200B'}</td>;
-
-        var setudan=this.state.str.split('\n');
-        var rstr=[];
-        for(let i of setudan)
-            rstr.push(i,<br />);
-        return (
-            <React.Fragment>
-                <textarea id="user-input" onChange={(e)=>this.handleChange(e)} value={this.state.str}>
-
-                </textarea>
-                <button onClick={(e)=>this.handleClick(e)}>Copy</button>
-                <table ref={this.resultDivRef} id="result-inner">
-                    <tbody>
-                        <tr>{spaceTD}{spaceTD}{spaceTD}</tr>
-                        <tr id="center-tr">
-                            {spaceTD}
-                            <td>
-                                {rstr}
-                            </td>
-                            {spaceTD}
-                        </tr>
-                        <tr>{spaceTD}{spaceTD}{spaceTD}</tr>
-                    </tbody>
-                </table>
-            </React.Fragment>            
-        )
-        return (
-            <React.Fragment>
-                <textarea id="user-input" onChange={(e)=>this.handleChange(e)} value={this.state.str}>
-
-                </textarea>
-                <button onClick={(e)=>this.handleClick(e)}>Copy</button>
-                <table ref={this.resultDivRef} id="result-outer">
-                    <tbody>
-                        <tr>
-                            <td >
-                                <table id="result-inner">
-                                    <tbody>
-                                        <tr>{spaceTD}{spaceTD}{spaceTD}</tr>
-                                        <tr id="center-tr">
-                                            {spaceTD}
-                                            <td>
-                                                {rstr}
-                                            </td>
-                                            {spaceTD}
-                                        </tr>
-                                        <tr>{spaceTD}{spaceTD}{spaceTD}</tr>
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-            </React.Fragment>
-        );
+    calculateGradientColors(strlen) {
+        //TODO cache
+        let colors = [];
+        let minlen=this.GRADIENT_PRIME_LENGTH < strlen ?strlen: this.GRADIENT_PRIME_LENGTH;
+        for(let i=0;i<minlen;i++){
+            let v=this.gradient([224,225,255],[255,213,244],i/(minlen -1))
+            colors.push(`rgb(${v[0]},${v[1]},${v[2]})`);
+        }
+        return colors;
     }
 
+    gradient(c1,c2,step){
+        return [c2[0]*step+c1[0]*(1-step),c2[1]*step+c1[1]*(1-step),c2[2]*step+c1[2]*(1-step),];
+    }
+
+    render() {
+        var resultSelectable;
+        switch (this.state.mode) {
+            case "grapefruit":
+                let spaceTD = (<td>{'\u200B'}</td>);
+
+                let stringSection = this.state.str.split('\n');
+                let resultStr = [];
+                for (let i of stringSection)
+                    resultStr.push(i, <br />);
+                resultSelectable = (
+                    <table ref={this.resultDivRef} id="result-inner">
+                        <tbody>
+                            <tr>{spaceTD}{spaceTD}{spaceTD}</tr>
+                            <tr id="center-tr">
+                                {spaceTD}
+                                <td>{resultStr}</td>
+                                {spaceTD}
+                            </tr>
+                            <tr>{spaceTD}{spaceTD}{spaceTD}</tr>
+                        </tbody>
+                    </table>
+                );
+                break;
+            default:
+                let arr=[...this.state.str];
+                let colors=this.calculateGradientColors(arr.length);
+                resultSelectable = (
+                    <p ref={this.resultDivRef}>
+                        {arr.map((c,idx)=>{
+                            return (
+                                <span style={{background:colors[idx]}}>{c}</span>
+                            )
+                        })}
+                    </p>  
+                );
+                break;
+        }
+
+        return (
+            <React.Fragment>
+                <textarea id="user-input" onChange={(e) => this.handleSourceChange(e)} value={this.state.str}>
+
+                </textarea>
+                <button onClick={(e) => this.handleClick(e)}>Copy</button>
+
+                <select value={this.state.mode} onChange={(e)=>this.handleModeChange(e)}>
+                    <option value="grapefruit">葡萄柚</option>
+                    <option value="lime">柠檬</option>
+                    <option value="coconut">椰子</option>
+                    <option value="mango">芒果</option>
+                </select>
+
+                {resultSelectable}
+
+            </React.Fragment>
+        )
+    }
 }
+ControlPanel.prototype.GRADIENT_PRIME_LENGTH = 7;
