@@ -15,6 +15,8 @@ class ControlPanel extends React.Component {
         this.state = {
             str: "A".repeat(20),
             mode: "grapefruit",
+            GradientColorStart: "#b1efbb",
+            GradientColorStop: "#c7edff",
         };
         this.resultDivRef = React.createRef();
     }
@@ -22,7 +24,7 @@ class ControlPanel extends React.Component {
     handleSourceChange(e) {
         //TODO：trim will remove \t 
         this.setState({
-            str: e.target.value.replace(/ /g,"\u00a0").replace(/^\s+/g,"").replace(/\s+$/g,""),
+            str: e.target.value.replace(/ /g, "\u00a0").replace(/^\s+/g, "").replace(/\s+$/g, ""),
         })
     }
 
@@ -41,18 +43,37 @@ class ControlPanel extends React.Component {
     calculateGradientColors(strlen) {
         //TODO cache
         let colors = [];
-        let minlen=this.GRADIENT_PRIME_LENGTH < strlen ?strlen: this.GRADIENT_PRIME_LENGTH;
-        for(let i=0;i<minlen;i++){
-            let v=this.gradient([177,239,187],[199,237,255],i/(minlen -1))
+        let minlen = this.GRADIENT_PRIME_LENGTH < strlen ? strlen : this.GRADIENT_PRIME_LENGTH;
+        for (let i = 0; i < minlen; i++) {
+            let v = this.gradient(this.countRGB(this.state.GradientColorStart), this.countRGB(this.state.GradientColorStop), i / (minlen - 1))
             colors.push(`rgb(${v[0]},${v[1]},${v[2]})`);
         }
         return colors;
     }
 
-    gradient(c1,c2,step){
+    onGradientColorChange(e) {
+        if (e.target.name == "colorStart") {
+            this.setState({
+                GradientColorStart: e.target.value,
+            })
+        }
+        else {
+            this.setState({
+                GradientColorStop: e.target.value,
+            })
+        }
+    }
 
+    countRGB(str) {
+        if (str[0] == "#")
+            str = str.slice(1);
+        return [Number.parseInt(str.slice(0, 2), 16),
+        Number.parseInt(str.slice(2, 4), 16),
+        Number.parseInt(str.slice(4, 6), 16)]
+    }
 
-        return [c2[0]*step+c1[0]*(1-step),c2[1]*step+c1[1]*(1-step),c2[2]*step+c1[2]*(1-step),];
+    gradient(c1, c2, step) {
+        return [c2[0] * step + c1[0] * (1 - step), c2[1] * step + c1[1] * (1 - step), c2[2] * step + c1[2] * (1 - step),];
     }
 
     render() {
@@ -79,18 +100,26 @@ class ControlPanel extends React.Component {
                     </table>
                 );
                 break;
-            default:
-                let arr=[...this.state.str];
-                let colors=this.calculateGradientColors(arr.length);
+            case "lime":
+            case "coconut":
+                let stystr;
+                if (this.state.mode == "lime")
+                    stystr = "background";
+                else
+                    stystr = "color";
+                let arr = [...this.state.str];
+                let colors = this.calculateGradientColors(arr.length);
                 resultSelectable = (
                     <p ref={this.resultDivRef}>
-                        {arr.map((c,idx)=>{
+                        {arr.map((c, idx) => {
                             return (
-                                <span style={{background:colors[idx]}}>{c}</span>
+                                <span style={{ [stystr]: colors[idx] }}>{c}</span>
                             )
                         })}
-                    </p>  
+                    </p>
                 );
+                break;
+            default:
                 break;
         }
 
@@ -101,12 +130,15 @@ class ControlPanel extends React.Component {
                 </textarea>
                 <button onClick={(e) => this.handleClick(e)}>Copy</button>
 
-                <select value={this.state.mode} onChange={(e)=>this.handleModeChange(e)}>
+                <select value={this.state.mode} onChange={(e) => this.handleModeChange(e)}>
                     <option value="grapefruit">葡萄柚</option>
                     <option value="lime">柠檬</option>
                     <option value="coconut">椰子</option>
-                    <option value="mango">芒果</option>
+                    {/* <option value="mango">芒果</option> */}
                 </select>
+
+                <input type="color" name="colorStart" value={this.state.GradientColorStart} onChange={(e) => this.onGradientColorChange(e)} />
+                <input type="color" name="colorStop" value={this.state.GradientColorStop} onChange={(e) => this.onGradientColorChange(e)} />
 
                 {resultSelectable}
 
