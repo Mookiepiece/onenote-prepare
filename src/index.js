@@ -20,8 +20,9 @@ class ControlPanel extends React.Component {
     }
 
     handleSourceChange(e) {
+        //TODO：trim will remove \t 
         this.setState({
-            str: e.target.value.trim(),
+            str: e.target.value.replace(/ /g,"\u00a0").replace(/^\s+/g,"").replace(/\s+$/g,""),
         })
     }
 
@@ -42,13 +43,15 @@ class ControlPanel extends React.Component {
         let colors = [];
         let minlen=this.GRADIENT_PRIME_LENGTH < strlen ?strlen: this.GRADIENT_PRIME_LENGTH;
         for(let i=0;i<minlen;i++){
-            let v=this.gradient([224,225,255],[255,213,244],i/(minlen -1))
+            let v=this.gradient([177,239,187],[199,237,255],i/(minlen -1))
             colors.push(`rgb(${v[0]},${v[1]},${v[2]})`);
         }
         return colors;
     }
 
     gradient(c1,c2,step){
+
+
         return [c2[0]*step+c1[0]*(1-step),c2[1]*step+c1[1]*(1-step),c2[2]*step+c1[2]*(1-step),];
     }
 

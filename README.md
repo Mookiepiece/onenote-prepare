@@ -33,5 +33,9 @@ webpages to format and preprocess texts to make better OneNote
 
 08-09：
 
-- ​	发现office不支持Alpha通道颜色，带有A通道的颜色不能复制上去
+- 发现office不支持Alpha通道颜色，带有A通道的颜色不能复制上去
+
+08-12：
+
+- 发现仅复制一种格式的字符时（我是加background），格式不会被复制，但是在pre、h1-h5标签中可以是例外，h6却不行，原理不明
 
