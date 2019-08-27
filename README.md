@@ -15,7 +15,7 @@ webpages to format and preprocess texts to make better OneNote
 
 项目定题时间：8月6日
 
-预计项目 Draft 版截止时间：8月20日
+预计项目 Draft 版截止时间：9月15日
 
 使用的技术：React，Webpack
 
