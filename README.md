@@ -39,3 +39,6 @@ webpages to format and preprocess texts to make better OneNote
 
 - 发现仅复制一种格式的字符时（我是加background），格式不会被复制，但是在pre、h1-h5标签中可以是例外，h6却不行，原理不明
 
+09-11：
+
+- 使用typescript, 关于这个编辑器的key一直是难题，key经常会重复，一个办法是利用子元素的innerHTML做key
