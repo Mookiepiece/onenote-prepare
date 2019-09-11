@@ -4,7 +4,7 @@ import './default.css';
 import select from 'select';
 
 window.onload = () => {
-    render(<ControlPanel />, root);
+render(<ControlPanel />, root);
 }
 
 class ControlPanel extends React.Component {
