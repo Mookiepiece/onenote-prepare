@@ -8,8 +8,6 @@ window.onload = () => {
 }
 
 class ControlPanel extends React.Component {
-
-
     constructor() {
         super();
         this.state = {
