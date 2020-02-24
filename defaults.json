@@ -1,0 +1,211 @@
+{
+    "context": "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote",
+    "devtool": "eval-source-map",
+    "externals": [
+        "source-map-support",
+        "electron",
+        "webpack",
+        "electron-devtools-installer"
+    ],
+    "node": {
+        "__dirname": true,
+        "__filename": true
+    },
+    "output": {
+        "filename": "[name].js",
+        "chunkFilename": "[name].bundle.js",
+        "libraryTarget": "commonjs2",
+        "path": "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\dist\\renderer"
+    },
+    "target": "electron-renderer",
+    "resolve": {
+        "alias": {
+            "@": "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\src\\renderer",
+            "common": "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\src\\common"
+        },
+        "extensions": [
+            ".js",
+            ".json",
+            ".node",
+            ".css"
+        ]
+    },
+    "module": {
+        "rules": [
+            {
+                "test": {},
+                "exclude": {},
+                "use": {
+                    "loader": "babel-loader",
+                    "options": {
+                        "presets": [
+                            [
+                                null,
+                                {
+                                    "modules": false,
+                                    "targets": {
+                                        "electron": "5.0.6"
+                                    }
+                                }
+                            ],
+                            [
+                                null
+                            ]
+                        ],
+                        "plugins": [
+                            null
+                        ]
+                    }
+                }
+            },
+            {
+                "test": {},
+                "use": "node-loader"
+            },
+            {
+                "test": {},
+                "use": [
+                    "css-hot-loader",
+                    "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\node_modules\\_mini-css-extract-plugin@0.7.0@mini-css-extract-plugin\\dist\\loader.js",
+                    {
+                        "loader": "css-loader",
+                        "options": {
+                            "modules": "global"
+                        }
+                    }
+                ]
+            },
+            {
+                "test": {},
+                "use": [
+                    "css-hot-loader",
+                    "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\node_modules\\_mini-css-extract-plugin@0.7.0@mini-css-extract-plugin\\dist\\loader.js",
+                    {
+                        "loader": "css-loader",
+                        "options": {
+                            "modules": "global"
+                        }
+                    },
+                    "less-loader"
+                ]
+            },
+            {
+                "test": {},
+                "use": [
+                    "css-hot-loader",
+                    "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\node_modules\\_mini-css-extract-plugin@0.7.0@mini-css-extract-plugin\\dist\\loader.js",
+                    {
+                        "loader": "css-loader",
+                        "options": {
+                            "modules": "global"
+                        }
+                    },
+                    "sass-loader"
+                ]
+            },
+            {
+                "test": {},
+                "use": {
+                    "loader": "url-loader",
+                    "options": {
+                        "limit": 10240,
+                        "name": "imgs/[name]--[folder].[ext]"
+                    }
+                }
+            },
+            {
+                "test": {},
+                "loader": "url-loader",
+                "options": {
+                    "limit": 10240,
+                    "name": "media/[name]--[folder].[ext]"
+                }
+            },
+            {
+                "test": {},
+                "use": {
+                    "loader": "url-loader",
+                    "options": {
+                        "limit": 10240,
+                        "name": "fonts/[name]--[folder].[ext]"
+                    }
+                }
+            },
+            {
+                "test": {},
+                "use": {
+                    "loader": "html-loader"
+                }
+            }
+        ]
+    },
+    "plugins": [
+        {
+            "options": {
+                "template": "!!html-loader?minimize=false&url=false!C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\dist\\.renderer-index-template.html",
+                "filename": "index.html",
+                "hash": false,
+                "inject": true,
+                "compile": true,
+                "favicon": false,
+                "minify": false,
+                "cache": true,
+                "showErrors": true,
+                "chunks": "all",
+                "excludeChunks": [],
+                "chunksSortMode": "auto",
+                "meta": {},
+                "title": "Webpack App",
+                "xhtml": false,
+                "nodeModules": "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\node_modules"
+            }
+        },
+        {
+            "options": {
+                "filename": "styles.css",
+                "chunkFilename": "[id].styles.css"
+            }
+        },
+        {
+            "definitions": {
+                "__static": "\"C:\\\\Users\\\\Mookiepiece\\\\Documents\\\\MKLIB\\\\pre-onenote\\\\static\"",
+                "process.env.NODE_ENV": "\"development\""
+            }
+        },
+        {
+            "options": {},
+            "fullBuildTimeout": 200,
+            "requestTimeout": 10000
+        },
+        {},
+        {
+            "keys": [
+                "ELECTRON_WEBPACK_WDS_HOST",
+                "ELECTRON_WEBPACK_WDS_PORT"
+            ],
+            "defaultValues": {}
+        }
+    ],
+    "devServer": {
+        "contentBase": [
+            "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\static",
+            "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\dist\\renderer-dll"
+        ],
+        "host": "localhost",
+        "port": "57913",
+        "hot": true,
+        "overlay": true
+    },
+    "optimization": {
+        "nodeEnv": "development",
+        "namedModules": true,
+        "noEmitOnErrors": true
+    },
+    "mode": "development",
+    "entry": {
+        "renderer": [
+            "css-hot-loader/hotModuleReplacement",
+            "C:\\Users\\Mookiepiece\\Documents\\MKLIB\\pre-onenote\\src\\renderer\\index.js"
+        ]
+    }
+}
