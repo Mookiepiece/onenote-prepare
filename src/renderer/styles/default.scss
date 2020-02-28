@@ -1,0 +1,92 @@
+/* normalize */
+
+body {
+  margin: 0;
+}
+
+/* variables */
+
+:root {
+  --button-color-static: white;
+  --button-color-hover: #{mix(white, black, 95%)};
+  --button-color-active: #{mix(white, black, 85%)};
+
+  --button-alpha-color-static: transparent;
+  --button-alpha-color-hover: #{mix(transparent, white, 80%)};
+  --button-alpha-color-active: #{mix(transparent, black, 80%)};
+
+  --color-onenote: rgb(1, 135, 145);
+}
+
+/* custom class */
+
+.clearfix {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+.button {
+  position: relative;
+  display: inline-block;
+
+  text-align: center;
+  padding: 6px;
+  border: 0;
+
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.button-default {
+  color: black;
+  background-color: var(--button-color-static);
+  &:hover {
+    background-color: var(--button-color-hover);
+  }
+  &:active {
+    background-color: var(--button-color-active);
+  }
+}
+
+.button-alpha {
+  color: mix(white, transparent, 95%);
+  background-color: var(--button-alpha-color-static);
+  &:hover {
+    color: white;
+    background-color: var(--button-alpha-color-hover);
+  }
+  &:active {
+    color: white;
+    background-color: var(--button-alpha-color-active);
+  }
+}
+
+.button.unfocusable {
+  outline: 0;
+}
+
+/* app */
+
+#app {
+  & > nav {
+    & > a {
+      float: left;
+      width: 100px;
+
+      &.active {
+        &::before {
+          content: "";
+          position: absolute;
+          width: 50%;
+          height: 3px;
+          bottom: 2px;
+          left: 25%;
+          background-color: var(--color-onenote);
+        }
+      }
+    }
+  }
+}

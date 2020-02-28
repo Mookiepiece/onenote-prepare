@@ -5,16 +5,13 @@ module.exports = function (config) {
         '.js',
         '.json',
         '.jsx',
-        '.node',
-        '.css',
-        '.sass',
-        '.scss'
+        '.node'
     ];
 
-    const sassRules = config.module.rules.filter(rule =>
+    const cssRules = config.module.rules.filter(rule =>
         rule.test.toString().match(/css|less|s\(\[ac\]\)ss/)
     );
-    sassRules.forEach(rule => {
+    cssRules.forEach(rule => {
         //remove css-hot-loader
         rule.use = rule.use.filter(use => use !== 'css-hot-loader');
 
