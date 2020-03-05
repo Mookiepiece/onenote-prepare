@@ -1,7 +1,11 @@
 # pre-onenote
-webpages to format and preprocess texts to make better OneNote
+format and preprocess texts to beautify OneNote
+
+in developing...so slow
 
 格式化待粘贴到OneNote的文本
+
+正在开发中...
 
 ## 动机
 
@@ -9,13 +13,17 @@ webpages to format and preprocess texts to make better OneNote
 
 ## 开发日志
 
+20-03-03:
+
+- nbsp的字符码是\u00A0即160，测试认为表格从网页粘贴到ON里，需要border-style:none;才会隐藏边框，哪怕是solid 0px也会显示边框，合理，因为ON的表格边框厚度无关
+
 20-02-23：
 
 - 项目终止了一段时间，正在重新安排,使用electron-webpack脚手架
 
 19-09-11：
 
-- 使用typescript, 关于这个编辑器的key一直是难题，key经常会重复，一个办法是利用子元素的innerHTML做key
+- 删除
 
 19-08-12：
 

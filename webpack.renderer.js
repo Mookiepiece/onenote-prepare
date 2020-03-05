@@ -11,6 +11,8 @@ module.exports = function (config) {
     const cssRules = config.module.rules.filter(rule =>
         rule.test.toString().match(/css|less|s\(\[ac\]\)ss/)
     );
+
+    // failed to remove css-hot-loader due to [entry] cannot reach in this function
     cssRules.forEach(rule => {
         //remove css-hot-loader
         rule.use = rule.use.filter(use => use !== 'css-hot-loader');
@@ -29,16 +31,7 @@ module.exports = function (config) {
         })
     });
 
-    config.module.rules.push({
-        test: /\.jsx$/,
-        exclude: /node_modules/,
-        use: {
-            loader: 'babel-loader',
-            options: {
-                presets: ['@babel/react']
-            }
-        }
-    });
+    config.module.rules[0].test=/\.jsx?$/;
 
     return config;
 }

@@ -11,16 +11,17 @@ let mainWindow
 
 function createMainWindow() {
   const window = new BrowserWindow({
-    frame:false,
+    // frame:false,
     webPreferences: {
       nodeIntegration: true
     }
   })
+  window.maximize();
 
   if (isDevelopment) {
-    // window.webContents.openDevTools({
-    //   mode: 'bottom'
-    // })
+    window.webContents.openDevTools({
+      mode: 'bottom'
+    })
   }
 
   if (isDevelopment) {

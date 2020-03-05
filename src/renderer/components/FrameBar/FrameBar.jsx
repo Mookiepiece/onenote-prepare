@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './style.scss';
-import { Icon } from 'antd';
+import { BlockOutlined, BorderOutlined, CloseOutlined, MinusOutlined } from '@ant-design/icons'
 
 import { remote } from 'electron';
 
+let currentWindow = remote.getCurrentWindow();
+
 function useWindowMaximize() {
-    const currentWindow = remote.getCurrentWindow();
     let [windowMaximize, _setWindowMaximize] = useState(currentWindow.isMaximized());
-
-
 
     const setWindowMaximize = (bool) => {
         if (bool) {
@@ -52,7 +51,7 @@ export default function FrameBar() {
                     onClick={_ => currentWindow.minimize()}
                     tabIndex='-1'
                     className="button button-alpha unfocusable">
-                    <Icon type="minus" />
+                    <MinusOutlined />
                 </button>
 
                 {/* maximize button */}
@@ -64,13 +63,9 @@ export default function FrameBar() {
                             tabIndex='-1'
                             className="button button-alpha unfocusable"
                         >
-                            <Icon
-                                type="border"
-                                style={{
-                                    display: 'inline-block',
-                                    transform: 'scale(.8)'
-                                }}
-                            />
+                            <BorderOutlined style={{
+
+                            }} />
                         </button>
                         :
                         <button
@@ -78,7 +73,7 @@ export default function FrameBar() {
                             tabIndex='-1'
                             className="button button-alpha unfocusable"
                         >
-                            <Icon type="block" />
+                            <BlockOutlined />
                         </button>
                 }
 
@@ -88,7 +83,7 @@ export default function FrameBar() {
                     tabIndex='-1'
                     className="button button-alpha unfocusable"
                 >
-                    <Icon type="close" />
+                    <CloseOutlined />
                 </button>
             </div>
         </header>
