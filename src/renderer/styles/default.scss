@@ -7,34 +7,30 @@ body {
 /* variables */
 
 :root {
+  --gray-1: #ffffff;
+  --gray-2: #fafafa;
+  --gray-3: #f5f5f5;
+  --gray-4: #f0f0f0;
+  --gray-5: #d9d9d9;
+  --gray-6: #bfbfbf;
+  --gray-7: #8c8c8c;
+  --gray-8: #595959;
+  --gray-9: #434343;
+  --gray-10: #262626;
+  --gray-11: #1f1f1f;
+  --gray-12: #141414;
+  --gray-13: #000000;
 
-  --gray-1:#ffffff;
-  --gray-2:#fafafa;
-  --gray-3:#f5f5f5;
-  --gray-4:#f0f0f0;
-  --gray-5:#d9d9d9;
-  --gray-6:#bfbfbf;
-  --gray-7:#8c8c8c;
-  --gray-8:#595959;
-  --gray-9:#434343;
-  --gray-10:#262626;
-  --gray-11:#1f1f1f;
-  --gray-12:#141414;
-  --gray-13:#000000;
-
-  --cyan-1:#e6fffb;
-  --cyan-2:#b5f5ec;
-  --cyan-3:#87e8de;
-  --cyan-4:#5cdbd3;
-  --cyan-5:#36cfc9;
-  --cyan-6:#13c2c2;
-  --cyan-7:#08979c;
-  --cyan-8:#006d75;
-  --cyan-9:#00474f;
-  --cyan-10:#002329;
-
-
-
+  --cyan-1: #e6fffb;
+  --cyan-2: #b5f5ec;
+  --cyan-3: #87e8de;
+  --cyan-4: #5cdbd3;
+  --cyan-5: #36cfc9;
+  --cyan-6: #13c2c2;
+  --cyan-7: #08979c;
+  --cyan-8: #006d75;
+  --cyan-9: #00474f;
+  --cyan-10: #002329;
 
   --button-color-static: var(--gray-1);
   --button-color-hover: var(--gray-3);
@@ -49,12 +45,16 @@ body {
 
 /* custom class */
 
-.clearfix {
+%clearfix {
   &::after {
     content: "";
     display: table;
     clear: both;
   }
+}
+
+.clearfix {
+  @extend %clearfix;
 }
 
 .button {
@@ -97,25 +97,3 @@ body {
   outline: 0;
 }
 
-/* app */
-
-#app {
-  & > nav {
-    & > a {
-      float: left;
-      width: 100px;
-
-      &.active {
-        &::before {
-          content: "";
-          position: absolute;
-          width: 50%;
-          height: 3px;
-          bottom: 2px;
-          left: 25%;
-          background-color: var(--color-onenote);
-        }
-      }
-    }
-  }
-}

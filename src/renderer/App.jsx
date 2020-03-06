@@ -1,39 +1,49 @@
 import React from 'react';
-import {
-    HashRouter as Router,
-    Switch,
-    Route,
-    NavLink,
-    Redirect
-} from "react-router-dom";
+import { Router, Link, Redirect, createHistory, createMemorySource, LocationProvider } from '@reach/router';
 
 import FrameBar from './components/FrameBar/FrameBar';
 import Workbench from './pages/Workbench/Workbench';
+import Settings from './pages/Settings/Settings';
 
-export default class App extends React.Component {
+import './style.scss';
 
-    render() {
-        return (
-            <>
+
+//reach router setup
+let source = createMemorySource("/workbench")
+let history = createHistory(source);
+const Main = ({ children }) => (<div>{children}</div>);
+const NavLink = props => (
+    <Link
+        {...props}
+        getProps={({ isCurrent }) => {
+            // the object returned here is passed to the
+            // anchor element's props
+            return {
+                className: isCurrent ? "button button-default active" : 'button button-default'
+            };
+        }}
+    />
+);
+
+const App = () => {
+
+    return (
+        <>
+            <LocationProvider history={history}>
                 <FrameBar />
+                <nav className="clearfix">
+                    <NavLink to="/workbench">Workbench</NavLink>
+                    <NavLink to="/settings">Settings</NavLink>
+                </nav>
                 <Router>
-                    <>
-                        <nav className="clearfix">
-                            <NavLink to="/workbench" className="button button-default">Workbench</NavLink>
-                            <NavLink to="/gallery" className="button button-default">Gallery</NavLink>
-                            <NavLink to="/toolkit" className="button button-default">Toolkit</NavLink>
-                        </nav>
-                        <div className="main hahaha">
-                            <Switch>
-                                <Route path='/workbench'><Workbench /></Route>
-                                <Route path='/gallery'>2</Route>
-                                <Route path='/Toolkit'>3</Route>
-                                <Redirect to='/workbench' />
-                            </Switch>
-                        </div>
-                    </>
+                    <Main path='/'>
+                        <Workbench path='workbench' />
+                        <Settings path='settings' />
+                    </Main>
                 </Router>
-            </>
-        )
-    }
+            </LocationProvider>
+        </>
+    )
 }
+
+export default App;

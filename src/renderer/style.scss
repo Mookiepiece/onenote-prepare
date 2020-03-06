@@ -1,0 +1,22 @@
+/* app */
+
+#app {
+  & > nav {
+    & > a {
+      float: left;
+      width: 100px;
+
+      &.active {
+        &::before {
+          content: "";
+          position: absolute;
+          width: 50%;
+          height: 3px;
+          bottom: 2px;
+          left: 25%;
+          background-color: var(--color-onenote);
+        }
+      }
+    }
+  }
+}

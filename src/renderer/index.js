@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { render } from 'react-dom';
-import App from '@/App.jsx';
-import '@/styles/default.scss';
+import App from './App.jsx';
 import {remote} from 'electron';
 
 window.onload = _ => render(

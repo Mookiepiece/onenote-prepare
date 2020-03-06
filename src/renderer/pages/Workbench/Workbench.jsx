@@ -24,26 +24,34 @@ const Workbench = () => {
 
     return (
         <>
-            <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-                <Toolbar />
-                <Editable
-                    renderElement={renderElement}
-                    renderLeaf={renderLeaf}
-                    placeholder="Enter some rich text…"
-                    spellCheck
-                    autoFocus
-                    onKeyDown={event => {
-                        for (const hotkey in HOTKEYS) {
-                            if (isHotkey(hotkey, event)) {
-                                event.preventDefault()
-                                const mark = HOTKEYS[hotkey]
-                                toggleMark(editor, mark)
-                            }
-                        }
-                    }}
-                />
-            </Slate>
-            <p>{JSON.stringify(value)}</p>
+            <div className="workbench">
+                <div>
+
+                    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+                        <Toolbar />
+                        <Editable
+                            renderElement={renderElement}
+                            renderLeaf={renderLeaf}
+                            placeholder="Enter some rich text…"
+                            spellCheck
+                            autoFocus
+                            onKeyDown={event => {
+                                for (const hotkey in HOTKEYS) {
+                                    if (isHotkey(hotkey, event)) {
+                                        event.preventDefault()
+                                        const mark = HOTKEYS[hotkey]
+                                        toggleMark(editor, mark)
+                                    }
+                                }
+                            }}
+                        />
+                    </Slate>
+                    <p>{JSON.stringify(value)}</p>
+                </div>
+                <aside>
+
+                </aside>
+            </div>
         </>
     )
 }
@@ -76,7 +84,7 @@ const Toolbar = () => {
     );
 };
 
-const Divider = () => (<span class="divider"></span>)
+const Divider = () => (<span className="divider"></span>)
 
 const Leaf = ({ attributes, children, leaf }) => {
 
@@ -165,8 +173,6 @@ const isMarkActive = (editor, format) => {
     });
     return !!match;
 }
-
-
 
 const BlockButton = ({ format, icon }) => {
     const editor = useSlate();
