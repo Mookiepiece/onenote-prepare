@@ -13,6 +13,9 @@ in developing...so slow
 
 ## 开发日志
 
+20-03-13
+- 这几天在学webpack并把项目换成基于原生的electron和webpack了
+
 20-03-03:
 
 - nbsp的字符码是\u00A0即160，测试认为表格从网页粘贴到ON里，需要border-style:none;才会隐藏边框，哪怕是solid 0px也会显示边框，合理，因为ON的表格边框厚度无关

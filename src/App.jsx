@@ -7,7 +7,6 @@ import Settings from './pages/Settings/Settings';
 
 import './style.scss';
 
-
 //reach router setup
 let source = createMemorySource("/workbench")
 let history = createHistory(source);

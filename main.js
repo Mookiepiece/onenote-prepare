@@ -1,8 +1,11 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
-import * as path from 'path'
-import { format as formatUrl } from 'url'
+// import { app, BrowserWindow, ipcMain } from 'electron'
+// import * as path from 'path'
+// import { format as formatUrl } from 'url'
+const path = require('path');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const { format } = require('url');
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -25,10 +28,10 @@ function createMainWindow() {
   }
 
   if (isDevelopment) {
-    window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
+    window.loadURL(`http://localhost:9001`)
   }
   else {
-    window.loadURL(formatUrl({
+    window.loadURL(format({
       pathname: path.join(__dirname, 'index.html'),
       protocol: 'file',
       slashes: true
@@ -48,6 +51,16 @@ function createMainWindow() {
 
   return window
 }
+
+ipcMain.on('max', _ => {
+  if (!mainWindow.isDestroyed()) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
 
 // quit application when all windows are closed
 app.on('window-all-closed', () => {

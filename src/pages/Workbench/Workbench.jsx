@@ -16,6 +16,10 @@ import {
 
 import './style.scss';
 
+// const withPreOneNote=(editor:Editor)=>{
+//     editor.isInline=
+// }
+
 const Workbench = () => {
     const [value, setValue] = useState(initialValue);
     const renderElement = useCallback(props => <Element {...props} />, []);
