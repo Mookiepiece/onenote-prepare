@@ -10,7 +10,7 @@ import './style.scss';
 //reach router setup
 let source = createMemorySource("/workbench")
 let history = createHistory(source);
-const Main = ({ children }) => (<div>{children}</div>);
+const Main = ({ children }) => (<div className="app">{children}</div>);
 const NavLink = props => (
     <Link
         {...props}
@@ -18,7 +18,7 @@ const NavLink = props => (
             // the object returned here is passed to the
             // anchor element's props
             return {
-                className: isCurrent ? "button button-default active" : 'button button-default'
+                className: isCurrent ? "mk-button mk-button-default active" : 'mk-button mk-button-default'
             };
         }}
     />

@@ -1,96 +1,116 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import isHotkey from 'is-hotkey';
-import { Editable, withReact, useSlate, Slate } from 'slate-react';
-import { Editor, Transforms, createEditor } from 'slate';
+import { Editable, withReact, Slate } from 'slate-react';
+import { createEditor, Range, Editor, Point, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
-import {
-    BoldOutlined,
-    ItalicOutlined,
-    UnderlineOutlined,
-    CodeOutlined,
-    FontSizeOutlined,
-    ContainerOutlined,
-    OrderedListOutlined,
-    UnorderedListOutlined
-} from '@ant-design/icons';
-
 import './style.scss';
 
-// const withPreOneNote=(editor:Editor)=>{
-//     editor.isInline=
-// }
+import {
+    higherOrderKeydownHandler,
+    Toolbar
+} from './components/tools';
+import Aside from './components/Aside';
 
 const Workbench = () => {
     const [value, setValue] = useState(initialValue);
     const renderElement = useCallback(props => <Element {...props} />, []);
     const renderLeaf = useCallback(props => <Leaf {...props} />, []);
-    const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+    const editor = useMemo(() => withTables(withHistory(withReact(createEditor()))), []);
+    const handleKeydown = event => higherOrderKeydownHandler(editor)(event);
 
     return (
         <>
             <div className="workbench">
-                <div>
-
+                <div className="slate">
                     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
                         <Toolbar />
                         <Editable
+                            id="__SLATE_CONTENT"
                             renderElement={renderElement}
                             renderLeaf={renderLeaf}
                             placeholder="Enter some rich text…"
-                            spellCheck
-                            autoFocus
-                            onKeyDown={event => {
-                                for (const hotkey in HOTKEYS) {
-                                    if (isHotkey(hotkey, event)) {
-                                        event.preventDefault()
-                                        const mark = HOTKEYS[hotkey]
-                                        toggleMark(editor, mark)
-                                    }
-                                }
-                            }}
+                            onKeyDown={handleKeydown}
                         />
                     </Slate>
                     <p>{JSON.stringify(value)}</p>
                 </div>
-                <aside>
-
-                </aside>
+                <Aside />
             </div>
         </>
     )
 }
+const withTables = editor => {
+    const { deleteBackward, deleteForward, insertBreak } = editor
 
-const HOTKEYS = {
-    'mod+b': 'bold',
-    'mod+i': 'italic',
-    'mod+u': 'underline',
-    'mod+`': 'code',
-};
+    editor.deleteBackward = unit => {
+        const { selection } = editor
 
-const LIST_TYPES = ['numbered-list', 'bulleted-list'];
+        if (selection && Range.isCollapsed(selection)) {
+            const [cell] = Editor.nodes(editor, {
+                match: n => n.type === 'table-cell',
+            })
 
-const Toolbar = () => {
-    let editor = useSlate();
-    return (
-        <div className="editor-toolbar">
-            <MarkButton format="bold" icon={BoldOutlined} />
-            <MarkButton format="italic" icon={ItalicOutlined} />
-            <MarkButton format="underline" icon={UnderlineOutlined} />
-            <MarkButton format="code" icon={CodeOutlined} />
-            <Divider />
-            <BlockButton format="heading-one" icon={FontSizeOutlined} />
-            <BlockButton format="heading-two" icon={FontSizeOutlined} />
-            <BlockButton format="block-quote" icon={ContainerOutlined} />
-            <Divider />
-            <BlockButton format="numbered-list" icon={OrderedListOutlined} />
-            <BlockButton format="bulleted-list" icon={UnorderedListOutlined} />
-        </div>
-    );
-};
+            if (cell) {
+                const [, cellPath] = cell;
+                const start = Editor.start(editor, cellPath);
+                const end = Editor.end(editor, cellPath);
+                if (Point.equals(selection.anchor, start)) {
+                    //cursor was positioned in both start and end, means no text inside, move to prev cell
+                    if (Point.equals(selection.anchor, end)) {
+                        Transforms.move(editor, { reverse: true });
+                        return;
+                    }
+                    return;
+                }
+            }
+        }
 
-const Divider = () => (<span className="divider"></span>)
+        deleteBackward(unit)
+    }
+
+    editor.deleteForward = unit => {
+        const { selection } = editor
+
+        if (selection && Range.isCollapsed(selection)) {
+            const [cell] = Editor.nodes(editor, {
+                match: n => n.type === 'table-cell',
+            })
+
+            if (cell) {
+                const [, cellPath] = cell;
+                const start = Editor.start(editor, cellPath);
+                const end = Editor.end(editor, cellPath);
+                if (Point.equals(selection.anchor, end)) {
+                    if (Point.equals(selection.anchor, start)) {
+                        Transforms.move(editor);
+                        return;
+                    }
+                    return;
+                }
+            }
+        }
+
+        deleteForward(unit)
+    }
+
+    // editor.insertBreak = () => {
+    //     const { selection } = editor
+
+    //     if (selection) {
+    //         const [table] = Editor.nodes(editor, { match: n => n.type === 'table' })
+
+    //         if (table) {
+    //             return
+    //         }
+    //     }
+
+    //     insertBreak()
+    // }
+
+    return editor
+}
 
 const Leaf = ({ attributes, children, leaf }) => {
+    let style = {};
 
     if (leaf.bold) {
         children = <strong>{children}</strong>;
@@ -108,11 +128,22 @@ const Leaf = ({ attributes, children, leaf }) => {
         children = <u>{children}</u>;
     }
 
-    return <span {...attributes}>{children}</span>;
+    if (leaf.fontColor) {
+        style = { ...style, color: leaf.fontColor };
+    }
+    if (leaf.bgColor) {
+        style = { ...style, backgroundColor: leaf.bgColor };
+    }
+    if (leaf.fontFamily) {
+        style = { ...style, fontFamily: leaf.fontFamily };
+    }
+
+    return <span {...attributes} style={style}>{children}</span>;
 };
 
 const Element = ({ attributes, children, element }) => {
     switch (element.type) {
+        //richtext
         case 'block-quote':
             return <blockquote {...attributes}>{children}</blockquote>;
         case 'bulleted-list':
@@ -125,130 +156,163 @@ const Element = ({ attributes, children, element }) => {
             return <li {...attributes}>{children}</li>;
         case 'numbered-list':
             return <ol {...attributes}>{children}</ol>;
+        //table
+        case 'table':
+            return (
+                <table>
+                    <tbody {...attributes}>{children}</tbody>
+                </table>
+            )
+        case 'table-row':
+            return <tr {...attributes}>{children}</tr>
+        case 'table-cell':
+            return <td {...attributes}>{children}</td>
         default:
             return <p {...attributes}>{children}</p>;
     }
 };
 
-const toggleBlock = (editor, format) => {
-    const isActive = isBlockActive(editor, format);
-    const isList = LIST_TYPES.includes(format);
-
-    //无论什么情况，取消列表包装
-    Transforms.unwrapNodes(editor, {
-        match: n => LIST_TYPES.includes(n.type),
-        split: true,
-    });
-
-    //列表更复杂：如果是列表，设置为li并用该列表（ol ul）包住（下一句）
-    //否则是简单的换成p或者该format
-    Transforms.setNodes(editor, {
-        type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-    });
-
-    if (!isActive && isList) {
-        const block = { type: format, children: [] };
-        Transforms.wrapNodes(editor, block);
-    }
-}
-
-const toggleMark = (editor, format) => {
-    const isActive = isMarkActive(editor, format);
-
-    if (isActive) {
-        Editor.removeMark(editor, format);
-    } else {
-        Editor.addMark(editor, format, true);
-    }
-}
-
-const isBlockActive = (editor, format) => {
-    const [match] = Editor.nodes(editor, {
-        match: n => n.type === format,
-    });
-    return !!match;
-}
-
-//TODO:模拟OneNote行为：只有选择的节点全都符合条件才判定为符合
-const isMarkActive = (editor, format) => {
-    const [match] = Editor.nodes(editor, {
-        match: n => n[format] === true,
-        mode: 'all',
-    });
-    return !!match;
-}
-
-const BlockButton = ({ format, icon }) => {
-    const editor = useSlate();
-    const Icon = icon;
-    const className = `editor-button ${isBlockActive(editor, format) ? 'editor-button-active' : ''}`;
-
-    return (
-        <button
-            className={className}
-            onMouseDown={event => {
-                event.preventDefault();
-                toggleBlock(editor, format);
-            }}
-        >
-            <Icon />
-        </button>
-    );
-}
-
-const MarkButton = ({ format, icon }) => {
-    const editor = useSlate();
-    const Icon = icon;
-    const className = `editor-button ${isMarkActive(editor, format) ? 'editor-button-active' : ''}`;
-
-    return (
-        <button
-            className={className}
-            onMouseDown={event => {
-                event.preventDefault();
-                toggleMark(editor, format);
-            }}
-        >
-            <Icon />
-        </button>
-    );
-}
-
 const initialValue = [
     {
-        type: 'paragraph',
-        children: [
-            { text: 'This is editable ' },
-            { text: 'rich', bold: true },
-            { text: ' text, ' },
-            { text: 'much', italic: true },
-            { text: ' better than a ' },
-            { text: '<textarea>', code: true },
-            { text: '!' },
-        ],
-    },
-    {
-        type: 'paragraph',
         children: [
             {
+                fontFamily:'等线',
                 text:
-                    "Since it's rich text, you can do things like turn a selection of text ",
-            },
-            { text: 'bold', bold: true },
-            {
-                text:
-                    ', or add a semantically rendered block quote in the middle of the page, like this:',
+                    'Since the editor is based on a recursive tree model, similar to an HTML document, you can create complex nested structures, like tables:',
             },
         ],
     },
     {
-        type: 'block-quote',
-        children: [{ text: 'A wise quote.' }],
+        type: 'table',
+        children: [
+            {
+                type: 'table-row',
+                children: [
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'haha', bold: true }]
+                            }
+                        ],
+                    },
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                ],
+            },
+            {
+                type: 'table-row',
+                children: [
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                ],
+            },
+            {
+                type: 'table-row',
+                children: [
+                    {
+                        type: 'table-cell',
+                        children: [{ text: '# of Lives', bold: true }],
+                    },
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                    {
+                        type: 'table-cell',
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: 'wawa', bold: true }]
+                            }
+                        ],
+                    },
+                ],
+            },
+        ],
     },
     {
-        type: 'paragraph',
-        children: [{ text: 'Try it out for yourself!' }],
+        children: [
+            {
+                text:
+                    "This table is just a basic example of rendering a table, and it doesn't have fancy functionality. But you could augment it to add support for navigating with arrow keys, displaying table headers, adding column and rows, or even formulas if you wanted to get really crazy!",
+            },
+        ],
     },
-]
+];
 
 export default Workbench

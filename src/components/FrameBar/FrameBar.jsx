@@ -41,8 +41,8 @@ export default function FrameBar() {
     return (
         <header className="frame-bar">
             <div role="frame-bar-menu">
-                <button tabIndex='-1' className="button button-alpha unfocusable">one</button>
-                <button tabIndex='-1' className="button button-alpha unfocusable">two</button>
+                <button tabIndex='-1' className="mk-button mk-button-alpha unfocusable">one</button>
+                <button tabIndex='-1' className="mk-button mk-button-alpha unfocusable">two</button>
             </div>
             <div role="os-menu">
 
@@ -50,7 +50,7 @@ export default function FrameBar() {
                 <button
                     onClick={_ => currentWindow.minimize()}
                     tabIndex='-1'
-                    className="button button-alpha unfocusable">
+                    className="mk-button mk-button-alpha unfocusable">
                     <MinusOutlined />
                 </button>
 
@@ -61,7 +61,7 @@ export default function FrameBar() {
                         <button
                             onClick={_ => setWindowMaximize(true)}
                             tabIndex='-1'
-                            className="button button-alpha unfocusable"
+                            className="mk-button mk-button-alpha unfocusable"
                         >
                             <BorderOutlined style={{
 
@@ -71,7 +71,7 @@ export default function FrameBar() {
                         <button
                             onClick={_ => setWindowMaximize(false)}
                             tabIndex='-1'
-                            className="button button-alpha unfocusable"
+                            className="mk-button mk-button-alpha unfocusable"
                         >
                             <BlockOutlined />
                         </button>
@@ -81,7 +81,7 @@ export default function FrameBar() {
                 <button
                     onClick={_ => currentWindow.close()}
                     tabIndex='-1'
-                    className="button button-alpha unfocusable"
+                    className="mk-button mk-button-alpha unfocusable"
                 >
                     <CloseOutlined />
                 </button>

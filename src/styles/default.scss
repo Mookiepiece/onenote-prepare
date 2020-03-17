@@ -1,8 +1,12 @@
+@import './classes.scss';
+
 /* normalize */
 
 body {
   margin: 0;
 }
+
+*,*::before,*::after{ box-sizing: border-box;}
 
 /* variables */
 
@@ -43,21 +47,7 @@ body {
   --color-onenote: var(--cyan-7);
 }
 
-/* custom class */
-
-%clearfix {
-  &::after {
-    content: "";
-    display: table;
-    clear: both;
-  }
-}
-
-.clearfix {
-  @extend %clearfix;
-}
-
-.button {
+.mk-button {
   position: relative;
   display: inline-block;
 
@@ -66,34 +56,40 @@ body {
   border: 0;
 
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.1s;
+  
+  &.mk-button-fullwidth{
+    width: 100%;
+  }
 }
 
-.button-default {
+.mk-button-default {
   color: black;
   background-color: var(--button-color-static);
   &:hover {
     background-color: var(--button-color-hover);
   }
-  &:active {
+  &:active,.active {
     background-color: var(--button-color-active);
+    transition: all 0.1s;
   }
 }
 
-.button-alpha {
+.mk-button-alpha {
   color: mix(white, transparent, 95%);
   background-color: var(--button-alpha-color-static);
   &:hover {
     color: white;
     background-color: var(--button-alpha-color-hover);
   }
-  &:active {
+  &:active,.active {
     color: white;
     background-color: var(--button-alpha-color-active);
+    transition: all 0.1s;
   }
 }
 
-.button.unfocusable {
+.mk-button.unfocusable {
   outline: 0;
 }
 

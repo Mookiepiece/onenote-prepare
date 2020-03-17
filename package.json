@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "private": true,
   "license": "MIT",
-  "main":"main.js",
+  "main": "main.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.js",
     "start": "cross-env NODE_ENV=development && electron .",
@@ -16,12 +16,13 @@
     "antd": "^4.0.1",
     "is-hotkey": "^0.1.6",
     "react": "^16.12.0",
+    "react-color": "^2.18.0",
     "react-dom": "^16.12.0",
-    "url": "^0.11.0",
     "slate": "^0.57.1",
     "slate-history": "^0.57.1",
     "slate-react": "^0.57.1",
-    "source-map-support": "^0.5.12"
+    "source-map-support": "^0.5.12",
+    "url": "^0.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
@@ -35,6 +36,7 @@
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.9.0",
     "node-sass": "^4.13.1",
+    "prop-types": "^15.7.2",
     "react-hot-loader": "^4.12.19",
     "sass": "^1.26.3",
     "sass-loader": "^8.0.2",

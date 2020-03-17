@@ -1,7 +1,16 @@
+/* normalize */
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 /* app */
 
 #app {
   & > nav {
+    height: 32px;
     & > a {
       float: left;
       width: 100px;
@@ -18,5 +27,13 @@
         }
       }
     }
+  }
+  .app {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: scroll;
   }
 }

@@ -14,7 +14,7 @@ let mainWindow
 
 function createMainWindow() {
   const window = new BrowserWindow({
-    // frame:false,
+    frame:false,
     webPreferences: {
       nodeIntegration: true
     }
