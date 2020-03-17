@@ -137,6 +137,9 @@ const Leaf = ({ attributes, children, leaf }) => {
     if (leaf.fontFamily) {
         style = { ...style, fontFamily: leaf.fontFamily };
     }
+    if (leaf.fontSize) {
+        style = { ...style, fontSize: leaf.fontSize };
+    }
 
     return <span {...attributes} style={style}>{children}</span>;
 };
@@ -176,7 +179,8 @@ const initialValue = [
     {
         children: [
             {
-                fontFamily:'等线',
+                fontFamily: '等线',
+                fontSize: 16,
                 text:
                     'Since the editor is based on a recursive tree model, similar to an HTML document, you can create complex nested structures, like tables:',
             },
@@ -193,7 +197,13 @@ const initialValue = [
                         children: [
                             {
                                 type: 'paragraph',
-                                children: [{ text: 'haha', bold: true }]
+                                children: [
+                                    {
+                                        fontFamily: '等线',
+                                        fontSize: 16,
+                                        text: 'haha',
+                                        bold: true
+                                    }]
                             }
                         ],
                     },
@@ -202,7 +212,12 @@ const initialValue = [
                         children: [
                             {
                                 type: 'paragraph',
-                                children: [{ text: 'wawa', bold: true }]
+                                children: [{
+                                    fontFamily: '等线',
+                                    fontSize: 16,
+                                    text: 'wawa',
+                                    bold: true
+                                }]
                             }
                         ],
                     },
@@ -211,7 +226,12 @@ const initialValue = [
                         children: [
                             {
                                 type: 'paragraph',
-                                children: [{ text: 'wawa', bold: true }]
+                                children: [{
+                                    fontFamily: '微软雅黑',
+                                    fontSize:20,
+                                    text: 'wawa',
+                                    bold: true
+                                }]
                             }
                         ],
                     },

@@ -4,7 +4,9 @@ import { Editor, Transforms } from 'slate';
 import isHotkey from 'is-hotkey';
 import { SketchPicker } from 'react-color';
 
-import DropdownButton from '../../../components/DropdownButton/DropdownButton';
+import DropdownButtonMousedownSelect from '@/components/DropdownButton/DropdownButtonMousedownSelect';
+import DropdownButtonMousedown from '@/components/DropdownButton/DropdownButtonMousedown';
+
 import Button from '@/components/MkButton';
 import {
     BoldOutlined,
@@ -82,6 +84,7 @@ export const Toolbar = () => {
             />
             <Divider />
             <FontComponent />
+            <FontSizeComponent />
         </div>
     );
 };
@@ -139,6 +142,7 @@ const ActionButton = () => {
         </Button>
     )
 }
+
 const ActionButtonX = () => {
     const editor = useSlate();
     return (
@@ -154,12 +158,19 @@ const ActionButtonX = () => {
         </Button>
     )
 }
+
 const ColorButton = ({ format, icon }) => {
     const editor = useSlate();
     const [pickerActive, setPickerActive] = useState(false);
     const [color, setColor] = useState('#f90');
 
     const action = (newColor = color) => {
+        // getSelection(editor);
+        setColor(newColor);
+        // toggleMark(editor, format, newColor);
+    }
+    const actionX = (newColor = color) => {
+        // getSelection(editor);
         setColor(newColor);
         toggleMark(editor, format, newColor);
     }
@@ -173,78 +184,146 @@ const ColorButton = ({ format, icon }) => {
                 active={isMarkActive(editor, format, color)}
                 onMouseDown={event => {
                     event.preventDefault();
-                    action();
+                    actionX();
                     setPickerActive(false);
                 }}>
                 <div style={{ background: color }}></div>
                 <Icon />
             </Button>
-            <Button
-                className="editor-button editor-button-color-r"
+
+            <DropdownButtonMousedown
                 active={pickerActive}
-                onMouseDown={event => {
-                    event.preventDefault();
-                    setPickerActive(!pickerActive);
-                }}
-            >
-                <SwapRightOutlined />
-                <div
-                    className="color-picker"
-                    onMouseDown={event => { event.stopPropagation() }}
-                >
-                    {
-                        pickerActive ?
-                            <SketchPicker
-                                color={color}
-                                onChangeComplete={({ hex }) => {
-                                    action(hex);
-                                }} /> :
-                            null
+                setActive={_ => setPickerActive(_)}
+                beforeClick={_ => putSelection(editor)}
+
+                renderButton={
+                    (buttonRef) => {
+                        return (
+                            <Button
+                                className={`editor-button editor-button-color-r${pickerActive ? " dropdown" : ""}`}
+                                active={pickerActive}
+                                onMouseDown={event => {
+                                    event.preventDefault();
+                                    setPickerActive(!pickerActive);
+                                }}
+                                ref={buttonRef}
+                            >
+                                <SwapRightOutlined />
+                            </Button>
+                        )
                     }
-                </div>
-            </Button>
+                }
+
+                renderDropdown={
+                    (setPickerActive) => {
+                        return (
+                            <div
+                                className="color-picker"
+                            >
+                                <SketchPicker
+                                    color={color}
+                                    onChange={({ hex }) => {
+                                        action(hex);
+                                    }}
+                                />
+                                }
+                            </div>
+                        )
+                    }
+                }
+            />
         </>
     )
 }
 
 const DEAFULT_FONT_FAMILY = "等线 Light";
+const DEAFULT_FONT_SIZE = 12;
 
-const FontComponent = () => {
+const useMutiActiveSet = (format, defaultValue) => {
+    const editor = useSlate();
+}
+
+const FontComponent = ({
+    format = "fontFamily",
+    defaultValue = DEAFULT_FONT_FAMILY,
+    renderLabel = ({ value, label }) => (<span style={{ fontFamily: value }}>{label}</span>),
+    options = [
+        { label: `${defaultValue}（默认）`, value: defaultValue },
+        { label: '微软雅黑', value: '微软雅黑' },
+        { label: '等线', value: '等线' },
+        { label: '宋体', value: '宋体' }
+    ]
+}) => {
     const editor = useSlate();
     let value;
 
-    const matches = getMarkActiveSet(editor, 'fontFamily');
+    const matches = getMarkActiveSet(editor, format);
 
     if (matches.length > 1) {
-        value = '-----';
+        value = '-----';  //muti style
     } else if (matches[0] === '') {
-        value = DEAFULT_FONT_FAMILY;
+        value = defaultValue;  // not set yet
+    } else {
+        value = matches[0];
+    }
+    console.log(options);
+
+    const action = (newValue) => {
+        if (!getSelection(editor)) return;
+        if (newValue === '') newValue = defaultValue;
+        Editor.addMark(editor, format, newValue);
+        //NOTE:颜色使用toggleMark是因为要将去色优先着色随后，但字体的话直接add就完事了
+    };
+
+    return (
+        <DropdownButtonMousedownSelect
+            width={120}
+            beforeClick={_ => putSelection(editor)}
+            text={value}
+            options={options}
+            renderLabel={renderLabel}
+            action={action}
+        />
+    )
+}
+
+const FontSizeComponent = ({
+    format = "fontSize",
+    defaultValue = DEAFULT_FONT_SIZE,
+    options = [
+        { label: `14（默认）`, value: 14 },
+        { label: '16', value: 16 },
+        { label: '18', value: 18 },
+        { label: '20', value: 20 }
+    ]
+}) => {
+    const editor = useSlate();
+    let value;
+
+    const matches = getMarkActiveSet(editor, format);
+
+    if (matches.length > 1) {
+        value = '-----';  //muti style
+    } else if (matches[0] === '') {
+        value = defaultValue;  // not set yet
     } else {
         value = matches[0];
     }
 
     const action = (newValue) => {
         if (!getSelection(editor)) return;
-        if (newValue === '') newValue = DEAFULT_FONT_FAMILY;
-        Editor.addMark(editor, 'fontFamily', newValue);
+        if (newValue === '') newValue = defaultValue;
+        Editor.addMark(editor, format, newValue);
         //NOTE:颜色使用toggleMark是因为要将去色优先着色随后，但字体的话直接add就完事了
     };
 
     return (
-        <>
-            <DropdownButton
-                beforeClick={_ => putSelection(editor)}
-                value={value}
-                options={[
-                    { label: '等线 Light（默认）', value: DEAFULT_FONT_FAMILY },
-                    { label: '微软雅黑', value: '微软雅黑' },
-                    { label: '等线', value: '等线' },
-                    { label: '宋体', value: '宋体' }
-                ]}
-                action={action}
-                renderLabel={({ value, label }) => (<span style={{ fontFamily: value }}>{label}</span>)}
-                width={120}
-            />
-        </>
+        <DropdownButtonMousedownSelect
+            width={120}
+            beforeClick={_ => putSelection(editor)}
+            text={value}
+            options={options}
+            action={action}
+        />
     )
 }

@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { SketchPicker } from 'react-color';
 
-const Settings=()=>{
-    return(
-        <div>2</div>
+const Settings = () => {
+    const [v, s] = useState("#666");
+    return (
+        <div>
+            <SketchPicker
+                color={v}
+                onChange={v => {
+                    console.log(v);
+                    s(v.hex);
+                }}
+            />
+        </div>
     );
 }
 
