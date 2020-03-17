@@ -68,9 +68,10 @@ export const putSelection = editor => {
 }
 
 export const getSelection = editor => {
-    if (typeof selection === 'object'){
+    if (selection !== null) {
         ReactEditor.focus(editor);
         Transforms.select(editor, selection); //NOTE:setSelection不能即时生效，不明白setSelection和select的区别
+        return true;
     }
-    console.log("focus", selection);
+    return false;
 }

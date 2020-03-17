@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 
+import Button from '@/components/MkButton';
+
 const Portal = ({ children }) => {
     return (
         ReactDOM.createPortal(children, document.body)
@@ -13,6 +15,7 @@ const DropdownButton = ({
     action,
     width,
     renderLabel = ({ label }) => (<span>{label}</span>),
+    beforeClick = _ => { }
 }) => {
     const [panelActive, setPanelActive] = useState();
     const buttonRef = useRef();
@@ -28,8 +31,8 @@ const DropdownButton = ({
     }
 
     const renderOptions = (option) => (
-        <button
-            className="mk-button mk-button-default mk-button-fullwidth"
+        <Button
+            full
             key={option.value}
             onMouseDown={
                 event => {
@@ -38,20 +41,21 @@ const DropdownButton = ({
                     setPanelActive(false);
                 }
             }
-        >{renderLabel(option)}</button>
+        >{renderLabel(option)}</Button>
     )
 
     return (
         <>
-            <button
+            <Button
                 ref={buttonRef}
-                className="mk-button mk-button-default"
                 onMouseDown={event => {
                     event.preventDefault();
+                    beforeClick();
                     setPanelActive(!panelActive);
                 }}
+                type="plain"
                 style={{ width }}
-            >{value}</button>
+            >{value}</Button>
             <Portal>
                 <div
                     style={{

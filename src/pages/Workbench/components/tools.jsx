@@ -5,7 +5,7 @@ import isHotkey from 'is-hotkey';
 import { SketchPicker } from 'react-color';
 
 import DropdownButton from '../../../components/DropdownButton/DropdownButton';
-
+import Button from '@/components/MkButton';
 import {
     BoldOutlined,
     ItalicOutlined,
@@ -92,69 +92,66 @@ const Divider = () => (<span className="divider"></span>)
 const BlockButton = ({ format, icon }) => {
     const editor = useSlate();
     const Icon = icon;
-    const className = `editor-button ${isBlockActive(editor, format) ? 'editor-button-active' : ''}`;
-
     return (
-        <button
-            className={className}
+        <Button
+            className="editor-button"
             onMouseDown={event => {
                 event.preventDefault();
                 toggleBlock(editor, format);
             }}
+            active={isBlockActive(editor, format)}
         >
             <Icon />
-        </button>
+        </Button>
     );
 }
 
 const MarkButton = ({ format, icon }) => {
     const editor = useSlate();
     const Icon = icon;
-    const className = `editor-button ${isMarkActive(editor, format) ? 'editor-button-active' : ''}`;
 
     return (
-        <button
-            className={className}
+        <Button
+            className="editor-button"
             onMouseDown={event => {
                 event.preventDefault();
                 toggleMark(editor, format);
             }}
+            active={isMarkActive(editor, format)}
         >
             <Icon />
-        </button>
+        </Button>
     );
 }
 
 const ActionButton = () => {
     const editor = useSlate();
     return (
-        <button
+        <Button
             className="editor-button"
             onMouseDown={
                 event => {
                     event.preventDefault();
-                    putSelection(editor);
                 }
             }
         >
             <CaretRightOutlined />
-        </button>
+        </Button>
     )
 }
 const ActionButtonX = () => {
     const editor = useSlate();
     return (
-        <button
+        <Button
             className="editor-button"
             onMouseDown={
                 event => {
                     event.preventDefault();
-                    getSelection(editor);
                 }
             }
         >
             <CaretRightOutlined />
-        </button>
+        </Button>
     )
 }
 const ColorButton = ({ format, icon }) => {
@@ -167,17 +164,13 @@ const ColorButton = ({ format, icon }) => {
         toggleMark(editor, format, newColor);
     }
 
-    const className = `editor-button editor-button-color ${isMarkActive(editor, format, color) ? 'editor-button-active' : ''}`;
-    const classNameR = `editor-button editor-button-color-r ${pickerActive ? 'editor-button-active' : ''}`
-
     const Icon = icon;
 
-    //click left button, toggle color state of selection
-    //click right button, toggle color picker
     return (
         <>
-            <button
-                className={className}
+            <Button
+                className="editor-button editor-button-color"
+                active={isMarkActive(editor, format, color)}
                 onMouseDown={event => {
                     event.preventDefault();
                     action();
@@ -185,9 +178,10 @@ const ColorButton = ({ format, icon }) => {
                 }}>
                 <div style={{ background: color }}></div>
                 <Icon />
-            </button>
-            <button
-                className={classNameR}
+            </Button>
+            <Button
+                className="editor-button editor-button-color-r"
+                active={pickerActive}
                 onMouseDown={event => {
                     event.preventDefault();
                     setPickerActive(!pickerActive);
@@ -208,7 +202,7 @@ const ColorButton = ({ format, icon }) => {
                             null
                     }
                 </div>
-            </button>
+            </Button>
         </>
     )
 }
@@ -230,7 +224,7 @@ const FontComponent = () => {
     }
 
     const action = (newValue) => {
-        getSelection(editor);
+        if (!getSelection(editor)) return;
         if (newValue === '') newValue = DEAFULT_FONT_FAMILY;
         Editor.addMark(editor, 'fontFamily', newValue);
         //NOTE:颜色使用toggleMark是因为要将去色优先着色随后，但字体的话直接add就完事了
@@ -239,6 +233,7 @@ const FontComponent = () => {
     return (
         <>
             <DropdownButton
+                beforeClick={_ => putSelection(editor)}
                 value={value}
                 options={[
                     { label: '等线 Light（默认）', value: DEAFULT_FONT_FAMILY },
@@ -250,30 +245,6 @@ const FontComponent = () => {
                 renderLabel={({ value, label }) => (<span style={{ fontFamily: value }}>{label}</span>)}
                 width={120}
             />
-
-            {/* {
-                pickerActive ?
-                    <Select
-                        value={value}
-                        onChange={action}
-                        showSearch
-                        placeholder="Select a person"
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.trim().toLowerCase()) >= 0
-                        }
-                    >
-                        <Option value="">（默认）</Option>
-                        <Option value="微软雅黑">微软雅黑</Option>
-                        <Option value="等线">等线</Option>
-                        <Option value="宋体">宋体</Option>
-                    </Select> :
-                    <Button type="primary" onMouseDown={event => {
-                        event.preventDefault();
-                        putSelection(editor);
-                        setPickerActive(true);
-                    }}>{value}</Button>
-            } */}
         </>
     )
 }

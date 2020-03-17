@@ -1,4 +1,4 @@
-@import "../../styles/default.scss";
+@import '@/styles/classes.scss';
 
 .workbench {
   @extend %clearfix;
@@ -34,22 +34,8 @@
 }
 
 .editor-button {
-  position: relative;
-  border: 0;
-  display: inline-block;
-
   width: 40px;
   height: 40px;
-
-  //color
-  background: var(--button-color-static);
-  &:hover {
-    background: var(--button-color-hover);
-  }
-  &:active,
-  &.editor-button-active {
-    background: var(--button-color-active);
-  }
 
   //icon
   span.anticon {

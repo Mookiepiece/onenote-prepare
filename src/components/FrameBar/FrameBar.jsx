@@ -3,6 +3,7 @@ import './style.scss';
 import { BlockOutlined, BorderOutlined, CloseOutlined, MinusOutlined } from '@ant-design/icons'
 
 import { remote } from 'electron';
+import Button from '@/components/MkButton';
 
 let currentWindow = remote.getCurrentWindow();
 
@@ -41,50 +42,51 @@ export default function FrameBar() {
     return (
         <header className="frame-bar">
             <div role="frame-bar-menu">
-                <button tabIndex='-1' className="mk-button mk-button-alpha unfocusable">one</button>
-                <button tabIndex='-1' className="mk-button mk-button-alpha unfocusable">two</button>
+                <Button type="alpha" unfocusable>one</Button>
+                <Button type="alpha" unfocusable>two</Button>
             </div>
             <div role="os-menu">
 
                 {/* minimize button */}
-                <button
+                <Button
                     onClick={_ => currentWindow.minimize()}
-                    tabIndex='-1'
-                    className="mk-button mk-button-alpha unfocusable">
+                    type="alpha"
+                    unfocusable
+                >
                     <MinusOutlined />
-                </button>
+                </Button>
 
                 {/* maximize button */}
                 {
                     !windowMaximize
                         ?
-                        <button
+                        <Button
                             onClick={_ => setWindowMaximize(true)}
-                            tabIndex='-1'
-                            className="mk-button mk-button-alpha unfocusable"
+                            type="alpha"
+                            unfocusable
                         >
                             <BorderOutlined style={{
 
                             }} />
-                        </button>
+                        </Button>
                         :
-                        <button
+                        <Button
                             onClick={_ => setWindowMaximize(false)}
-                            tabIndex='-1'
-                            className="mk-button mk-button-alpha unfocusable"
+                            type="alpha"
+                            unfocusable
                         >
                             <BlockOutlined />
-                        </button>
+                        </Button>
                 }
 
                 {/* close button */}
-                <button
+                <Button
                     onClick={_ => currentWindow.close()}
-                    tabIndex='-1'
-                    className="mk-button mk-button-alpha unfocusable"
+                    type="alpha"
+                    unfocusable
                 >
                     <CloseOutlined />
-                </button>
+                </Button>
             </div>
         </header>
     )

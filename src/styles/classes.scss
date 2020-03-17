@@ -1,15 +1,13 @@
-
 /* custom class */
 
 %clearfix {
-    &::after {
-      content: "";
-      display: table;
-      clear: both;
-    }
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
   }
-  
-  .clearfix {
-    @extend %clearfix;
-  }
-  
+}
+
+.clearfix {
+  @extend %clearfix;
+}
