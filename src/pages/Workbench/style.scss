@@ -12,7 +12,7 @@
   > aside {
     width: $aside-width;
     min-height: 300px;
-    border-left: 1px solid var(--gray-9);
+    border-left: 1px solid var(--gray-6);
     position: absolute;
     right: 0;
     top: 0;
@@ -29,7 +29,7 @@
     height: 30px;
 
     margin: 0 2px;
-    background: #aaa;
+    background: var(--gray-6);
   }
 }
 
