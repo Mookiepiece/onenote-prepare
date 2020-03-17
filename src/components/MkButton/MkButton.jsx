@@ -12,7 +12,7 @@ const MkButton = React.forwardRef(({
 }, ref) => {
     className = className + ' ' + "mk-button";
 
-    if (!active) {
+    if (active) {
         className += ' ' + "active";
     }
     if (unfocusable) {

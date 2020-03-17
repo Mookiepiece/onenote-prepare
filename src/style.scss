@@ -7,7 +7,7 @@
       float: left;
       width: 100px;
 
-      &.active {
+      &.router-active {
         &::before {
           content: "";
           position: absolute;

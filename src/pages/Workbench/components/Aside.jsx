@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-
+import Button from "@/components/MkButton";
 const Aside = () => {
 
 
     return (
         <aside>
-
+            <Button full>add rule</Button>
         </aside>
     )
 }

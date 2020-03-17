@@ -18,7 +18,7 @@ const NavLink = props => (
             // the object returned here is passed to the
             // anchor element's props
             return {
-                className: isCurrent ? "mk-button mk-button-default active" : 'mk-button mk-button-default'
+                className: isCurrent ? "mk-button mk-button-default router-active" : 'mk-button mk-button-default'
             };
         }}
     />

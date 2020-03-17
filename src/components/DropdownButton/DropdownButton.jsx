@@ -3,10 +3,34 @@ import ReactDOM from 'react-dom';
 
 import Button from '@/components/MkButton';
 
+/**
+ * copy from slate.js
+ * create React portal on body
+ */
 const Portal = ({ children }) => {
     return (
         ReactDOM.createPortal(children, document.body)
     )
+}
+
+/**
+ * copy from npm - delegate
+ * Finds the closest parent that matches a selector.
+ *
+ * @param {Element} element
+ * @param {String} selector
+ * @return {Function}
+ */
+function closest(element, selector) {
+    while (element && element !== document.body) {
+        if (
+            typeof element.matches === 'function' &&element.matches(selector)
+        ) {
+            return element;
+        }
+        element = element.parentNode;
+    }
+    return;
 }
 
 const DropdownButton = ({
@@ -30,6 +54,25 @@ const DropdownButton = ({
         left = rect.left;
     }
 
+
+    //click anywhere to hide dropdown
+    useEffect(_ => {
+        const handler = event => {
+            const delegateTarget = closest(event.target, '.dropdown');
+            if (delegateTarget) {
+                return;
+            }
+            setPanelActive(false);
+            document.body.removeEventListener('mousedown', handler);
+        }
+        if (panelActive) {
+            document.body.addEventListener('mousedown', handler);
+        }
+        return _ => {
+            document.body.removeEventListener('mousedown', handler);
+        }
+    }, [panelActive]);
+
     const renderOptions = (option) => (
         <Button
             full
@@ -47,6 +90,7 @@ const DropdownButton = ({
     return (
         <>
             <Button
+                className="dropdown"
                 ref={buttonRef}
                 onMouseDown={event => {
                     event.preventDefault();
@@ -57,17 +101,18 @@ const DropdownButton = ({
                 style={{ width }}
             >{value}</Button>
             <Portal>
+
                 <div
+                    className="dropdown"
                     style={{
-                        zIndex: 1000,
-                        position: "absolute",
+                        zIndex: 1001,
+                        position: "fixed",
                         top,
                         left,
                         border: "1px solid salmon",
                         width: "25%",
                         mixHeight: 100,
-                        background: 'pink',
-                        display: panelActive ? "block" : "none"
+                        display: panelActive ? null : "none"
                     }}>
                     {
                         options.map(renderOptions)
