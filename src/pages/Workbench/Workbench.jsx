@@ -145,6 +145,12 @@ const Leaf = ({ attributes, children, leaf }) => {
 };
 
 const Element = ({ attributes, children, element }) => {
+
+    let style = {};
+    style = { ...style, textAlign: element.align ? element.align : null };
+
+    attributes = { ...attributes, style }
+
     switch (element.type) {
         //richtext
         case 'block-quote':
@@ -171,12 +177,13 @@ const Element = ({ attributes, children, element }) => {
         case 'table-cell':
             return <td {...attributes}>{children}</td>
         default:
-            return <p {...attributes}>{children}</p>;
+            return <pre {...attributes}>{children}</pre>;
     }
 };
 
 const initialValue = [
     {
+        align:'right',
         children: [
             {
                 fontFamily: '等线',
@@ -228,7 +235,7 @@ const initialValue = [
                                 type: 'paragraph',
                                 children: [{
                                     fontFamily: '微软雅黑',
-                                    fontSize:20,
+                                    fontSize: 20,
                                     text: 'wawa',
                                     bold: true
                                 }]

@@ -1,29 +1,41 @@
 import { Editor, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
-import { unwatchFile } from 'fs';
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list'];
 
-export const toggleBlock = (editor, format) => {
-    const isActive = isBlockActive(editor, format);
-    const isList = LIST_TYPES.includes(format);
+const DEFAULT_KEY_MAP = new Map([
+    ['align', 'left'],
+]);
 
-    //无论什么情况，取消列表包装
-    Transforms.unwrapNodes(editor, {
-        match: n => LIST_TYPES.includes(n.type),
-        split: true,
-    });
+export const toggleBlock = (editor, key, format) => {
 
-    //列表的情况更复杂：如果是列表，设置为li并用该列表（ol ul）包住（下一句）
-    //否则是简单的换成p或者该format
-    Transforms.setNodes(editor, {
-        type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-    });
+    if (key === "type") {
+        const isActive = isBlockActive(editor,key, format);
+        const isList = LIST_TYPES.includes(format);
 
-    if (!isActive && isList) {
-        const block = { type: format, children: [] };
-        Transforms.wrapNodes(editor, block);
+        //无论什么情况，取消列表包装
+        Transforms.unwrapNodes(editor, {
+            match: n => LIST_TYPES.includes(n.type),
+            split: true,
+        });
+
+        //列表的情况更复杂：如果是列表，设置为li并用该列表（ol ul）包住（下一句）
+        //否则是简单的换成p或者该format
+        Transforms.setNodes(editor, {
+            type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+        });
+
+        if (!isActive && isList) {
+            const block = { type: format, children: [] };
+            Transforms.wrapNodes(editor, block);
+        }
+    } else {
+        const isActive = isBlockActive(editor, key, format);
+        Transforms.setNodes(editor, {
+            [key]: isActive ? DEFAULT_KEY_MAP.get(key) : format
+        });
     }
+
 }
 
 export const toggleMark = (editor, format, value = true) => {
@@ -35,9 +47,9 @@ export const toggleMark = (editor, format, value = true) => {
     }
 }
 
-export const isBlockActive = (editor, format) => {
+export const isBlockActive = (editor, key, format) => {
     const [match] = Editor.nodes(editor, {
-        match: n => n.type === format,
+        match: n => n[key] === format,
     });
     return !!match;
 }

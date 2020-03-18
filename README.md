@@ -13,7 +13,9 @@ in developing...so slow
 
 ## 开发日志
 
-
+20-03-17
+- 在仅存在一种样式的情况下，pre标签可以获取正确的text-align等样式,会使用其代替p标签
+- 另外slate.js劫持了剪贴板使其不能直接操作富文本，需要在粘贴前将slate屏蔽
 
 20-03-13
 - 这几天在学webpack并把项目换成基于原生的electron和webpack了

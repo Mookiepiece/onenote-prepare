@@ -20,7 +20,10 @@ import {
     CaretRightOutlined,
     FontColorsOutlined,
     BgColorsOutlined,
-    SwapRightOutlined
+    SwapRightOutlined,
+    AlignLeftOutlined,
+    AlignCenterOutlined,
+    AlignRightOutlined
 } from '@ant-design/icons';
 
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from '../utils'
@@ -71,8 +74,11 @@ export const Toolbar = () => {
             <BlockButton format="numbered-list" icon={OrderedListOutlined} />
             <BlockButton format="bulleted-list" icon={UnorderedListOutlined} />
             <Divider />
-            <ActionButton />
-            <ActionButtonX />
+            <BlockButton formatKey="align" format="left" icon={AlignLeftOutlined} />
+            <BlockButton formatKey="align" format="center" icon={AlignCenterOutlined} />
+            <BlockButton formatKey="align" format="right" icon={AlignRightOutlined} />
+            {/* <ActionButton />
+            <ActionButtonX /> */}
             <Divider />
             <ColorButton
                 format="fontColor"
@@ -92,7 +98,7 @@ export const Toolbar = () => {
 const Divider = () => (<span className="divider"></span>)
 
 
-const BlockButton = ({ format, icon }) => {
+const BlockButton = ({ formatKey = "type", format, icon }) => {
     const editor = useSlate();
     const Icon = icon;
     return (
@@ -100,9 +106,9 @@ const BlockButton = ({ format, icon }) => {
             className="editor-button"
             onMouseDown={event => {
                 event.preventDefault();
-                toggleBlock(editor, format);
+                toggleBlock(editor, formatKey, format);
             }}
-            active={isBlockActive(editor, format)}
+            active={isBlockActive(editor, formatKey, format)}
         >
             <Icon />
         </Button>
