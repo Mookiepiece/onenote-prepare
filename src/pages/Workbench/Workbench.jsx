@@ -113,19 +113,15 @@ const Leaf = ({ attributes, children, leaf }) => {
     let style = {};
 
     if (leaf.bold) {
-        children = <strong>{children}</strong>;
-    }
-
-    if (leaf.code) {
-        children = <code>{children}</code>;
+        style = { ...style, fontWeight: 700 };
     }
 
     if (leaf.italic) {
-        children = <em>{children}</em>;
+        style = { ...style, fontStyle: 'italic' };
     }
-
+    
     if (leaf.underline) {
-        children = <u>{children}</u>;
+        style = { ...style, textDecorationLine: 'underline' };
     }
 
     if (leaf.fontColor) {
@@ -139,6 +135,11 @@ const Leaf = ({ attributes, children, leaf }) => {
     }
     if (leaf.fontSize) {
         style = { ...style, fontSize: leaf.fontSize };
+    }
+
+    //matched text
+    if(leaf.bling){
+        style={...style, backgroundColor:'red'};
     }
 
     return <span {...attributes} style={style}>{children}</span>;
@@ -183,7 +184,7 @@ const Element = ({ attributes, children, element }) => {
 
 const initialValue = [
     {
-        align:'right',
+        align: 'right',
         children: [
             {
                 fontFamily: '等线',

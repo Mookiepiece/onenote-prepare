@@ -8,7 +8,6 @@ const Settings = () => {
             <SketchPicker
                 color={v}
                 onChange={v => {
-                    console.log(v);
                     s(v.hex);
                 }}
             />

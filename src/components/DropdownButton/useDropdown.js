@@ -27,7 +27,6 @@ const useDropdown = (panelActive, setPanelActive, eventName = "click") => {
 
     if (panelActive) {
         const rect = buttonRef.current.getBoundingClientRect();
-        console.log(rect);
         top = rect.top + rect.height;
         left = rect.left;
     }

@@ -76,7 +76,7 @@ export const getMarkActiveSet = (editor, format) => {
 let selection;
 export const putSelection = editor => {
     selection = editor.selection;
-    console.log(selection);
+    console.debug(selection);
 }
 
 export const getSelection = editor => {

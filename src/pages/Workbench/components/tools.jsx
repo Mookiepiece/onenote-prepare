@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSlate, DefaultElement, ReactEditor } from 'slate-react';
-import { Editor, Transforms } from 'slate';
+import { Editor, Transforms, Range, Text, Path, Location, Point } from 'slate';
 import isHotkey from 'is-hotkey';
 import { SketchPicker } from 'react-color';
 
@@ -65,7 +65,6 @@ export const Toolbar = () => {
             <MarkButton format="bold" icon={BoldOutlined} />
             <MarkButton format="italic" icon={ItalicOutlined} />
             <MarkButton format="underline" icon={UnderlineOutlined} />
-            <MarkButton format="code" icon={CodeOutlined} />
             <Divider />
             <BlockButton format="heading-one" icon={FontSizeOutlined} />
             <BlockButton format="heading-two" icon={FontSizeOutlined} />
@@ -77,8 +76,8 @@ export const Toolbar = () => {
             <BlockButton formatKey="align" format="left" icon={AlignLeftOutlined} />
             <BlockButton formatKey="align" format="center" icon={AlignCenterOutlined} />
             <BlockButton formatKey="align" format="right" icon={AlignRightOutlined} />
-            {/* <ActionButton />
-            <ActionButtonX /> */}
+            <ActionButton />
+            <ActionButtonX />
             <Divider />
             <ColorButton
                 format="fontColor"
@@ -141,6 +140,87 @@ const ActionButton = () => {
             onMouseDown={
                 event => {
                     event.preventDefault();
+
+                    const children = editor.children;
+                    let childrenAlt = [...children];
+
+                    const ranges = [];
+
+                    //递归遍历树
+                    const v = (el, path, children, childrenAlt) => {
+
+                        if (!el.text) {
+                            if (!el.type || el.type === 'pre') {
+                                //pre里面只能有一层span了，故遍历一层拿出text
+                                //因为span里面不能继续嵌套p不会改变其它地方的path，所以不用担心因为高亮而split会在嵌套情况下出错，
+                                const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
+
+                                let reIndex = innerText.indexOf('###');
+
+                                let count = 0;
+
+                                let anchor, focus;
+
+                                //遍历叶子算匹配到的最叶位置
+                                el.children.every((leaf, index) => {
+                                    let length = Editor.end(editor, [...path, index]).offset;
+
+                                    if (!anchor) {
+                                        //anchor 必须在下一个node的开头而非本node的结尾 否则会把这个node搭上 不加等号
+                                        if (count + length > reIndex) {
+                                            anchor = {
+                                                path: [...path, index],
+                                                offset: reIndex - count
+                                            };
+                                            //focus 最好能在node的末尾而非开头 加等号
+                                            if (count + length >= reIndex + 3) {
+                                                focus = {
+                                                    path: [...path, index],
+                                                    offset: reIndex - count + 3
+                                                };
+                                                return false;
+                                            }
+                                        }
+                                    } else {
+                                        if (count + length >= reIndex + 3) {
+                                            focus = {
+                                                path: [...path, index],
+                                                offset: reIndex - count + 3
+                                            }
+                                            return false;
+                                        }
+                                    }
+                                    count += length;
+                                    return true;
+                                });
+
+                                if (reIndex > -1) {
+                                    ranges.push({
+                                        anchor,
+                                        focus
+                                        // anchor: { path: [...path, 0], offset: innerText.indexOf('###') },
+                                        // focus: { path: [...path, 0], offset: innerText.indexOf('###') + 3 },
+                                    });
+                                }
+                            } else {
+                                el.children && el.children.forEach((el, index) => v(el, [...path, index], children, childrenAlt));
+                            }
+                        }
+                    };
+                    children.forEach((el, index) => v(el, [index], children, childrenAlt));
+
+
+                    ranges.forEach(at => {
+                        console.log(at);
+                        Transforms.setNodes(editor, {
+                            bling: true,
+                        }, {
+                            match: n => Text.isText(n),
+                            at,
+                            split: true
+                        });
+                        // Editor.
+                    });
                 }
             }
         >
@@ -157,6 +237,14 @@ const ActionButtonX = () => {
             onMouseDown={
                 event => {
                     event.preventDefault();
+                    Transforms.setNodes(editor, {
+                        bling: false,
+                    }, {
+                        at: Editor.range(editor, Editor.edges(editor)[0], Editor.edges(editor)[1]),
+                        match: n => Text.isText(n),
+                        split: true
+
+                    });
                 }
             }
         >
@@ -272,7 +360,6 @@ const FontComponent = ({
     } else {
         value = matches[0];
     }
-    console.log(options);
 
     const action = (newValue) => {
         if (!getSelection(editor)) return;
@@ -300,7 +387,11 @@ const FontSizeComponent = ({
         { label: `14（默认）`, value: 14 },
         { label: '16', value: 16 },
         { label: '18', value: 18 },
-        { label: '20', value: 20 }
+        { label: '20', value: 20 },
+        { label: '22', value: 22 },
+        { label: '24', value: 24 },
+        { label: '26', value: 26 },
+        { label: '28', value: 28 },
     ]
 }) => {
     const editor = useSlate();
