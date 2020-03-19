@@ -1,0 +1,58 @@
+.dialog-select-transform {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  align-items: stretch;
+
+  .dialog-select-transform-option {
+    display: inline-block;
+    flex-basis: 200px;
+    flex-grow: 0;
+    border: 2px solid transparent;
+
+    > div {
+      background-color: aliceblue;
+      width: 200px;
+      height: 200px;
+    }
+    &:hover {
+      border-color: var(--button-color-hover);
+    }
+    &:active {
+      border-color: var(--button-color-active);
+    }
+  }
+}
+
+.transform-formular-activated-card {
+  position: relative;
+  padding-left: 10px;
+  padding-top: 32px;
+  border-top:1px solid;
+  border-bottom:1px solid;
+  padding: 12px;
+  margin-bottom: 12px;
+
+  > div.active-info {
+    position: absolute;
+    width: 10px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    background-color: transparent;
+  }
+  &.active {
+    > div.active-info {
+      background-color: skyblue;
+    }
+  }
+
+  > div.title {
+    .mk-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+}

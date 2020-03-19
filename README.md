@@ -14,8 +14,8 @@ in developing...so slow
 ## 开发日志
 
 20-03-19
-- 匹配功能到了一个里程碑，被匹配的文字将带有bling类，因为lock-on效果基于其长宽，故跨行元素只能设置white-space:pre 导致其不换行
-- 以后估计要开一个是否开启lock-on特效的功能，如果不开，就用background染个色就好了
+- 匹配功能到了一个里程碑，被匹配的文字将带有bling类，因为lock-on效果基于size，故跨行元素只能设置white-space:pre 导致其不换行
+- 以后估计要开一个是否开启lock-on特效的功能，如果不开，就用background/text-shadow/box-shadow染个色就好了
 
 20-03-18
 - HTML中 span 直接打出换行符可以实现office shift+enter伪换行效果，故shift+enter快捷键应该插入一个换行符伪换行

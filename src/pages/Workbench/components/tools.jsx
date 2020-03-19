@@ -246,7 +246,6 @@ const ActionButtonX = () => {
                         at: Editor.range(editor, Editor.edges(editor)[0], Editor.edges(editor)[1]),
                         match: n => Text.isText(n),
                         split: true
-
                     });
                 }
             }

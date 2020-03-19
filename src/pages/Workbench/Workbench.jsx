@@ -30,10 +30,10 @@ const Workbench = () => {
                             placeholder="Enter some rich text…"
                             onKeyDown={handleKeydown}
                         />
+                        <Aside />
                     </Slate>
                     <p>{JSON.stringify(value)}</p>
                 </div>
-                <Aside />
             </div>
         </>
     )
@@ -111,7 +111,7 @@ const withTables = editor => {
 
 const Leaf = ({ attributes, children, leaf }) => {
     let style = {};
-    let className='';
+    let className = '';
 
     if (leaf.bold) {
         style = { ...style, fontWeight: 700 };
@@ -120,7 +120,7 @@ const Leaf = ({ attributes, children, leaf }) => {
     if (leaf.italic) {
         style = { ...style, fontStyle: 'italic' };
     }
-    
+
     if (leaf.underline) {
         style = { ...style, textDecorationLine: 'underline' };
     }
@@ -135,15 +135,15 @@ const Leaf = ({ attributes, children, leaf }) => {
         style = { ...style, fontFamily: leaf.fontFamily };
     }
     if (leaf.fontSize) {
-        style = { ...style, fontSize: leaf.fontSize+'pt' };
+        style = { ...style, fontSize: leaf.fontSize + 'pt' };
     }
 
     //matched text
-    if(leaf.bling){
-        className+=' bling';
+    if (leaf.bling) {
+        className += ' bling';
     }
 
-    return <span {...attributes} style={style} className={className?className:null}>{children}</span>;
+    return <span {...attributes} style={style} className={className ? className : null}>{children}</span>;
 };
 
 const Element = ({ attributes, children, element }) => {

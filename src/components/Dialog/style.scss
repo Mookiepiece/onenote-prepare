@@ -11,11 +11,11 @@
 
 .dialog {
   z-index: 1001;
-  position: fixed;
-  top: 64px;
-  height: 300px;
+  position: relative;
+  top: 0px;
+  // height: 300px;
   left: 10px;
-  right: 10px;
+  width:calc(100vw - 20px);
 
   padding:24px;
 

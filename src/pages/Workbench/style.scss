@@ -2,20 +2,21 @@
 
 .workbench {
   @extend %clearfix;
-  $aside-width: 300px;
+  $aside-width: 500px;
   position: relative;
 
-  > div {
+  > .slate {
     padding-right: $aside-width;
-  }
+    position: relative;
 
-  > aside {
-    width: $aside-width;
-    min-height: 300px;
-    border-left: 1px solid var(--gray-6);
-    position: absolute;
-    right: 0;
-    top: 0;
+    > aside {
+      width: $aside-width;
+      min-height: 300px;
+      border-left: 1px solid var(--gray-6);
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
   }
 }
 
@@ -110,7 +111,7 @@
 
     &::after {
       animation: bling-after 0.75s cubic-bezier(0.1, 1, 0.5, 1) forwards, bling-shining 2s ease-in-out 0.75s infinite;
-      border: 2px solid hsl(200, 100%, 37%);
+      border: 0px solid hsl(200, 100%, 37%);
       border-radius: 2px;
       transform-origin: center;
       transform: scale(1);
@@ -119,23 +120,28 @@
   }
   @keyframes bling-after {
     from {
-      transform: scale(1.75);
-      opacity: 0;
+      transform: scale(1.25);
+      opacity: .3;
+      box-shadow: rgba(0, 170, 255, 1) 0 0 0 1px;
     }
     to {
-      transform: scale(0.9);
+      transform: scaleY(0.95);
+      box-shadow: rgba(0, 170, 255, 1) 0 0 0 1px;
     }
   }
 
   @keyframes bling-shining {
     0% {
-      transform: scale(0.9);
+      transform: scaleY(0.95);
+      box-shadow: rgba(0, 170, 255, 1) 0 0 0 1px;
     }
     50% {
-      transform: scale(1.2);
+      transform: scaleY(1.05);
+      box-shadow: rgba(0, 170, 255, 1) 0 0 0 2px;
     }
     100% {
-      transform: scale(0.9);
+      transform: scaleY(0.95);
+      box-shadow: rgba(0, 170, 255, 1) 0 0 0 1px;
     }
   }
 }
