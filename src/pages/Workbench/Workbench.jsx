@@ -111,6 +111,7 @@ const withTables = editor => {
 
 const Leaf = ({ attributes, children, leaf }) => {
     let style = {};
+    let className='';
 
     if (leaf.bold) {
         style = { ...style, fontWeight: 700 };
@@ -134,15 +135,15 @@ const Leaf = ({ attributes, children, leaf }) => {
         style = { ...style, fontFamily: leaf.fontFamily };
     }
     if (leaf.fontSize) {
-        style = { ...style, fontSize: leaf.fontSize };
+        style = { ...style, fontSize: leaf.fontSize+'pt' };
     }
 
     //matched text
     if(leaf.bling){
-        style={...style, backgroundColor:'red'};
+        className+=' bling';
     }
 
-    return <span {...attributes} style={style}>{children}</span>;
+    return <span {...attributes} style={style} className={className?className:null}>{children}</span>;
 };
 
 const Element = ({ attributes, children, element }) => {

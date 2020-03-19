@@ -148,19 +148,22 @@ const ActionButton = () => {
 
                     //递归遍历树
                     const v = (el, path, children, childrenAlt) => {
-
+                        console.log(el);
                         if (!el.text) {
-                            if (!el.type || el.type === 'pre') {
+                            if (!el.type || el.type === 'paragraph') {
                                 //pre里面只能有一层span了，故遍历一层拿出text
                                 //因为span里面不能继续嵌套p不会改变其它地方的path，所以不用担心因为高亮而split会在嵌套情况下出错，
                                 const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
 
-                                let reIndex = innerText.indexOf('###');
+                                let reIndex = innerText.indexOf('### ###');
+
+                                let len = 7;
 
                                 let count = 0;
 
                                 let anchor, focus;
 
+                                //样式不一致的情况
                                 //遍历叶子算匹配到的最叶位置
                                 el.children.every((leaf, index) => {
                                     let length = Editor.end(editor, [...path, index]).offset;
@@ -173,19 +176,19 @@ const ActionButton = () => {
                                                 offset: reIndex - count
                                             };
                                             //focus 最好能在node的末尾而非开头 加等号
-                                            if (count + length >= reIndex + 3) {
+                                            if (count + length >= reIndex + len) {
                                                 focus = {
                                                     path: [...path, index],
-                                                    offset: reIndex - count + 3
+                                                    offset: reIndex - count + len
                                                 };
                                                 return false;
                                             }
                                         }
                                     } else {
-                                        if (count + length >= reIndex + 3) {
+                                        if (count + length >= reIndex + len) {
                                             focus = {
                                                 path: [...path, index],
-                                                offset: reIndex - count + 3
+                                                offset: reIndex - count + len
                                             }
                                             return false;
                                         }

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { SketchPicker } from 'react-color';
+import  Input from '@/components/Input';
 
 const Settings = () => {
     const [v, s] = useState("#666");
     return (
         <div>
-            <SketchPicker
-                color={v}
+            <Input
+                value={v}
                 onChange={v => {
-                    s(v.hex);
+                    s(v);
                 }}
             />
         </div>
