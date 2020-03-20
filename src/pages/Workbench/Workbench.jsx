@@ -30,7 +30,7 @@ const Workbench = () => {
                             placeholder="Enter some rich text…"
                             onKeyDown={handleKeydown}
                         />
-                        <Aside />
+                        <Aside setSlateValue={setValue} />
                     </Slate>
                     <p>{JSON.stringify(value)}</p>
                 </div>
@@ -141,6 +141,7 @@ const Leaf = ({ attributes, children, leaf }) => {
     //matched text
     if (leaf.bling) {
         className += ' bling';
+        leaf.bling % 2 && (className += ' odd')
     }
 
     return <span {...attributes} style={style} className={className ? className : null}>{children}</span>;

@@ -10,7 +10,7 @@ const DEFAULT_KEY_MAP = new Map([
 export const toggleBlock = (editor, key, format) => {
 
     if (key === "type") {
-        const isActive = isBlockActive(editor,key, format);
+        const isActive = isBlockActive(editor, key, format);
         const isList = LIST_TYPES.includes(format);
 
         //无论什么情况，取消列表包装
@@ -87,3 +87,5 @@ export const getSelection = editor => {
     }
     return false;
 }
+
+export const deepCopy = v => JSON.parse(JSON.stringify(v));

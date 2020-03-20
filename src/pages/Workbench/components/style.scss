@@ -26,11 +26,9 @@
 
 .transform-formular-activated-card {
   position: relative;
-  padding-left: 10px;
-  padding-top: 32px;
-  border-top:1px solid;
-  border-bottom:1px solid;
-  padding: 12px;
+  padding: 32px 12px 12px;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
   margin-bottom: 12px;
 
   > div.active-info {
@@ -42,10 +40,14 @@
 
     background-color: transparent;
   }
-  &.active {
-    > div.active-info {
-      background-color: skyblue;
-    }
+  &.current > div.active-info {
+    background-color: skyblue;
+  }
+  &.applied > div.active-info {
+    background-color: lawngreen;
+  }
+  &.unused > div.active-info {
+    background-color: pink;
   }
 
   > div.title {

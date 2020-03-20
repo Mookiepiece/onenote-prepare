@@ -141,96 +141,16 @@ const ActionButton = () => {
                 event => {
                     event.preventDefault();
 
-                    const children = editor.children;
-                    let childrenAlt = [...children];
-
-                    const ranges = [];
-
-                    //递归遍历树
-                    const v = (el, path, children, childrenAlt) => {
-                        console.log(el);
-                        if (!el.text) {
-                            if (!el.type || el.type === 'paragraph') {
-                                //pre里面只能有一层span了，故遍历一层拿出text
-                                //因为span里面不能继续嵌套p不会改变其它地方的path，所以不用担心因为高亮而split会在嵌套情况下出错，
-                                const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
-
-                                let reIndex = innerText.indexOf('### ###');
-
-                                let len = 7;
-
-                                let count = 0;
-
-                                let anchor, focus;
-
-                                //样式不一致的情况
-                                //遍历叶子算匹配到的最叶位置
-                                el.children.every((leaf, index) => {
-                                    let length = Editor.end(editor, [...path, index]).offset;
-
-                                    if (!anchor) {
-                                        //anchor 必须在下一个node的开头而非本node的结尾 否则会把这个node搭上 不加等号
-                                        if (count + length > reIndex) {
-                                            anchor = {
-                                                path: [...path, index],
-                                                offset: reIndex - count
-                                            };
-                                            //focus 最好能在node的末尾而非开头 加等号
-                                            if (count + length >= reIndex + len) {
-                                                focus = {
-                                                    path: [...path, index],
-                                                    offset: reIndex - count + len
-                                                };
-                                                return false;
-                                            }
-                                        }
-                                    } else {
-                                        if (count + length >= reIndex + len) {
-                                            focus = {
-                                                path: [...path, index],
-                                                offset: reIndex - count + len
-                                            }
-                                            return false;
-                                        }
-                                    }
-                                    count += length;
-                                    return true;
-                                });
-
-                                if (reIndex > -1) {
-                                    ranges.push({
-                                        anchor,
-                                        focus
-                                        // anchor: { path: [...path, 0], offset: innerText.indexOf('###') },
-                                        // focus: { path: [...path, 0], offset: innerText.indexOf('###') + 3 },
-                                    });
-                                }
-                            } else {
-                                el.children && el.children.forEach((el, index) => v(el, [...path, index], children, childrenAlt));
-                            }
-                        }
-                    };
-                    children.forEach((el, index) => v(el, [index], children, childrenAlt));
-
-
-                    ranges.forEach(at => {
-                        console.log(at);
-                        Transforms.setNodes(editor, {
-                            bling: true,
-                        }, {
-                            match: n => Text.isText(n),
-                            at,
-                            split: true
-                        });
-                        // Editor.
-                    });
                 }
             }
         >
             <CaretRightOutlined />
-        </Button>
+        </Button >
     )
 }
+
+//NOTE:Transform.insertNodes如果给的是point是不会删除内容，给range会删除range里的内容
+//如果range给的小也没问题
 
 const ActionButtonX = () => {
     const editor = useSlate();
@@ -240,13 +160,7 @@ const ActionButtonX = () => {
             onMouseDown={
                 event => {
                     event.preventDefault();
-                    Transforms.setNodes(editor, {
-                        bling: false,
-                    }, {
-                        at: Editor.range(editor, Editor.edges(editor)[0], Editor.edges(editor)[1]),
-                        match: n => Text.isText(n),
-                        split: true
-                    });
+                    
                 }
             }
         >

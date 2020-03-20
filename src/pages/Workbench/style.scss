@@ -63,6 +63,7 @@
 }
 .editor-button-color-r {
   width: 20px;
+  min-width: 20px;
   & > span.anticon {
     transform: translate(-5px) rotate(90deg);
   }
@@ -116,6 +117,11 @@
       transform-origin: center;
       transform: scale(1);
       background-color: rgba(0, 146, 219, 0.192);
+    }
+    
+    &.odd::after{
+      border: 0px solid hsl(315, 62%, 55%);
+      background-color: rgba(214, 75, 168, 0.192);
     }
   }
   @keyframes bling-after {

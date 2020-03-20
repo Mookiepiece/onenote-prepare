@@ -1,35 +1,25 @@
-import React, { useState, useReducer, useCallback, useMemo } from 'react';
+import React, { useState, useReducer, useCallback, useMemo, useEffect } from 'react';
 import Button from "@/components/MkButton";
 import Dialog from "@/components/Dialog";
-import { Transforms, Editor, Text } from 'slate';
+import { Transforms, Editor, Text, Range, Node, Path } from 'slate';
 
 import './style.scss';
 import Input from '@/components/Input';
-import { useSlate } from 'slate-react';
+import { useSlate, useEditor } from 'slate-react';
 
 import {
     CloseOutlined
 } from '@ant-design/icons';
 
-// console.log([...Editor.nodes(editor, {
-//     at: Editor.range(editor, Editor.edges(editor)[0], Editor.edges(editor)[1])
-// })]);
-
-
-// un: (editor) => {
-//     Transforms.setNodes(editor, {
-//         bling: false,
-//     }, { at: Editor.range(editor, Editor.edges(editor)[0], Editor.edges(editor)[1]) });
-// },
+import { deepCopy } from '../utils'
 
 const applyMatch = (editor, ranges) => {
-    ranges.forEach(at => {
-        console.log(at);
+    ranges.forEach((at, i) => {
         Transforms.setNodes(editor, {
-            bling: true,
+            bling: i + 1,
         }, {
-            match: n => Text.isText(n),
             at,
+            match: Text.isText,
             split: true
         });
     });
@@ -39,7 +29,7 @@ const clearUp = (editor) => {
         bling: false,
     }, {
         at: Editor.range(editor, Editor.edges(editor)[0], Editor.edges(editor)[1]),
-        match: n => Text.isText(n),
+        match: Text.isText,
         split: true
     });
 };
@@ -48,134 +38,317 @@ const M = [
     {
         title: "match first ### ### in every line",
         desc: 'a match to any first ### ### in every line',
-        func: (editor, value) => {
-            const children = editor.children;
-            let childrenAlt = [...children];
 
-            const ranges = [];
+        get() {
+            return ({
+                match: (editor, { value, result }) => {
+                    if (!value) return;
+                    const children = editor.children;
+                    let childrenAlt = [...children];
 
-            //递归遍历树
-            const v = (el, path, children, childrenAlt) => {
-                console.log(el);
-                if (!el.text) {
-                    if (!el.type || el.type === 'paragraph') {
-                        //pre里面只能有一层span了，故遍历一层拿出text
-                        //因为span里面不能继续嵌套p不会改变其它地方的path，所以不用担心因为高亮而split会在嵌套情况下出错，
-                        const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
+                    const ranges = [];
 
-                        let reIndex = innerText.indexOf(value);
+                    //递归遍历树
+                    const v = (el, path, children, childrenAlt) => {
+                        if (!el.text) {
+                            if (!el.type || el.type === 'paragraph') {
+                                //pre里面只能有一层span了，故遍历一层拿出text
+                                //因为span里面不能继续嵌套p不会改变其它地方的path，所以不用担心因为高亮而split会在嵌套情况下出错，
+                                const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
 
-                        let len = value.length;
+                                let reIndex = innerText.indexOf(value);
 
-                        let count = 0;
+                                let len = value.length;
 
-                        let anchor, focus;
+                                let count = 0;
 
-                        //样式不一致的情况
-                        //遍历叶子算匹配到的最叶位置
-                        el.children.every((leaf, index) => {
-                            let length = Editor.end(editor, [...path, index]).offset;
+                                let anchor, focus;
 
-                            if (!anchor) {
-                                //anchor 必须在下一个node的开头而非本node的结尾 否则会把这个node搭上 不加等号
-                                if (count + length > reIndex) {
-                                    anchor = {
-                                        path: [...path, index],
-                                        offset: reIndex - count
-                                    };
+                                //样式不一致的情况
+                                //遍历叶子算匹配到的最叶位置
+                                el.children.every((leaf, index) => {
+                                    let length = Editor.end(editor, [...path, index]).offset;
 
+                                    if (!anchor) {
+                                        //anchor 必须在下一个node的开头而非本node的结尾 否则会把这个node搭上 不加等号
+                                        if (count + length > reIndex) {
+                                            anchor = {
+                                                path: [...path, index],
+                                                offset: reIndex - count
+                                            };
+
+                                        }
+                                    }
+                                    if (anchor) {
+                                        //focus 最好能在node的末尾而非开头 加等号
+                                        if (count + length >= reIndex + len) {
+                                            focus = {
+                                                path: [...path, index],
+                                                offset: reIndex - count + len
+                                            };
+                                            return false;
+                                        }
+                                    }
+                                    count += length;
+                                    return true;
+                                });
+
+                                if (reIndex > -1) {
+                                    ranges.push({
+                                        anchor,
+                                        focus
+                                    });
                                 }
+                            } else {
+                                el.children && el.children.forEach((el, index) => v(el, [...path, index], children, childrenAlt));
                             }
-                            if (anchor) {
-                                //focus 最好能在node的末尾而非开头 加等号
-                                if (count + length >= reIndex + len) {
-                                    focus = {
-                                        path: [...path, index],
-                                        offset: reIndex - count + len
-                                    };
-                                    return false;
-                                }
-                            }
-                            count += length;
-                            return true;
-                        });
-
-                        if (reIndex > -1) {
-                            ranges.push({
-                                anchor,
-                                focus
-                            });
                         }
-                    } else {
-                        el.children && el.children.forEach((el, index) => v(el, [...path, index], children, childrenAlt));
+                    };
+                    children.forEach((el, index) => v(el, [index], children, childrenAlt));
+
+                    applyMatch(editor, ranges);//ranges没有必要存，因为applyMatch后数据结构发生变化了，以后可能会考虑decorate
+                },
+                apply: (editor, { value, result }) => { //TODO support node result and optional keep style
+                    const children = editor.children;
+                    const v = (el, path, children) => {
+                        if (!el.text) {
+                            if (!el.type || el.type === 'paragraph') {
+                                let lastLeafActive = -1;
+                                el.children.forEach((leaf, index) => {
+                                    console.log("each")
+                                    let thisLeafActive = leaf.bling;
+
+                                    if (thisLeafActive) {
+                                        if (!lastLeafActive || lastLeafActive !== thisLeafActive) {
+                                            //get leaf range
+                                            const at = Editor.edges(editor, [...path, index]).reduce((anchor, focus) => ({ anchor, focus }));
+
+                                            //keep node style and swap text
+                                            const [[{ bling, text, ...prevLeaf }]] = Editor.nodes(editor, { at, match: Text.isText });
+
+                                            Transforms.insertNodes(editor, {
+                                                ...prevLeaf,
+                                                text: result
+                                            }, { at });
+
+                                        } else {
+                                            //mark to delete
+                                            Transforms.setNodes(editor, { '🖤': true, }, { at: [...path, index] });
+                                        }
+                                    }
+
+                                    lastLeafActive = thisLeafActive;
+                                });
+
+                            } else {
+                                el.children && el.children.forEach((el, index) => v(el, [...path, index], children));
+                            }
+                        }
                     }
+                    children.forEach((el, index) => v(el, [index], children));
+
+                    Transforms.removeNodes(editor, {
+                        at: Editor.edges(editor, []).reduce((anchor, focus) => ({ anchor, focus })),
+                        match: n => n['🖤']
+                    });
+                },
+
+                inputs: { value: '', result: '' },
+
+                render({ color, inputs: { value, result }, onInput, onApply }) {
+
+                    const editor = useSlate();
+
+                    const handleChange = value => {
+                        onInput({ value });
+
+                        clearUp(editor);
+                        this.match(editor, { value });
+                    };
+
+                    return (
+                        <>
+                            {
+                                <>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
+                                        <span>匹配文本:</span>
+                                        <Input value={value} onChange={handleChange} />
+                                        <span>结果文本:</span>
+                                        <Input value={result} onChange={result => onInput({ result })} />
+                                    </div>
+                                    <Button onClick={onApply}>APPLY</Button>
+                                </>
+
+                            }
+                        </>
+                    )
                 }
-            };
-            children.forEach((el, index) => v(el, [index], children, childrenAlt));
-
-            applyMatch(editor, ranges);
+            })
         },
-        apply(editor,ranges,result){
-            
-        },
-        render(isActive) {
-            const editor = useSlate();
-            const [value, setValue] = useState("");
 
-            const handleChange = value => {
-                setValue(value);
-                clearUp(editor);
-                if (value)
-                    this.func(editor, value);
-            };
-
-            return (
-                <>
-                    <span>match contents:</span>
-                    {
-                        isActive ?
-                            <Input value={value} onChange={handleChange} /> :
-                            <span>{value}</span>
-                    }
-                </>
-            )
-        }
     },
 ]
 
-const Aside = () => {
-    const [dialogVisible, setDialogVisible] = useState();
-    const [state, dispatch] = useReducer((state, action) => {
+const setArrayItem = (array, index, item) => {
+    return [
+        ...array.slice(0, index),
+        item,
+        ...array.slice(index + 1, array.length)
+    ]
+}
+
+const altArrayItem = (array, index, item) => {
+    return [
+        ...array.slice(0, index),
+        { ...array[index], ...item },
+        ...array.slice(index + 1, array.length)
+    ]
+}
+
+const removeArrayItem = (array, index) => {
+    return [
+        ...array.slice(0, index),
+        ...array.slice(index + 1, array.length)
+    ]
+}
+
+const useAsideState = (initialState, setSlateValue) => {
+    const editor = useSlate();
+    const [_state, setState] = useState(initialState);
+
+    const applyChange = useCallback((state, index = state.currentIndex) => {
+        state.v[index].match(editor, state.v[index].inputs);
+        state.v[index].apply(editor, state.v[index].inputs);
+        return {
+            ...state,
+            memory: [...state.memory, deepCopy(editor.children)]
+        };
+    }, []);
+
+    const applyMatch = useCallback((state, index = state.currentIndex) => {
+        clearUp();
+        state.v[index].match(editor, state.v[index].inputs);
+        return state;
+    }, []);
+
+    const currentState = useCallback(state => {
+        if (state.memory.length > state.currentIndex + 1)
+            return 'applied';
+        else
+            return 'current';
+    }, []);
+
+    let state = _state;
+
+    const dispatch = action => setState((_ => {
         switch (action.type) {
             case 'DELETE':
-                return {
-                    ...state,
-                    v: [
-                        ...state.v.slice(0, action.index),
-                        ...state.v.slice(action.index + 1, state.v.length)
-                    ]
-                };
-            case 'PUSH':
+                //TODO 
+                return state;
+            case 'PUSH': {
+                if (state.currentIndex !== null && currentState(state) === 'current') {
+                    state = applyChange(state);
+                }
+                console.log(state.currentIndex, currentState(state))
+
                 return {
                     ...state,
                     v: [...state.v, { ...action.value, key: Date.now() }],
-                    activeIndex: state.v.length,
+                    currentIndex: state.v.length,
                 };
-            case 'TOGGLE_ACTIVE':
+            }
+            case 'INPUT':
                 return {
                     ...state,
-                    activeIndex: action.index === state.activeIndex ? null : action.index
+                    v: altArrayItem(state.v, action.index, {
+                        inputs: {
+                            ...state.v[action.index].inputs,
+                            ...action.inputs
+                        }
+                    })
+                };
+            case 'TOGGLE_ACTIVE': {
+
+                let index = action.index;
+
+                if (index < state.currentIndex) {
+                    //一步到位还原状态，
+                    setSlateValue(state.memory[index]);
+                    state = {
+                        ...state,
+                        currentIndex: index,
+                        memory: [...state.memory].slice(0, index + 1)
+                    };
+
+                } else if (index === state.currentIndex) {
+                    if (currentState(state) === "current") {
+                        state = applyChange(state);
+                        return state;
+                    } else {
+                        setSlateValue(state.memory[index]); //setSlateValue后无法激活match要下一个阶段激活 
+                        state = {
+                            ...state,
+                            memory: [...state.memory].slice(0, index + 1)
+                        };
+                        return state;
+                    }
+                } else {
+                    //逐步应用
+                    if (currentState(state) === "current") {
+                        state = applyChange(state);
+                    }
+                    for (let i = state.currentIndex + 1; i !== index; i++) {
+                        state = applyChange(state, i);
+                    }
+
+                    state = {
+                        ...state,
+                        currentIndex: index,
+                    }
+
                 }
+                // clearUp(); //TODO clear up here???
+                return state;
+            }
+            case 'MATCH':
+                state = applyMatch(state);
+                return state;
+            case 'APPLY':
+                state = applyChange(state);
+                return state;
+            default:
+                console.error('[pre-onenote] incorrent action type:', action.type);
+                return state;
         }
-    }, {
-        activeIndex: null,
-        v: []
-    });
+    })());
+
+    return [_state, dispatch];
+}
+
+
+//current 正在match，新建的话自动apply, apply已拥有
+const Aside = ({ setSlateValue }) => {
+    const editor = useSlate();
+    const [dialogVisible, setDialogVisible] = useState();
+    const [state, dispatch] = useAsideState({
+        v: [],
+        memory: [deepCopy(editor.children)],
+        currentIndex: null,
+    }, setSlateValue);
+    console.log(state);
+
+    //dupulicated
+    const currentState = useCallback(state => {
+        if (state.memory.length > state.currentIndex + 1)
+            return 'applied';
+        else
+            return 'current';
+    }, []);
 
     const handleClick = (i) => {
         dispatch({
             type: 'PUSH',
-            value: M[i]
+            value: M[i].get()
         });
         setDialogVisible(false);
     };
@@ -185,22 +358,50 @@ const Aside = () => {
             <Button full onClick={_ => setDialogVisible(true)}>add rule</Button>
 
             {
-                state.v.map((m, i) => (
+                state.v.map((v, index) => (
                     <TransformFormularActivated
-                        key={m.key}
-                        match={m}
+                        v={v}
+                        onInput={inputs => dispatch({
+                            type: 'INPUT',
+                            index,
+                            inputs
+                        })}
+
+                        key={v.key}
+
+                        color={
+                            ((() => {
+                                if (index < state.currentIndex) {
+                                    return 'applied';
+                                } else if (index > state.currentIndex) {
+                                    return 'unused';
+                                } else {
+                                    return currentState(state);
+                                }
+                            })())
+                        }
+
                         onClose={_ => dispatch({
                             type: 'DELETE',
-                            index: i
+                            index
                         })}
                         onActive={
                             _ => dispatch({
                                 type: 'TOGGLE_ACTIVE',
-                                index: i
+                                index
                             })
                         }
-                        isActive={
-                            i === state.activeIndex
+                        onMatch={
+                            _ => dispatch({
+                                type: 'MATCH',
+                                index
+                            })
+                        }
+                        onApply={
+                            _ => dispatch({
+                                type: 'APPLY',
+                                index
+                            })
                         }
                     />)
                 ).reverse()
@@ -216,10 +417,8 @@ const Aside = () => {
     )
 }
 
-const TransformFormularActivated = ({ match, onClose, onActive, isActive }) => {
-    let className = useMemo(_ => {
-        return `transform-formular-activated-card${isActive ? ' active' : ''}`
-    }, [isActive]);
+const TransformFormularActivated = ({ v, color, onClose, onActive, onInput, onMatch, onApply }) => {
+    let className = `transform-formular-activated-card${' ' + color}`;
 
     return (
         <div className={className}>
@@ -227,7 +426,7 @@ const TransformFormularActivated = ({ match, onClose, onActive, isActive }) => {
                 <Button onClick={onClose}><CloseOutlined /></Button>
             </div>
             <div className="active-info" onMouseDown={onActive}></div>
-            <div className="content"> {match.render(isActive)}</div>
+            <div className="content"> {v.render({ color, inputs: v.inputs, onInput, onMatch, onApply })}</div>
         </div>
     )
 }
@@ -243,20 +442,3 @@ const MatchCard = ({ match, onClick }) => {
 }
 
 export default Aside;
-
-// type styleMatch{
-//     qsa:String
-// }
-
-// type textMatch{
-//     re:RegExp
-// }
-
-// type match {
-//     type:'string'|'style'
-//      
-// // }
-
-// type transform{
-
-// }
