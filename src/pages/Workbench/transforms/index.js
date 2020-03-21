@@ -16,7 +16,7 @@ import { applyMatch, clearUp } from './sideEffects';
  * @param {Function} callback 
  */
 const interator = (el, path, children, callback) => {
-    if (callback(el, path, children)) {
+    if (callback(el, path, children)) {  //TODO many 'return true;' in callback
         el.children && el.children.forEach((el, index) => interator(el, [...path, index], children, callback));
     }
 }
@@ -25,7 +25,7 @@ const applyOfAll = (editor, { value, result }) => { //TODO support node result a
     const children = editor.children;
 
     children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
-        if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
+        if (el.text === undefined && (!el.type || el.type === 'paragraph')) { //NOTE:强制undefined是因为加入inline Node在行首尾时，会因为normalize而会出现text''的Leaf强制在首尾
             let lastLeafActive = -1;
             el.children.forEach((leafOrPlaceholder, index) => {
                 let thisLeafActive = leafOrPlaceholder.bling;
@@ -54,7 +54,6 @@ const applyOfAll = (editor, { value, result }) => { //TODO support node result a
             return true;
         } else if (el.type === 'bling-placeholder') {
             //get placeholder range
-            // const at = Editor.edges(editor, [...path, index]).reduce((anchor, focus) => ({ anchor, focus }));
 
             //既然placeholder被slate认为是inline元素，左右两边必然各有leaf，虽然有可能是text''
             let style = null;
@@ -98,7 +97,7 @@ const applyOfAll = (editor, { value, result }) => { //TODO support node result a
     }));
 
     Transforms.removeNodes(editor, {
-        at: Editor.edges(editor, []).reduce((anchor, focus) => ({ anchor, focus })),
+        at: [],
         match: n => n['🖤'] || n.type === 'bling-placeholder'
     });
 
@@ -106,21 +105,22 @@ const applyOfAll = (editor, { value, result }) => { //TODO support node result a
 
 const T = [
     {
-        title: "字符匹配",
-        desc: 'a match to any first ### ### in every line',
+        title: "行内文本匹配",
+        desc: '匹配行内文本',
 
         get() {
             return ({
                 inputs: { value: '', result: '' },
 
                 match: (editor, { value, result }) => {
+                    clearUp(editor);
                     if (!value) return;
                     const children = editor.children;
 
                     const ranges = [];
 
                     children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
-                        if (!el.text && (!el.type || el.type === 'paragraph')) {
+                        if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                             //匹配过程中pre里面只能有一层span不会出现placeholder
                             const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
 
@@ -202,8 +202,8 @@ const T = [
         },
     },
     {
-        title: "开头匹配",
-        desc: 'a match to any first ### ### in every line',
+        title: "行首匹配",
+        desc: '匹配（以某文本串开头的）行首',
         get() {
             return {
                 inputs: { value: '', result: '' },
@@ -216,7 +216,7 @@ const T = [
 
                     if (value === '') {
                         children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
-                            if (!el.text && (!el.type || el.type === 'paragraph')) {
+                            if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                                 let anchor, focus;
                                 anchor = focus = {
                                     path: [...path, 0],
@@ -228,7 +228,7 @@ const T = [
                         }));
                     } else {
                         children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
-                            if (!el.text && (!el.type || el.type === 'paragraph')) {
+                            if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                                 const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
                                 if (innerText.startsWith(value)) {
                                     let anchor = {
@@ -238,20 +238,17 @@ const T = [
                                     let len = value.length;
                                     let count = 0;
 
-                                    el.children.every((leaf, index) => {
-                                        let length = Editor.end(editor, [...path, index]).offset;
-
-                                        //focus 最好能在node的末尾而非开头 加等号
-                                        if (count + length >= len) {
+                                    for (let index = 0; index < el.children.length; index--) {
+                                        let leafLength = Editor.end(editor, [...path, index]).offset;
+                                        if (count + leafLength >= len) {
                                             focus = {
                                                 path: [...path, index],
                                                 offset: len - count
                                             };
-                                            return false;
+                                            break;
                                         }
-                                        count += length;
-                                        return true;
-                                    });
+                                        count += leafLength;
+                                    }
 
                                     ranges.push({ anchor, focus });
                                 }
@@ -292,7 +289,89 @@ const T = [
             }
 
         },
+    },
+    {
+        title: "行尾匹配",
+        desc: '匹配（以某文本串结尾的）行尾',
+        get() {
+            return {
+                inputs: { value: '', result: '' },
+                match: (editor, { value, result }) => {
+                    clearUp(editor);
+                    const children = editor.children;
 
+                    const ranges = [];
+
+                    if (value === '') {
+                        children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+                            if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
+                                let anchor, focus;
+                                anchor = focus = Editor.end(editor, path);
+                                ranges.push({ anchor, focus });
+                            }
+                            return true;
+                        }));
+                    } else {
+                        children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+                            if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
+                                console.log(el);
+                                const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
+                                if (innerText.endsWith(value)) {
+                                    let anchor, focus = Editor.end(editor, path);
+                                    let len = value.length;
+                                    let count = 0;
+
+                                    for (let index = el.children.length - 1; index >= 0; index--) {
+                                        let leafLength = Editor.end(editor, [...path, index]).offset;
+                                        if (count + leafLength >= len) { //反的所以是正的
+                                            anchor = {
+                                                path: [...path, index],
+                                                offset: count - len //反的
+                                            };
+                                            break;
+                                        }
+                                        count += leafLength;
+                                    }
+
+                                    ranges.push({ anchor, focus });
+                                }
+                            }
+                            return true;
+                        }));
+                    }
+                    console.log('ranges', ranges);
+                    applyMatch(editor, ranges);
+                },
+
+                apply: applyOfAll,
+                render({ color, inputs, onInput, onApply }) {
+                    const { value, result } = inputs;
+                    const editor = useSlate();
+
+                    const handleChange = value => {
+                        onInput({ value });
+                        this.match(editor, { ...inputs, value });
+                    };
+
+                    return (
+                        <>
+                            {
+                                <>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
+                                        <span>结尾限制:</span>
+                                        <Input value={value} onChange={handleChange} onFocus={_ => this.match(editor, inputs)} />
+                                        <span>结果文本:</span>
+                                        <Input value={result} onChange={result => onInput({ result })} />
+                                    </div>
+                                    <Button onClick={onApply}>APPLY</Button>
+                                </>
+                            }
+                        </>
+                    )
+                }
+            }
+
+        },
     }
 ]
 

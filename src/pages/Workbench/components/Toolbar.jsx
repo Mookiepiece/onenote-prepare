@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSlate, DefaultElement, ReactEditor } from 'slate-react';
 import { Editor, Transforms, Range, Text, Path, Location, Point } from 'slate';
-import isHotkey from 'is-hotkey';
 import { SketchPicker } from 'react-color';
 
 import DropdownButtonMousedownSelect from '@/components/DropdownButton/DropdownButtonMousedownSelect';
@@ -26,39 +25,9 @@ import {
     AlignRightOutlined
 } from '@ant-design/icons';
 
-import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from '../utils'
+import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from '../utils';
 
-const HOTKEYS_MARK = {
-    'mod+b': 'bold',
-    'mod+i': 'italic',
-    'mod+u': 'underline',
-    'mod+`': 'code',
-};
-
-const HOTKEYS_BLOCK = {
-    'mod+.': 'bulleted-list',
-    'mod+/': 'numbered-list'
-};
-
-export const higherOrderKeydownHandler = (editor) => {
-    return event => {
-        for (const hotkey in HOTKEYS_MARK) {
-            if (isHotkey(hotkey, event)) {
-                event.preventDefault();
-                toggleMark(editor, HOTKEYS_MARK[hotkey]);
-            }
-        }
-        for (const hotkey in HOTKEYS_BLOCK) {
-            if (isHotkey(hotkey, event)) {
-                event.preventDefault();
-                toggleBlock(editor, HOTKEYS_BLOCK[hotkey]);
-            }
-        }
-
-    }
-}
-
-export const Toolbar = () => {
+const Toolbar = () => {
 
     return (
         <div className="editor-toolbar">
@@ -249,10 +218,6 @@ const ColorButton = ({ format, icon }) => {
 const DEAFULT_FONT_FAMILY = "等线 Light";
 const DEAFULT_FONT_SIZE = 12;
 
-const useMutiActiveSet = (format, defaultValue) => {
-    const editor = useSlate();
-}
-
 const FontComponent = ({
     format = "fontFamily",
     defaultValue = DEAFULT_FONT_FAMILY,
@@ -340,3 +305,6 @@ const FontSizeComponent = ({
         />
     )
 }
+
+
+export default Toolbar;

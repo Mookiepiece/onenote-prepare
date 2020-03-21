@@ -4,13 +4,10 @@ import { createEditor, Range, Editor, Point, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
 import './style.scss';
 
-import {
-    higherOrderKeydownHandler,
-    Toolbar
-} from './components/tools';
+import Toolbar  from './components/Toolbar';
 import Aside from './components/Aside';
 import { BranchesOutlined } from '@ant-design/icons';
-
+import higherOrderKeydownHandler from './hotkeys';
 const Workbench = () => {
     const [value, setValue] = useState(initialValue);
     const renderElement = useCallback(props => <Element {...props} />, []);
