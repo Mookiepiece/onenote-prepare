@@ -95,7 +95,13 @@
     border: 1px solid;
   }
 
-  .bling {
+  .bling-placeholder{
+    width:0;
+    height:1em;
+    display: inline-block;
+  }
+
+  .bling,.bling-placeholder {
     position: relative;
     white-space: pre;
 
@@ -120,7 +126,6 @@
     }
     
     &.odd::after{
-      border: 0px solid hsl(315, 62%, 55%);
       background-color: rgba(214, 75, 168, 0.192);
     }
   }

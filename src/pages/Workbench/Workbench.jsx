@@ -9,12 +9,13 @@ import {
     Toolbar
 } from './components/tools';
 import Aside from './components/Aside';
+import { BranchesOutlined } from '@ant-design/icons';
 
 const Workbench = () => {
     const [value, setValue] = useState(initialValue);
     const renderElement = useCallback(props => <Element {...props} />, []);
     const renderLeaf = useCallback(props => <Leaf {...props} />, []);
-    const editor = useMemo(() => withTables(withHistory(withReact(createEditor()))), []);
+    const editor = useMemo(() => withPlaceholders(withTables(withHistory(withReact(createEditor())))), []);
     const handleKeydown = event => higherOrderKeydownHandler(editor)(event);
 
     return (
@@ -109,6 +110,20 @@ const withTables = editor => {
     return editor
 }
 
+const withPlaceholders = editor => {
+    const { isInline, isVoid } = editor
+
+    editor.isInline = element => {
+        return element.type === 'bling-placeholder' ? true : isInline(element)
+    }
+
+    editor.isVoid = element => {
+        return element.type === 'bling-placeholder' ? true : isVoid(element)
+    }
+
+    return editor
+}
+
 const Leaf = ({ attributes, children, leaf }) => {
     let style = {};
     let className = '';
@@ -179,6 +194,21 @@ const Element = ({ attributes, children, element }) => {
             return <tr {...attributes}>{children}</tr>
         case 'table-cell':
             return <td {...attributes}>{children}</td>
+
+        //placeholder
+        case 'bling-placeholder':
+            // switch (element.placeholderType) {
+            //     case 'bling':
+            //     }
+            return (
+                <div
+                    className="bling-placeholder"
+                    {...attributes}
+                >
+                    {children}
+                </div>
+            )
+
         default:
             return <pre {...attributes}>{children}</pre>;
     }
@@ -302,7 +332,12 @@ const initialValue = [
                 children: [
                     {
                         type: 'table-cell',
-                        children: [{ text: '# of Lives', bold: true }],
+                        children: [
+                            {
+                                type: 'paragraph',
+                                children: [{ text: '### of lives', bold: true }]
+                            }
+                        ],
                     },
                     {
                         type: 'table-cell',
