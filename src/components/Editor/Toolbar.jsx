@@ -5,8 +5,8 @@ import { SketchPicker } from 'react-color';
 
 import DropdownButtonMousedownSelect from '@/components/DropdownButton/DropdownButtonMousedownSelect';
 import DropdownButtonMousedown from '@/components/DropdownButton/DropdownButtonMousedown';
-
 import Button from '@/components/MkButton';
+
 import {
     BoldOutlined,
     ItalicOutlined,
@@ -25,7 +25,7 @@ import {
     AlignRightOutlined
 } from '@ant-design/icons';
 
-import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from '../utils';
+import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
 
 const Toolbar = () => {
 

@@ -4,6 +4,7 @@ import { Router, Link, Redirect, createHistory, createMemorySource, LocationProv
 import FrameBar from './components/FrameBar/FrameBar';
 import Workbench from './pages/Workbench/Workbench';
 import Settings from './pages/Settings/Settings';
+import StyleCollection from './pages/StyleCollection/StyleCollection';
 
 import './style.scss';
 
@@ -32,11 +33,13 @@ const App = () => {
                 <FrameBar />
                 <nav className="clearfix">
                     <NavLink to="/workbench">Workbench</NavLink>
+                    <NavLink to="/styles">StyleCollection</NavLink>
                     <NavLink to="/settings">Settings</NavLink>
                 </nav>
                 <Router>
                     <Main path='/'>
                         <Workbench path='workbench' />
+                        <StyleCollection path='styles' />
                         <Settings path='settings' />
                     </Main>
                 </Router>
