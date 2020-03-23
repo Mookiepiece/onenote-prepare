@@ -3,7 +3,6 @@ import { Transforms, Editor, Text, Range, Node, Path } from 'slate';
 import { useSlate, useEditor } from 'slate-react';
 
 import Button from "@/components/MkButton";
-import Dialog from "@/components/Dialog";
 
 import './style.scss';
 
@@ -14,7 +13,9 @@ import {
 import { deepCopy, altArrayItem } from '@/utils';
 
 import M from '../transforms';
-import { applyMatch, clearUp } from '../transforms/sideEffects';
+import { applyMatch, clearUp, applyRender } from '../transforms/sideEffects';
+
+import DialogMatchPicker from './DialogMatchPicker';
 
 const useAsideState = (initialState, setSlateValue) => {
     const editor = useSlate();
@@ -22,7 +23,7 @@ const useAsideState = (initialState, setSlateValue) => {
 
     const applyChange = useCallback((state, index = state.currentIndex) => {
         state.v[index].match(editor, state.v[index].inputs);
-        state.v[index].apply(editor, state.v[index].inputs);
+        applyRender(editor, state.v[index].inputs);
         return {
             ...state,
             memory: [...state.memory, deepCopy(editor.children)]
@@ -147,7 +148,7 @@ const Aside = ({ setSlateValue }) => {
             return 'current';
     }, []);
 
-    const handleClick = (i) => {
+    const handleMatchSelected = (i) => {
         dispatch({
             type: 'PUSH',
             value: M[i].get()
@@ -208,13 +209,7 @@ const Aside = ({ setSlateValue }) => {
                     />)
                 ).reverse()
             }
-            <Dialog visible={dialogVisible} setVisible={setDialogVisible}>
-                <div className="dialog-select-transform">
-                    {
-                        M.map((m, i) => (<MatchCard key={i} match={m} onClick={_ => handleClick(i)} />))
-                    }
-                </div>
-            </Dialog>
+            <DialogMatchPicker visible={dialogVisible} setVisible={setDialogVisible} onApply={handleMatchSelected} />
         </aside>
     )
 }
@@ -229,16 +224,6 @@ const TransformFormularActivated = ({ v, color, onClose, onActive, onInput, onMa
             </div>
             <div className="active-info" onMouseDown={onActive}></div>
             <div className="content"> {v.render({ color, inputs: v.inputs, onInput, onMatch, onApply })}</div>
-        </div>
-    )
-}
-
-const MatchCard = ({ match, onClick }) => {
-    return (
-        <div className="dialog-select-transform-option" onClick={onClick}>
-            <div></div>
-            <h6>{match.title}</h6>
-            {/* <p>{match.desc}</p> */}
         </div>
     )
 }

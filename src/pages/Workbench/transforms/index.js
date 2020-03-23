@@ -8,101 +8,8 @@ import Button from "@/components/MkButton";
 import Switch from '@/components/Switch';
 
 import { applyMatch, clearUp } from './sideEffects';
+import {interator } from './utils';
 
-/**
- * interate the slate vdom tree
- * @param {Node} el 
- * @param {Array} path 
- * @param {Array} children 
- * @param {Function} callback 
- */
-const interator = (el, path, children, callback) => {
-    if (callback(el, path, children)) {  //TODO many 'return true;' in callback
-        el.children && el.children.forEach((el, index) => interator(el, [...path, index], children, callback));
-    }
-}
-
-const applyOfAll = (editor, { value, result }) => { //TODO support node result and optional keep style
-    const children = editor.children;
-
-    children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
-        if (el.text === undefined && (!el.type || el.type === 'paragraph')) { //NOTE:强制undefined是因为加入inline Node在行首尾时，会因为normalize而会出现text''的Leaf强制在首尾
-            let lastLeafActive = -1;
-            el.children.forEach((leafOrPlaceholder, index) => {
-                let thisLeafActive = leafOrPlaceholder.bling;
-
-                if (thisLeafActive) {
-                    if (!lastLeafActive || lastLeafActive !== thisLeafActive) {//防止两个range粘在一起而误判
-                        //get leaf range
-                        const at = Editor.edges(editor, [...path, index]).reduce((anchor, focus) => ({ anchor, focus }));
-
-                        //keep node style and swap text
-                        const [[{ bling, text, ...style }]] = Editor.nodes(editor, { at, match: Text.isText });
-
-                        Transforms.insertNodes(editor, {
-                            ...style,
-                            text: result
-                        }, { at });
-
-                    } else {
-                        //mark to delete
-                        Transforms.setNodes(editor, { '🖤': true, }, { at: [...path, index] });
-                    }
-                }
-
-                lastLeafActive = thisLeafActive;
-            });
-            return true;
-        } else if (el.type === 'bling-placeholder') {
-            //get placeholder range
-
-            //既然placeholder被slate认为是inline元素，左右两边必然各有leaf，虽然有可能是text''
-            let style = null;
-            //试探前面那个leaf，如果没文字说明它被插入在行首，应该继承后面那个leaf的style
-            let [[beforeLeaf]] = Editor.nodes(editor, {
-                at: [...path.slice(0, path.length - 1), path[path.length - 1] - 1],
-                match: Text.isText
-            });
-
-            let isFirst = !beforeLeaf.text.length;
-
-            if (isFirst) {
-                let { bling, text, ..._style } = beforeLeaf;
-                style = _style;
-            } else {
-                let [[afterLeaf]] = Editor.nodes(editor, {
-                    at: [...path.slice(0, path.length - 1), path[path.length - 1] + 1],
-                    match: Text.isText
-                });
-                let { bling, text, ..._style } = afterLeaf;
-                style = _style;
-            }
-
-            //keep node style and swap text
-            //因为开头是一个text:''，所以把这个应用了会替代开头的text''不会造成path变化
-            Transforms.insertNodes(editor, {
-                // ...style,
-                '🤍': true,
-                text: result
-            }, {
-                at: path,
-            });
-            if (!isFirst) {
-                Transforms.removeNodes(editor, {
-                    at: [...path.slice(0, path.length - 1), path[path.length - 1] + 1]
-                });
-            }
-        } else {
-            return true;
-        }
-    }));
-
-    Transforms.removeNodes(editor, {
-        at: [],
-        match: n => n['🖤'] || n.type === 'bling-placeholder'
-    });
-
-};
 
 const T = [
     {
@@ -186,7 +93,6 @@ const T = [
                     applyMatch(editor, ranges);//ranges没有必要存，因为applyMatch后数据结构发生变化了，以后可能会考虑decorate
                 },
 
-                apply: applyOfAll,
                 render({ color, inputs, onInput, onApply }) {
                     const { value, matchAll, result } = inputs;
                     const editor = useSlate();
@@ -270,7 +176,6 @@ const T = [
                     applyMatch(editor, ranges);
                 },
 
-                apply: applyOfAll,
                 render({ color, inputs, onInput, onApply }) {
                     const { value, result } = inputs;
                     const editor = useSlate();
@@ -352,7 +257,6 @@ const T = [
                     applyMatch(editor, ranges);
                 },
 
-                apply: applyOfAll,
                 render({ color, inputs, onInput, onApply }) {
                     const { value, result } = inputs;
                     const editor = useSlate();
@@ -402,7 +306,6 @@ const T = [
                     applyMatch(editor, ranges);
                 },
 
-                apply: applyOfAll,
                 render({ color, inputs, onInput, onApply }) {
                     const { styles, targetStyles } = inputs;
                     const editor = useSlate();

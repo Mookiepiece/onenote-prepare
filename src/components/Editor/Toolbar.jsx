@@ -11,7 +11,6 @@ import {
     BoldOutlined,
     ItalicOutlined,
     UnderlineOutlined,
-    CodeOutlined,
     FontSizeOutlined,
     ContainerOutlined,
     OrderedListOutlined,
