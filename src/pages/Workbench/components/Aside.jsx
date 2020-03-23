@@ -11,34 +11,10 @@ import {
     CloseOutlined
 } from '@ant-design/icons';
 
-import { deepCopy } from '../utils';
+import { deepCopy, altArrayItem } from '@/utils';
 
 import M from '../transforms';
 import { applyMatch, clearUp } from '../transforms/sideEffects';
-
-
-const setArrayItem = (array, index, item) => {
-    return [
-        ...array.slice(0, index),
-        item,
-        ...array.slice(index + 1, array.length)
-    ]
-}
-
-const altArrayItem = (array, index, item) => {
-    return [
-        ...array.slice(0, index),
-        { ...array[index], ...item },
-        ...array.slice(index + 1, array.length)
-    ]
-}
-
-const removeArrayItem = (array, index) => {
-    return [
-        ...array.slice(0, index),
-        ...array.slice(index + 1, array.length)
-    ]
-}
 
 const useAsideState = (initialState, setSlateValue) => {
     const editor = useSlate();
@@ -162,7 +138,6 @@ const Aside = ({ setSlateValue }) => {
         memory: [deepCopy(editor.children)],
         currentIndex: null,
     }, setSlateValue);
-    console.log(state);
 
     //dupulicated
     const currentState = useCallback(state => {

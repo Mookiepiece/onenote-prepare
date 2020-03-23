@@ -11,6 +11,7 @@
 
     > aside {
       width: $aside-width;
+      overflow: hidden;
       min-height: 300px;
       border-left: 1px solid var(--gray-6);
       position: absolute;
@@ -95,13 +96,14 @@
     border: 1px solid;
   }
 
-  .bling-placeholder{
-    width:0;
-    height:1em;
+  .bling-placeholder {
+    width: 0;
+    height: 1em;
     display: inline-block;
   }
 
-  .bling,.bling-placeholder {
+  .bling,
+  .bling-placeholder {
     position: relative;
     white-space: pre;
 
@@ -124,34 +126,31 @@
       transform: scale(1);
       background-color: rgba(0, 146, 219, 0.192);
     }
-    
-    &.odd::after{
+
+    &.odd::after {
       background-color: rgba(214, 75, 168, 0.192);
     }
   }
   @keyframes bling-after {
     from {
       transform: scale(1.25);
-      opacity: .3;
+      opacity: 0.3;
       box-shadow: rgba(0, 170, 255, 1) 0 0 0 1px;
     }
     to {
-      transform: scaleY(0.95);
+      transform: unset;
       box-shadow: rgba(0, 170, 255, 1) 0 0 0 1px;
     }
   }
 
   @keyframes bling-shining {
     0% {
-      transform: scaleY(0.95);
       box-shadow: rgba(0, 170, 255, 1) 0 0 0 1px;
     }
     50% {
-      transform: scaleY(1.05);
       box-shadow: rgba(0, 170, 255, 1) 0 0 0 2px;
     }
     100% {
-      transform: scaleY(0.95);
       box-shadow: rgba(0, 170, 255, 1) 0 0 0 1px;
     }
   }

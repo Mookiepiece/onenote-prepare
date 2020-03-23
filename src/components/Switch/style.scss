@@ -1,0 +1,19 @@
+.switch{
+    >input[type=checkbox]{
+        visibility: hidden;
+        width: 0;
+        height: 0;
+    }
+
+    >div{
+        width:32px;
+        height:32px;
+        
+        &.switch-active{
+            background-color: lime;
+        }
+        &.switch-inactive{
+            background-color: grey;
+        }
+    }
+}

@@ -87,5 +87,3 @@ export const getSelection = editor => {
     }
     return false;
 }
-
-export const deepCopy = v => JSON.parse(JSON.stringify(v));
