@@ -3,7 +3,7 @@
   user-select: none;
   width: 100%;
   height: 32px;
-  background-color: var(--color-onenote);
+  background-color: var(--gray-3);
 
   color: white !important;
 
@@ -27,6 +27,15 @@
       padding: 6px 16px;
       height: 32px;
       line-height: 16px;
+    }
+
+    //button color:
+
+    > button:not(:active) {
+      background-color: var(--gray-3);
+      &:hover {
+        background-color: var(--gray-1);
+      }
     }
 
     > button:last-child {

@@ -1,7 +1,7 @@
 import React from 'react';
 import Dialog from "@/components/Dialog";
 
-import M from '../transforms';
+import { M } from '../transforms';
 
 const DialogMatchPicker = ({ visible, setVisible, onSelect, onApply }) => {
 

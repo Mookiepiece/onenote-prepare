@@ -42,15 +42,14 @@ export default function FrameBar() {
     return (
         <header className="frame-bar">
             <div role="frame-bar-menu">
-                <Button type="alpha" unfocusable>one</Button>
-                <Button type="alpha" unfocusable>two</Button>
+                <Button unfocusable>one</Button>
+                <Button unfocusable>two</Button>
             </div>
             <div role="os-menu">
 
                 {/* minimize button */}
                 <Button
                     onClick={_ => currentWindow.minimize()}
-                    type="alpha"
                     unfocusable
                 >
                     <MinusOutlined />
@@ -62,7 +61,6 @@ export default function FrameBar() {
                         ?
                         <Button
                             onClick={_ => setWindowMaximize(true)}
-                            type="alpha"
                             unfocusable
                         >
                             <BorderOutlined style={{
@@ -72,7 +70,6 @@ export default function FrameBar() {
                         :
                         <Button
                             onClick={_ => setWindowMaximize(false)}
-                            type="alpha"
                             unfocusable
                         >
                             <BlockOutlined />
@@ -82,7 +79,6 @@ export default function FrameBar() {
                 {/* close button */}
                 <Button
                     onClick={_ => currentWindow.close()}
-                    type="alpha"
                     unfocusable
                 >
                     <CloseOutlined />

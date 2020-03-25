@@ -19,6 +19,7 @@ const Editor = ({ initialValue, renderAside }) => {
                 <Slate editor={editor} value={value} onChange={value => setValue(value)}>
                     <Toolbar />
                     <Editable
+                        className="slate-editable"
                         renderElement={renderElement}
                         renderLeaf={renderLeaf}
                         placeholder="Enter some rich text…"

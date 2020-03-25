@@ -1,3 +1,7 @@
+.workbench-aside {
+  font-size: 12px;
+}
+
 .dialog-select-transform {
   display: flex;
   flex-wrap: wrap;
@@ -35,37 +39,105 @@
   }
 }
 
-.transform-formular-activated-card {
+.transform-formular-card {
   position: relative;
-  padding: 32px 12px 12px;
-  border-top: 1px solid;
-  border-bottom: 1px solid;
-  margin-bottom: 12px;
+
+  padding: 32px 0px 0px 0px;
+  border: 1px solid var(--gray-5);
+  margin-bottom: -1px;
+  border-radius: 4px 0 0 4px;
+
+  overflow: hidden;
 
   > div.active-info {
     position: absolute;
-    width: 10px;
-    top: 0;
-    bottom: 0;
-    left: 0;
-
+    width: 4px;
+    top: -1px;
+    bottom: -1px;
+    right: 0;
     background-color: transparent;
   }
-  &.current > div.active-info {
-    background-color: skyblue;
+
+  border-right-width: 4px;
+
+  &.current {
+    border-right-color: skyblue;
   }
-  &.applied > div.active-info {
-    background-color: lawngreen;
+  &.applied {
+    border-right-color: lawngreen;
   }
-  &.unused > div.active-info {
-    background-color: grey;
+  &.unused {
+    border-right-color: grey;
   }
 
+  .content-matches {
+    margin: 8px;
+  }
+
+  .content-result {
+    margin: 8px;
+  }
+  .match-item {
+    border-bottom: 1px solid var(--gray-5);
+
+
+    .match-item-title {
+    }
+
+    .grid {
+      margin-left: 20px;
+      margin-bottom: 1em;
+      border-left: 1px solid var(--gray-5);
+
+      display: grid;
+      grid-template-columns: 100px auto;
+      align-items: center;
+
+      > span {
+        text-align: right;
+        margin-right: 20px;
+      }
+    }
+  }
   > div.title {
     .mk-button {
       position: absolute;
       top: 0;
-      right: 0;
+      left: 0;
     }
   }
+}
+
+
+
+.match-item-enter {
+  opacity: 0;
+}
+.match-item-enter-active {
+  opacity: 1;
+  transition: all .3s;
+}
+.match-item-exit {
+  opacity: 1;
+}
+.match-item-exit-active {
+  opacity: 0;
+  transition: all .3s;
+}
+
+.transform-formular-item-enter {
+  opacity: 0;
+  transform:translate(100px);
+}
+.transform-formular-item-enter-active {
+  opacity: 1;
+  transform: unset;
+  transition: all .3s;
+}
+.transform-formular-item-exit {
+  opacity: 1;
+}
+.transform-formular-item-exit-active {
+  opacity: 0;
+  transition: all .3s ;
 }

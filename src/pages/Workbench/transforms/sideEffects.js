@@ -128,7 +128,7 @@ export const clearUp = (editor) => {
     })
 };
 
-export const applyRender = (editor, { value, result }) => { //TODO support node result and optional keep style
+export const applyRender = (editor, result) => { //TODO support node result and optional keep style
     const children = editor.children;
 
     children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {

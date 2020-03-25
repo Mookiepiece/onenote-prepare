@@ -7,7 +7,9 @@ div.input {
 
     font-size: 14px;
 
-    border: 1px solid var(--button-color-active);
+    border: 1px solid var(--gray-5);
+    background-color: transparent;
+    border-radius: 2px;
     transition: all 0.1s;
 
     padding: 0 0.5em;

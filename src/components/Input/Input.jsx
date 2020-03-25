@@ -8,9 +8,9 @@ const Input = ({
 
     return (
         <div className="input">
-            <input value={value} onChange={e => {
-                onChange(e.target.value);
-            }}
+            <input
+                value={value}
+                onChange={e => onChange(e.target.value)}
                 {...others}
             />
             <span></span>

@@ -1,19 +1,41 @@
-.switch{
-    >input[type=checkbox]{
-        visibility: hidden;
-        width: 0;
-        height: 0;
+.switch {
+  width: 32px;
+  height: 32px;
+  > input[type="checkbox"] {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  > div {
+    width: 28px;
+    height: 10px;
+    margin: 11px 4px;
+    border-radius: 10px;
+
+    &.switch-active {
+      background-color: var(--blue-7);
+    }
+    &.switch-inactive {
+      background-color: grey;
     }
 
-    >div{
-        width:32px;
-        height:32px;
-        
-        &.switch-active{
-            background-color: lime;
-        }
-        &.switch-inactive{
-            background-color: grey;
-        }
+    position: relative;
+    &::before {
+      content: " ";
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--gray-5);
+      background-color: var(--gray-1);
+      border-radius: 50%;
+      position: absolute;
+      left: -3px;
+      top: -3px;
+      transition: all 0.3s;
     }
+    &.switch-active::before {
+      transform: translate(18px);
+    }
+  }
 }

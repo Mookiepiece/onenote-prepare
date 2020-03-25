@@ -1,4 +1,6 @@
 .mk-button {
+  font-size: 14px;
+
   position: relative;
   display: inline-block;
 
@@ -27,7 +29,7 @@
 
 .mk-button-default,
 .mk-button-plain {
-  color: black;
+  color: var(--gray-10);
   background-color: var(--button-color-static);
   &:hover {
     background-color: var(--button-color-hover);

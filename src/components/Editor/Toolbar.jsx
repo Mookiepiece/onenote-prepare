@@ -30,40 +30,44 @@ const Toolbar = () => {
 
     return (
         <div className="editor-toolbar">
-            <MarkButton format="bold" icon={BoldOutlined} />
-            <MarkButton format="italic" icon={ItalicOutlined} />
-            <MarkButton format="underline" icon={UnderlineOutlined} />
-            <Divider />
-            <BlockButton format="heading-one" icon={FontSizeOutlined} />
-            <BlockButton format="heading-two" icon={FontSizeOutlined} />
-            <BlockButton format="block-quote" icon={ContainerOutlined} />
-            <Divider />
+            <div className="toolbar-group">
+                <MarkButton format="bold" icon={BoldOutlined} />
+                <MarkButton format="italic" icon={ItalicOutlined} />
+                <MarkButton format="underline" icon={UnderlineOutlined} />
+            </div>
+            {/* <div className="toolbar-group">
+
+                <BlockButton format="heading-one" icon={FontSizeOutlined} />
+                <BlockButton format="heading-two" icon={FontSizeOutlined} />
+                <BlockButton format="block-quote" icon={ContainerOutlined} />
+            </div> */}
             <BlockButton format="numbered-list" icon={OrderedListOutlined} />
             <BlockButton format="bulleted-list" icon={UnorderedListOutlined} />
-            <Divider />
-            <BlockButton formatKey="align" format="left" icon={AlignLeftOutlined} />
-            <BlockButton formatKey="align" format="center" icon={AlignCenterOutlined} />
-            <BlockButton formatKey="align" format="right" icon={AlignRightOutlined} />
-            <ActionButton />
-            <ActionButtonX />
-            <Divider />
-            <ColorButton
-                format="fontColor"
-                icon={FontColorsOutlined}
-            />
-            <ColorButton
-                format="bgColor"
-                icon={BgColorsOutlined}
-            />
-            <Divider />
-            <FontComponent />
-            <FontSizeComponent />
+            <div className="toolbar-group">
+
+                <BlockButton formatKey="align" format="left" icon={AlignLeftOutlined} />
+                <BlockButton formatKey="align" format="center" icon={AlignCenterOutlined} />
+                <BlockButton formatKey="align" format="right" icon={AlignRightOutlined} />
+                {/* <ActionButton />
+                <ActionButtonX /> */}
+            </div>
+            <div className="toolbar-group">
+                <ColorButton
+                    format="fontColor"
+                    icon={FontColorsOutlined}
+                />
+                <ColorButton
+                    format="bgColor"
+                    icon={BgColorsOutlined}
+                />
+            </div>
+            <div className="toolbar-group">
+                <FontComponent />
+                <FontSizeComponent />
+            </div>
         </div>
     );
 };
-
-const Divider = () => (<span className="divider"></span>)
-
 
 const BlockButton = ({ formatKey = "type", format, icon }) => {
     const editor = useSlate();
@@ -296,7 +300,7 @@ const FontSizeComponent = ({
 
     return (
         <DropdownButtonMousedownSelect
-            width={120}
+            width={80}
             beforeClick={_ => putSelection(editor)}
             text={value}
             options={options}

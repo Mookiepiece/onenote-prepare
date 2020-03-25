@@ -6,10 +6,10 @@ const Switch = ({
 }) => {
 
     return (
-        <div className="switch">
+        <div className="switch" onClick={_ => onChange(!value)} >
             <input type="checkbox" value={value} onChange={onChange} />
-            <div className={value?'switch-active':'switch-inactive'} onClick={_ => onChange(!value)}></div>
-        </div>
+            <div className={value ? 'switch-active' : 'switch-inactive'} ></div>
+        </div >
     )
 }
 
