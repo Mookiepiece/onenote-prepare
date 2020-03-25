@@ -1,23 +1,45 @@
 /* app */
 
+@import "@/styles/default.scss";
+
 #app {
   & > nav {
-    height: 32px;
+    z-index: 90;
+    width: 64px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding-top: $app-frame-height;
+
+    border-right: 1px solid var(--gray-3);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
     & > a {
       float: left;
-      width: 100px;
+      width: 64px;
 
       &.router-active {
-          background-color: var(--blue-4);
+        background-color: var(--blue-4);
       }
     }
   }
   .app {
     position: absolute;
-    top: 64px;
-    left: 0;
+    top: 0;
+    left: 64px;
     right: 0;
     bottom: 0;
-    overflow: scroll;
+
+    & > div > div {
+      position: absolute; 
+      top:0;
+      left: 0;
+      width: 100%;
+      height:100%;
+    }
   }
 }

@@ -1,21 +1,24 @@
+@import "@/styles/default.scss";
+
+:root {
+  --frame-bar-drag-place: 4px;
+}
 .frame-bar {
-  -webkit-app-region: drag;
   user-select: none;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 32px;
-  background-color: var(--gray-3);
+  height: $app-frame-height;
+  z-index: 100;
 
-  color: white !important;
-
-  > div:first-child {
-    float: left;
-    margin-left: 24px;
-    -webkit-app-region: no-drag;
-    > button {
-      padding: 6px 16px;
-      height: 32px;
-      line-height: 16px;
-    }
+  .frame-bar-drag-place {
+    -webkit-app-region: drag;
+    position: absolute;
+    top: var(--frame-bar-drag-place);
+    left: var(--frame-bar-drag-place);
+    width: 100%;
+    bottom: 0;
   }
 
   > div:last-child {
@@ -27,15 +30,6 @@
       padding: 6px 16px;
       height: 32px;
       line-height: 16px;
-    }
-
-    //button color:
-
-    > button:not(:active) {
-      background-color: var(--gray-3);
-      &:hover {
-        background-color: var(--gray-1);
-      }
     }
 
     > button:last-child {

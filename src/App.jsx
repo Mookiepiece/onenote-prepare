@@ -1,5 +1,11 @@
 import React from 'react';
 import { Router, Link, Redirect, createHistory, createMemorySource, LocationProvider } from '@reach/router';
+import {
+    TranslationOutlined,
+    ScheduleOutlined,
+    SettingOutlined
+} from '@ant-design/icons'
+
 
 import FrameBar from './components/FrameBar/FrameBar';
 import Workbench from './pages/Workbench/Workbench';
@@ -32,9 +38,9 @@ const App = () => {
             <LocationProvider history={history}>
                 <FrameBar />
                 <nav className="clearfix">
-                    <NavLink to="/workbench">Workbench</NavLink>
-                    <NavLink to="/styles">StyleCollection</NavLink>
-                    <NavLink to="/settings">Settings</NavLink>
+                    <NavLink to="/workbench"><TranslationOutlined /></NavLink>
+                    <NavLink to="/styles"><ScheduleOutlined /></NavLink>
+                    <NavLink to="/settings"><SettingOutlined /></NavLink>
                 </nav>
                 <Router>
                     <Main path='/'>

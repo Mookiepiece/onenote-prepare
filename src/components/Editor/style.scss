@@ -1,10 +1,26 @@
+@import "@/styles/default.scss";
+
+.slate {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
 .editor-toolbar {
+  padding-top: $app-frame-height;
+  width: 100%;
+
   display: flex;
   justify-content: start;
   align-items: center;
   flex-wrap: wrap;
-  
-  background:--var();
+
+  border-bottom: 1px solid var(--gray-3);
 
   .toolbar-group {
     display: inline-flex;
@@ -22,55 +38,55 @@
       background: var(--gray-6);
     }
   }
+
+  .editor-button {
+    width: 40px;
+    height: 40px;
+
+    //icon
+    span.anticon {
+      font-size: 20px;
+      color: var(--gray-8);
+    }
+  }
+  //other style
+  .editor-button-color {
+    & > div {
+      position: absolute;
+      top: 26px;
+      left: 10px;
+      height: 4px;
+      width: 20px;
+    }
+    & > span.anticon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      height: 15px;
+      overflow: hidden;
+    }
+  }
+  .editor-button-color-r {
+    width: 20px;
+    min-width: 20px;
+    & > span.anticon {
+      transform: translate(-5px) rotate(90deg);
+    }
+    & > .color-picker {
+      position: absolute;
+      top: 40px;
+      left: 0;
+    }
+  }
 }
 
 .slate-editable {
   margin: 0 20px;
-
   font-size: 16px;
+  overflow: auto;
 }
 
-.editor-button {
-  width: 40px;
-  height: 40px;
-
-  //icon
-  span.anticon {
-    font-size: 20px;
-    color: var(--gray-8);
-  }
-}
-//other style
-.editor-button-color {
-  & > div {
-    position: absolute;
-    top: 26px;
-    left: 10px;
-    height: 4px;
-    width: 20px;
-  }
-  & > span.anticon {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    height: 15px;
-    overflow: hidden;
-  }
-}
-.editor-button-color-r {
-  width: 20px;
-  min-width: 20px;
-  & > span.anticon {
-    transform: translate(-5px) rotate(90deg);
-  }
-  & > .color-picker {
-    position: absolute;
-    top: 40px;
-    left: 0;
-  }
-}
-
-.slate {
+.slate-editable {
   blockquote {
     background-color: #f5f5f5;
     border-left: 5px solid #aaa;

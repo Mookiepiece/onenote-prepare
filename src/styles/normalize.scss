@@ -24,13 +24,15 @@ pre {
 
 ::-webkit-scrollbar {
   width: 8px;
-  box-shadow:0 0 red 0 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #6666;
+  background-color: transparent;
   border-radius: 4px;
+}
 
+:hover::-webkit-scrollbar-thumb {
+  background-color: var(--gray-5);
   &:hover {
     background-color: #8886;
   }

@@ -14,8 +14,6 @@ const Dialog = ({
                     in={visible}
                     timeout={300}
                     classNames='ani-dialog-bg'
-                    onExited={() => {
-                    }}
                     unmountOnExit
                 >
                     <div className="dialog-bg"
@@ -29,8 +27,6 @@ const Dialog = ({
                     in={visible}
                     timeout={300}
                     classNames='ani-dialog'
-                    onExited={() => {
-                    }}
                     unmountOnExit
                 >
                     <div {...others} className="dialog">

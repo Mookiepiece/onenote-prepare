@@ -8,6 +8,7 @@ const MkButton = React.forwardRef(({
     full,
     children,
     size = "small",
+    round,
     ...others
 }, ref) => {
     className = className + ' ' + "mk-button";
@@ -21,6 +22,10 @@ const MkButton = React.forwardRef(({
     if (full) {
         className += ' ' + "mk-button-fullwidth";
     }
+    if (round) {
+        className += ' ' + "mk-button-round";
+    }
+
 
     className += ' ' + (_ => {
         switch (type) {
@@ -28,6 +33,8 @@ const MkButton = React.forwardRef(({
                 return 'mk-button-alpha';
             case 'plain':
                 return 'mk-button-plain'
+            case 'primary':
+                return 'mk-button-primary'    
             default:
                 return "mk-button-default";
         }

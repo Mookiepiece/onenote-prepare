@@ -14,21 +14,29 @@ function useWindowMaximize() {
         if (bool) {
             currentWindow.maximize();
             _setWindowMaximize(true);
+            document.documentElement.style.setProperty('--frame-bar-drag-place','0');
         } else {
             currentWindow.unmaximize();
             _setWindowMaximize(false);
+            document.documentElement.style.setProperty('--frame-bar-drag-place','4px');
         }
     }
 
-    const setTrue = _ => _setWindowMaximize(true);
-    const setFalse = _ => _setWindowMaximize(false);
+    const handleMaximize = _ => {
+        _setWindowMaximize(true);
+        document.documentElement.style.setProperty('--frame-bar-drag-place','0');
+    };
+    const handleUnmaximize = _ => {
+        _setWindowMaximize(false);
+        document.documentElement.style.setProperty('--frame-bar-drag-place','4px');
+    };
 
     useEffect(_ => {
-        currentWindow.on('maximize', setTrue);
-        currentWindow.on('unmaximize', setFalse);
+        currentWindow.on('maximize', handleMaximize);
+        currentWindow.on('unmaximize', handleUnmaximize);
         return _ => {
-            currentWindow.off('maximize', setTrue);
-            currentWindow.off('unmaximize', setFalse);
+            currentWindow.off('maximize', handleMaximize);
+            currentWindow.off('unmaximize', handleUnmaximize);
         }
     }, []);
 
@@ -41,10 +49,7 @@ export default function FrameBar() {
     const currentWindow = remote.getCurrentWindow();
     return (
         <header className="frame-bar">
-            <div role="frame-bar-menu">
-                <Button unfocusable>one</Button>
-                <Button unfocusable>two</Button>
-            </div>
+            <div className="frame-bar-drag-place"></div>
             <div role="os-menu">
 
                 {/* minimize button */}

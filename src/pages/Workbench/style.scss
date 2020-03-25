@@ -1,23 +1,24 @@
 @import "@/styles/classes.scss";
+@import "@/styles/default.scss";
 
 .workbench {
   @extend %clearfix;
-  $aside-width: 500px;
+  $aside-width: 40%;
   position: relative;
 
   > .slate {
-    padding-right: $aside-width;
-    position: relative;
+    right: $aside-width;
 
-    > aside {
+    + aside {
       width: $aside-width;
-      overflow: hidden;
+      overflow-y: auto;
       min-height: 300px;
-      border-left: 1px solid var(--gray-6);
+      border-left: 1px solid var(--gray-3);
       position: absolute;
       right: 0;
-      top: 0;
-      padding: 12px;
+      top: $app-frame-height;
+      bottom: 0;
+      padding: 12px 12px 12px 24px;
     }
   }
 }

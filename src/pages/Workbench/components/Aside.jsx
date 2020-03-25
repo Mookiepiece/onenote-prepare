@@ -6,7 +6,11 @@ import {
 } from 'react-transition-group';
 import { useSlate, useEditor } from 'slate-react';
 import {
-    CloseOutlined
+    CloseOutlined,
+    ClearOutlined,
+    ApiOutlined,
+    BorderOutlined,
+    CheckSquareOutlined
 } from '@ant-design/icons';
 import { v4 as uuid } from 'uuid';
 
@@ -24,6 +28,31 @@ import DialogMatchPicker from './DialogMatchPicker';
 
 let matchedRanges = [];
 
+
+const applyChange = (editor, state, index = state.currentIndex) => {
+    applyMatcher(editor, state, index)
+    applyRender(editor, state.v[index].result);
+    return {
+        ...state,
+        memory: [...state.memory, deepCopy(editor.children)]
+    };
+};
+
+const applyMatcher = (editor, state, index = state.currentIndex) => {
+    clearUp(editor);
+    const v = state.v[index];
+    const ranges = v.matches.reduce((prevRanges, v, i) => { return v.match(editor, matchedRanges, v.inputs) }, []);
+    applyMatch(editor, ranges);
+    return state;
+};
+
+const currentState = state => {
+    if (state.memory.length > state.currentIndex + 1)
+        return 'applied';
+    else
+        return 'current';
+};
+
 const useAsideState = (initialState, setSlateValue) => {
     const editor = useSlate();
     const [_state, _setState] = useState(initialState);
@@ -31,30 +60,6 @@ const useAsideState = (initialState, setSlateValue) => {
     const setState = v => {
         _setState(v);
     }
-
-    const applyChange = useCallback((editor, state, index = state.currentIndex) => {
-        applyMatcher(editor, state, index)
-        applyRender(editor, state.v[index].result);
-        return {
-            ...state,
-            memory: [...state.memory, deepCopy(editor.children)]
-        };
-    }, []);
-
-    const applyMatcher = useCallback((editor, state, index = state.currentIndex) => {
-        clearUp(editor);
-        const v = state.v[index];
-        const ranges = v.matches.reduce((prevRanges, v, i) => { return v.match(editor, matchedRanges, v.inputs) }, []);
-        applyMatch(editor, ranges);
-        return state;
-    }, []);
-
-    const currentState = useCallback(state => {
-        if (state.memory.length > state.currentIndex + 1)
-            return 'applied';
-        else
-            return 'current';
-    }, []);
 
     let state = _state;
 
@@ -64,13 +69,13 @@ const useAsideState = (initialState, setSlateValue) => {
                 //TODO 
                 return state;
             case 'PUSH_MATCH_RULE': {
-                if (action.pushTransform) { //如果是点击add transform 按钮，则要新建一个transform
+                if (action.pushTransform) { //PUSH_TRANSFORM 如果是点击add transform 按钮，则要新建一个transform
                     if (state.currentIndex !== null && currentState(state) === 'current') { //save prev transform
                         state = applyChange(editor, state);
                     }
                     state = {
                         ...state,
-                        v: [...state.v, { matches: [], currentMatch: null, result: '', key: uuid() }],
+                        v: [...state.v, { name: action.value.title, matches: [], currentMatch: null, result: '', key: uuid() }],
                         currentIndex: state.v.length,
                     }
                 }
@@ -312,7 +317,7 @@ const TransformFormularCard = ({ v, color, onClose, onActive, onInput, onMatch, 
     return (
         <div className={className}>
             <div className="title">
-                <Button onClick={onClose}><CloseOutlined /></Button>
+                <Button onClick={onClose} className="close-button"><CloseOutlined /></Button>
             </div>
             <div className="active-info" onMouseDown={onActive}></div>
             <TransitionGroup className="content-matches">
@@ -341,20 +346,21 @@ const TransformFormularCard = ({ v, color, onClose, onActive, onInput, onMatch, 
                     })
                 }
             </TransitionGroup>
-            <Button onClick={onOpenDialog} full>add new match</Button>
+            <Button className="add-match-button" full onClick={onOpenDialog} ><ApiOutlined /></Button>
             {
                 v.matches.length ?
                     (
                         <div className="content-result" >
-                            <div style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
+                            <div className="grid">
                                 <span>结果文本:</span>
                                 <Input value={v.result} onChange={result => onInput(result, false, -1)} />
+                                <Button className="add-match-button" ><ApiOutlined /></Button>
                             </div>
                         </div>
                     )
                     : null
             }
-            <Button onClick={onApply}>APPLY</Button>
+            <Button onClick={onActive} full className="apply-transform-button">{color === 'applied' ? <CheckSquareOutlined /> : <BorderOutlined />}</Button>
         </div>
     )
 }

@@ -42,3 +42,16 @@ div.input {
     }
   }
 }
+
+div.input{
+  &.input-size-small{
+    >input{
+      height: 24px;
+    }
+  }
+  &.input-size-large{
+    >input {
+      height:48px;
+    }
+  }
+}

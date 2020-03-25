@@ -13,24 +13,19 @@ const Editor = ({ initialValue, renderAside }) => {
     const handleKeydown = event => higherOrderKeydownHandler(editor)(event);
 
     return (
-        <>
-            {/* <div className="workbench"> */}
+        <Slate editor={editor} value={value} onChange={value => setValue(value)}>
             <div className="slate">
-                <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-                    <Toolbar />
-                    <Editable
-                        className="slate-editable"
-                        renderElement={renderElement}
-                        renderLeaf={renderLeaf}
-                        placeholder="Enter some rich text…"
-                        onKeyDown={handleKeydown}
-                    />
-                    <Aside setSlateValue={setValue} />
-                </Slate>
-                <p>{JSON.stringify(value)}</p>
+                <Toolbar />
+                <Editable
+                    className="slate-editable"
+                    renderElement={renderElement}
+                    renderLeaf={renderLeaf}
+                    placeholder="Enter some rich text…"
+                    onKeyDown={handleKeydown}
+                />
             </div>
-            {/* </div> */}
-        </>
+            <Aside setSlateValue={setValue} />
+        </Slate>
     )
 }
 

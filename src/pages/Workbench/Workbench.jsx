@@ -7,11 +7,9 @@ import Editor from '@/components/Editor';
 
 const Workbench = () => {
     return (
-        <>
-            <div className="workbench">
-                <Editor initialValue={initialValue} renderAside={Aside} />
-            </div>
-        </>
+        <div className="workbench">
+            <Editor initialValue={initialValue} renderAside={Aside} />
+        </div>
     )
 }
 

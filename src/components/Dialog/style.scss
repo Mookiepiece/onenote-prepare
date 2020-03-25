@@ -12,10 +12,9 @@
 .dialog {
   z-index: 1001;
   position: relative;
-  top: 0px;
-  // height: 300px;
-  left: 10px;
-  width:calc(100vw - 20px);
+  top: 32px;
+  left: 8px;
+  width:calc(100vw - 16px);
 
   padding:24px;
 
@@ -24,13 +23,6 @@
 
   border: 1px solid var(--gray-6);
   background-color: var(--gray-1);
-}
-
-@keyframes dialog {
-  from {
-  }
-  to {
-  }
 }
 
 .ani-dialog-bg-enter {
