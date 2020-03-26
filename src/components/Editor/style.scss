@@ -12,7 +12,7 @@
 }
 
 .editor-toolbar {
-  padding-top: $app-frame-height;
+  padding: $app-frame-height 12px 8px;
   width: 100%;
 
   display: flex;
@@ -20,7 +20,7 @@
   align-items: center;
   flex-wrap: wrap;
 
-  border-bottom: 1px solid var(--gray-3);
+  border-bottom: 1px solid var(--gray-4);
 
   .toolbar-group {
     display: inline-flex;
@@ -81,6 +81,8 @@
 }
 
 .slate-editable {
+  color:black;
+
   margin: 0 20px;
   font-size: 16px;
   overflow: auto;

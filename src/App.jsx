@@ -11,6 +11,7 @@ import FrameBar from './components/FrameBar/FrameBar';
 import Workbench from './pages/Workbench/Workbench';
 import Settings from './pages/Settings/Settings';
 import StyleCollection from './pages/StyleCollection/StyleCollection';
+import logo from '@/images/logo.png';
 
 import './style.scss';
 
@@ -37,7 +38,8 @@ const App = () => {
         <>
             <LocationProvider history={history}>
                 <FrameBar />
-                <nav className="clearfix">
+                <img src={logo} className="app-logo" />
+                <nav>
                     <NavLink to="/workbench"><TranslationOutlined /></NavLink>
                     <NavLink to="/styles"><ScheduleOutlined /></NavLink>
                     <NavLink to="/settings"><SettingOutlined /></NavLink>

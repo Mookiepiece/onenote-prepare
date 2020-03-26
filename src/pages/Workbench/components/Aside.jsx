@@ -10,7 +10,9 @@ import {
     ClearOutlined,
     ApiOutlined,
     BorderOutlined,
-    CheckSquareOutlined
+    CheckSquareOutlined,
+    BookOutlined,
+    PlusCircleOutlined
 } from '@ant-design/icons';
 import { v4 as uuid } from 'uuid';
 
@@ -216,97 +218,108 @@ const Aside = ({ setSlateValue }) => {
     };
 
     return (
-        <aside className="workbench-aside">
-            <Button
-                full
-                onClick={_ => {
-                    setDialogVisible(true);
-                    setDialogPushTransform(true);
-                }}
-                style={{ marginBottom: 12 }}
-            >
-                add rule
-            </Button>
-            <TransitionGroup component={null}>
-                {
-                    state.v.map((v, index) => (
-                        <CSSTransition
-                            key={v.key}
-                            timeout={300}
-                            classNames="transform-formular-item"
-                        >
-                            <TransformFormularCard
-                                v={v}
-
-                                onInput={(inputs, rematch = false, matchIndex) => dispatch({
-                                    type: 'INPUT',
-                                    index,
-                                    inputs,
-                                    rematch,
-                                    matchIndex
-                                })}
-
+        <aside>
+            <div className="workbench-aside">
+                <Button
+                    full
+                    onClick={_ => {
+                        setDialogVisible(true);
+                        setDialogPushTransform(true);
+                    }}
+                    style={{ marginBottom: 12 }}
+                >add rule</Button>
+                <TransitionGroup component={null}>
+                    {
+                        state.v.map((v, index) => (
+                            <CSSTransition
                                 key={v.key}
+                                timeout={300}
+                                classNames="transform-formular-item"
+                            >
+                                <TransformFormularCard
+                                    v={v}
 
-                                color={
-                                    ((() => {
-                                        if (index < state.currentIndex) {
-                                            return 'applied';
-                                        } else if (index > state.currentIndex) {
-                                            return 'unused';
-                                        } else {
-                                            return currentState(state);
-                                        }
-                                    })())
-                                }
+                                    onInput={(inputs, rematch = false, matchIndex) => dispatch({
+                                        type: 'INPUT',
+                                        index,
+                                        inputs,
+                                        rematch,
+                                        matchIndex
+                                    })}
 
-                                onOpenDialog={_ => {
-                                    dispatch({
-                                        type: 'SET_CURRENT_INDEX',
+                                    key={v.key}
+
+                                    color={
+                                        ((() => {
+                                            if (index < state.currentIndex) {
+                                                return 'applied';
+                                            } else if (index > state.currentIndex) {
+                                                return 'unused';
+                                            } else {
+                                                return currentState(state);
+                                            }
+                                        })())
+                                    }
+
+                                    onOpenDialog={_ => {
+                                        dispatch({
+                                            type: 'SET_CURRENT_INDEX',
+                                            index
+                                        })
+                                        setDialogVisible(true);
+                                        setDialogPushTransform(false);
+                                    }}
+
+                                    onClose={_ => dispatch({
+                                        type: 'DELETE',
                                         index
-                                    })
-                                    setDialogVisible(true);
-                                    setDialogPushTransform(false);
-                                }}
+                                    })}
 
-                                onClose={_ => dispatch({
-                                    type: 'DELETE',
-                                    index
-                                })}
+                                    onActive={
+                                        _ => dispatch({
+                                            type: 'TOGGLE_ACTIVE',
+                                            index
+                                        })
+                                    }
 
-                                onActive={
-                                    _ => dispatch({
-                                        type: 'TOGGLE_ACTIVE',
-                                        index
-                                    })
-                                }
+                                    onMatch={
+                                        _ => dispatch({
+                                            type: 'MATCH',
+                                            index
+                                        })
+                                    }
 
-                                onMatch={
-                                    _ => dispatch({
-                                        type: 'MATCH',
-                                        index
-                                    })
-                                }
+                                    onApply={
+                                        _ => dispatch({
+                                            type: 'APPLY',
+                                            index
+                                        })
+                                    }
 
-                                onApply={
-                                    _ => dispatch({
-                                        type: 'APPLY',
-                                        index
-                                    })
-                                }
-
-                                onMatchChange={
-                                    value => dispatch({
-                                        type: 'SET_CURRENT_MATCH',
-                                        value
-                                    })
-                                }
-                            />
-                        </CSSTransition>
-                    )).reverse()
-                }
-            </TransitionGroup>
-            <DialogMatchPicker visible={dialogVisible} setVisible={setDialogVisible} onApply={handleMatchSelected} />
+                                    onMatchChange={
+                                        value => dispatch({
+                                            type: 'SET_CURRENT_MATCH',
+                                            value
+                                        })
+                                    }
+                                />
+                            </CSSTransition>
+                        )).reverse()
+                    }
+                </TransitionGroup>
+                <DialogMatchPicker visible={dialogVisible} setVisible={setDialogVisible} onApply={handleMatchSelected} />
+            </div>
+            <div className="aside-bottom">
+                <Button
+                    type="plain"
+                    round
+                    onClick={_ => {
+                        setDialogVisible(true);
+                        setDialogPushTransform(true);
+                    }}
+                    style={{ marginBottom: 12 }}
+                >apply rule</Button>
+            </div>
         </aside >
     )
 }
@@ -346,16 +359,14 @@ const TransformFormularCard = ({ v, color, onClose, onActive, onInput, onMatch, 
                     })
                 }
             </TransitionGroup>
-            <Button className="add-match-button" full onClick={onOpenDialog} ><ApiOutlined /></Button>
+            <Button className="add-match-button" onClick={onOpenDialog} ><PlusCircleOutlined /></Button>
             {
                 v.matches.length ?
                     (
                         <div className="content-result" >
-                            <div className="grid">
-                                <span>结果文本:</span>
-                                <Input value={v.result} onChange={result => onInput(result, false, -1)} />
-                                <Button className="add-match-button" ><ApiOutlined /></Button>
-                            </div>
+                            <span>结果文本:</span>
+                            <Input value={v.result} onChange={result => onInput(result, false, -1)} />
+                            <Button className="add-match-button" ><BookOutlined /></Button>
                         </div>
                     )
                     : null

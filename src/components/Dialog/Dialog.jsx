@@ -16,6 +16,19 @@ const Dialog = ({
                     classNames='ani-dialog-bg'
                     unmountOnExit
                 >
+                    <div className="dialog-bg-no-poiner-event"
+                        onMouseDown={_ => {
+                            setVisible(false);
+                        }}
+                    >
+                    </div>
+                </CSSTransition>
+                <CSSTransition
+                    in={visible}
+                    timeout={300}
+                    classNames='ani-dialog-bg'
+                    unmountOnExit
+                >
                     <div className="dialog-bg"
                         onMouseDown={_ => {
                             setVisible(false);

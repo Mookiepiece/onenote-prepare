@@ -18,11 +18,12 @@ export const M = [
     {
         title: "行内文本匹配",
         desc: '匹配行内文本',
-        resultType: 'leaf',
+        inType: '',
+        outType: 'leaf',
 
         inputs: _ => ({ value: '', matchAll: true }),
 
-        match: (editor, prevRanges, { value, matchAll}) => {
+        match: (editor, prevRanges, { value, matchAll }) => {
             if (!value) return [];
             const children = editor.children;
 
@@ -92,33 +93,35 @@ export const M = [
             return ranges;
         },
 
-        render({ color, inputs, onInput, onApply, onMatch }) {
+        render({ inputs, onInput, onMatch }) {
             const { value, matchAll } = inputs;
-            const editor = useSlate();
-
-            const handleChange = value => {
-                onInput({ value }, true);
-            };
 
             return (
                 <>
                     <div className="grid" >
                         <span>匹配文本:</span>
-                        <Input value={value} onChange={handleChange} onFocus={onMatch} />
+                        <Input
+                            value={value}
+                            onChange={value => onInput({ value }, true)}
+                            onFocus={onMatch}
+                        />
                         <span>匹配所有:</span>
-                        <Switch value={matchAll} onChange={matchAll => onInput({ matchAll })} />
+                        <Switch
+                            value={matchAll}
+                            onChange={matchAll => onInput({ matchAll })}
+                        />
                     </div>
                 </>
             )
         }
-
     },
     {
         title: "行首匹配",
         desc: '匹配（以某文本串开头的）行首',
-        resultType: 'leaf',
+        inType: '',
+        outType: 'leaf',
 
-        inputs: _ => ({ value: ''}),
+        inputs: _ => ({ value: '' }),
         match: (editor, prevRanges, { value }) => {
             // if (!value) return; 0字符仍然匹配开头
             const children = editor.children;
@@ -164,25 +167,15 @@ export const M = [
             return ranges;
         },
 
-        render({ color, inputs, onInput, onApply, onMatch }) {
+        render({ inputs, onInput, onMatch }) {
             const { value } = inputs;
-            const editor = useSlate();
-
-            const handleChange = value => {
-                onInput({ value });
-                onMatch();
-            };
 
             return (
                 <>
-                    {
-                        <>
-                            <div className="grid" >
-                                <span>开头限制:</span>
-                                <Input value={value} onChange={handleChange} onFocus={onMatch} />
-                            </div>
-                        </>
-                    }
+                    <div className="grid" >
+                        <span>开头限制:</span>
+                        <Input value={value} onChange={value => onInput({ value }, true)} onFocus={onMatch} />
+                    </div>
                 </>
             )
         }
@@ -190,9 +183,10 @@ export const M = [
     {
         title: "行尾匹配",
         desc: '匹配（以某文本串结尾的）行尾',
-        resultType: 'leaf',
+        inType: '',
+        outType: 'leaf',
 
-        inputs: _ => ({ value: '',}),
+        inputs: _ => ({ value: '', }),
         match: (editor, prevRanges, { value }) => {
             const children = editor.children;
 
@@ -237,25 +231,15 @@ export const M = [
             return ranges;
         },
 
-        render({ color, inputs, onInput, onApply, onMatch }) {
+        render({ inputs, onInput, onMatch }) {
             const { value } = inputs;
-            const editor = useSlate();
-
-            const handleChange = value => {
-                onInput({ value });
-                onMatch();
-            };
 
             return (
                 <>
-                    {
-                        <>
-                            <div className="grid">
-                                <span>结尾限制:</span>
-                                <Input value={value} onChange={handleChange} onFocus={onMatch} />
-                            </div>
-                        </>
-                    }
+                    <div className="grid">
+                        <span>结尾限制:</span>
+                        <Input value={value} onChange={value => onInput({ value }, true)} onFocus={onMatch} />
+                    </div>
                 </>
             )
         }

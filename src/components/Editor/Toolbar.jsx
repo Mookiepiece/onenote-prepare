@@ -31,6 +31,8 @@ const Toolbar = () => {
     return (
         <div className="editor-toolbar">
             <div className="toolbar-group">
+                <FontComponent />
+                <FontSizeComponent />
                 <MarkButton format="bold" icon={BoldOutlined} />
                 <MarkButton format="italic" icon={ItalicOutlined} />
                 <MarkButton format="underline" icon={UnderlineOutlined} />
@@ -41,8 +43,10 @@ const Toolbar = () => {
                 <BlockButton format="heading-two" icon={FontSizeOutlined} />
                 <BlockButton format="block-quote" icon={ContainerOutlined} />
             </div> */}
-            <BlockButton format="numbered-list" icon={OrderedListOutlined} />
-            <BlockButton format="bulleted-list" icon={UnorderedListOutlined} />
+            <div className="toolbar-group">
+                <BlockButton format="numbered-list" icon={OrderedListOutlined} />
+                <BlockButton format="bulleted-list" icon={UnorderedListOutlined} />
+            </div>
             <div className="toolbar-group">
 
                 <BlockButton formatKey="align" format="left" icon={AlignLeftOutlined} />
@@ -60,10 +64,6 @@ const Toolbar = () => {
                     format="bgColor"
                     icon={BgColorsOutlined}
                 />
-            </div>
-            <div className="toolbar-group">
-                <FontComponent />
-                <FontSizeComponent />
             </div>
         </div>
     );
@@ -182,7 +182,7 @@ const ColorButton = ({ format, icon }) => {
                     (buttonRef) => {
                         return (
                             <Button
-                                className={`editor-button editor-button-color-r${pickerActive ? " dropdown" : ""}`}
+                                className={`editor-button editor-button-color-r${pickerActive ? " __dropdown" : ""}`}
                                 active={pickerActive}
                                 onMouseDown={event => {
                                     event.preventDefault();
@@ -233,7 +233,7 @@ const FontComponent = ({
     ]
 }) => {
     const editor = useSlate();
-    let value;
+    let value = '/';
 
     const matches = getMarkActiveSet(editor, format);
 
@@ -279,7 +279,7 @@ const FontSizeComponent = ({
     ]
 }) => {
     const editor = useSlate();
-    let value;
+    let value = '/';
 
     const matches = getMarkActiveSet(editor, format);
 

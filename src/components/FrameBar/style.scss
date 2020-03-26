@@ -27,9 +27,23 @@
     -webkit-app-region: no-drag;
 
     > button {
+      color: var(--gray-5);
+    }
+    &:hover > button {
+      color: var(--gray-7);
+    }
+
+    > button {
       padding: 6px 16px;
       height: 32px;
       line-height: 16px;
+      background: transparent;
+      &:hover {
+        background-color: mix(black,transparent,5%);
+      }
+      &:active {
+        background-color: mix(black,transparent,15%);
+      }
     }
 
     > button:last-child {

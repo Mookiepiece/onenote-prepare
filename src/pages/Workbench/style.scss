@@ -11,14 +11,15 @@
 
     + aside {
       width: $aside-width;
-      overflow-y: auto;
-      min-height: 300px;
-      border-left: 1px solid var(--gray-3);
+
+      box-shadow: var(--gray-3) 0 0 4px 2px;
+      border-left: 1px solid var(--gray-4);
+      
       position: absolute;
+      top: 0;
       right: 0;
-      top: $app-frame-height;
       bottom: 0;
-      padding: 12px 12px 12px 24px;
+      padding-top: $app-frame-height;
     }
   }
 }

@@ -10,7 +10,7 @@ const useDropdown = (panelActive, setPanelActive, eventName = "click") => {
     useEffect(_ => {
         if (panelActive) {
             const handler = event => {
-                const delegateTarget = closest(event.target, '.dropdown');
+                const delegateTarget = closest(event.target, '.__dropdown');
                 if (delegateTarget) {
                     return;
                 }

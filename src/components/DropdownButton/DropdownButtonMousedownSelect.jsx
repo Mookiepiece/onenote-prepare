@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import Button from '@/components/MkButton';
 import DropdownButtonMousedown from './DropdownButtonMousedown';
+import './style.scss';
 
 const DropdownButtonMousedownSelect = ({
     options = [],
