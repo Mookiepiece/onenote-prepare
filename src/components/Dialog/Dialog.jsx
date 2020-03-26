@@ -42,17 +42,13 @@ const Dialog = ({
                     classNames='ani-dialog'
                     unmountOnExit
                 >
-                    <div {...others} className="dialog">
+                    <div {...others} className="dialog dialog-default">
                         {children}
                     </div>
                 </CSSTransition>
             </div>
         </Portal>
     )
-}
-
-const useDialog = () => {
-
 }
 
 export default Dialog;

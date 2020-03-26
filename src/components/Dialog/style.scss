@@ -26,10 +26,6 @@
 .dialog {
   z-index: 1001;
   position: absolute;
-  top: 64px;
-  left: 8px;
-  width: calc(100vw - 16px);
-  max-height: calc(100% - 72px);
   overflow: auto;
 
   padding: 24px;
@@ -39,6 +35,28 @@
 
   border: 1px solid var(--gray-3);
   background-color: var(--gray-1);
+}
+
+.dialog-default {
+  top: 64px;
+  left: 8px;
+  width: calc(100vw - 16px);
+  max-height: calc(100% - 72px);
+}
+
+.aside-dialog {
+  top: 32px;
+  bottom: 0;
+  right: 0;
+  width: 290px;
+  
+  box-shadow: var(--gray-3) 2px 2px 5px 3px;
+
+  padding-bottom: 64px;
+
+  .aside-dialog-button-close {
+    margin-top:24px;
+  }
 }
 
 .ani-dialog-bg-enter {
@@ -53,6 +71,7 @@
 .ani-dialog-bg-exit-active {
   opacity: 0;
 }
+
 .ani-dialog-enter {
   transform: scale(0.1);
   opacity: 0;
@@ -70,4 +89,23 @@
 .ani-dialog-exit-active {
   transform: scale(0.8);
   opacity: 0;
+}
+
+.ani-aside-dialog-enter {
+  transform: translate(500px);
+  opacity: .5;
+  transition: transform 0.3s cubic-bezier(0.1, 1, 0.5, 1), opacity 0.3s;
+}
+.ani-aside-dialog-enter-active {
+  transform: translate(0);
+  opacity: 1;
+}
+.ani-aside-dialog-exit {
+  transform: translate(0);
+  opacity: 1;
+  transition: transform 0.3s cubic-bezier(0.8, 0.1, 0.1, 0.8), opacity 0.3s;
+}
+.ani-aside-dialog-exit-active {
+  transform: translate(500px);
+  opacity: .5;
 }

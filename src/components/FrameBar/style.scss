@@ -30,7 +30,7 @@
       color: var(--gray-5);
     }
     &:hover > button {
-      color: var(--gray-7);
+      color: var(--gray-10);
     }
 
     > button {
@@ -48,10 +48,10 @@
 
     > button:last-child {
       &:hover {
-        background-color: crimson;
+        background-color: #e11;
       }
       &:active {
-        background-color: mix(crimson, transparent, 80%);
+        background-color: #b11;
       }
     }
   }

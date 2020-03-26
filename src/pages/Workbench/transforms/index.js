@@ -1,13 +1,20 @@
 import React, { useState, useReducer, useCallback, useMemo, useEffect } from 'react';
-
-import { useSlate, useEditor } from 'slate-react';
 import { Transforms, Editor, Text, Range, Node, Path } from 'slate';
+
+import {
+    PlusCircleOutlined
+} from '@ant-design/icons';
 
 import Input from '@/components/Input';
 import Button from "@/components/MkButton";
 import Switch from '@/components/Switch';
+import Dialog from "@/components/Dialog";
+import AsideDialog from "@/components/Dialog/asideDialog";
+
+import './style.scss';
 
 import { interator } from './utils';
+import { setArrayItem } from '@/utils';
 
 export const MGet = (i) => {
     let { inputs, ...staticAttrs } = M[i];
@@ -240,6 +247,74 @@ export const M = [
                         <span>结尾限制:</span>
                         <Input value={value} onChange={value => onInput({ value }, true)} onFocus={onMatch} />
                     </div>
+                </>
+            )
+        }
+    },
+    {
+        title: "文字样式匹配",
+        desc: '筛选具有文字颜色，加粗，斜体等样式的文字',
+        inType: '',
+        outType: 'leaf',
+
+        inputs: _ => ({ bold: [false, true], }),
+        match: (editor, prevRanges, { bold }) => {
+            const children = editor.children;
+
+            console.log(bold);
+            const ranges = [];
+
+            children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+                if (el.text !== undefined) {
+                    if (bold[0]) {
+                        if (!(el.bold === bold[1] || el.bold === undefined && !bold[1]))  //NOTE: undefined !== false and undefined !== true
+                            return false; //NOTE:return 仅仅是表示能不能继续向下循环 //不过这里防止push了
+                    } else {
+                        return false;
+                    }
+
+                    ranges.push({
+                        anchor: { path, offset: 0 },
+                        focus: Editor.end(editor, path)
+                    });
+                }
+                return true;
+            }));
+
+            return ranges;
+        },
+
+        render({ inputs, onInput, onMatch }) {
+            const { bold } = inputs;
+
+            const [visible, setVisible] = useState();
+
+            return (
+                <>
+                    <div className="grid">
+                        <span>选项:</span>
+                        <Button onClick={_ => setVisible(true)}><PlusCircleOutlined /></Button>
+                    </div>
+                    <AsideDialog visible={visible} setVisible={setVisible}>
+                        <div className="match-rule-style-match">
+                            <span>粗体:</span>
+                            <Switch
+                                value={bold[0]}
+                                onChange={v => onInput({ bold: setArrayItem(bold, 0, v) }, true)}
+                            />
+                            {
+                                bold[0] ? (
+                                    <>
+                                        <span>有无</span>
+                                        <Switch
+                                            value={bold[1]}
+                                            onChange={v => onInput({ bold: setArrayItem(bold, 1, v) }, true)}
+                                        />
+                                    </>
+                                ) : null
+                            }
+                        </div>
+                    </AsideDialog>
                 </>
             )
         }

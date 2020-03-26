@@ -312,7 +312,6 @@ const Aside = ({ setSlateValue }) => {
             <div className="aside-bottom">
                 <Button
                     type="plain"
-                    round
                     onClick={_ => {
                         setDialogVisible(true);
                         setDialogPushTransform(true);

@@ -15,7 +15,7 @@
   }
 
   text-decoration: none;
-  transition: all 0.1s, color 0.3s;
+  transition: all 0.1s, color 0.3s, box-shadow 0.3s;
 
   &.mk-button-fullwidth {
     width: 100%;
@@ -28,7 +28,8 @@
 }
 
 .mk-button-default,
-.mk-button-plain {
+.mk-button-plain,
+.mk-button-floating {
   color: var(--gray-10); //an <a> link also could add this class
   background-color: var(--button-color-static);
   &:hover {
@@ -44,9 +45,20 @@
   border: 1px solid var(--button-color-active);
 }
 
+.mk-button-floating {
+  box-shadow: var(--gray-3) 2px 2px 5px 3px;
+  &:hover {
+    box-shadow: var(--gray-3) 0 0 0 0;
+  }
+  &:active,
+  &.active {
+    box-shadow: var(--gray-3) 0 0 0 0;
+  }
+}
+
 .mk-button-primary {
-  background: var(--blue-7);
   color: white;
+  background-color: var(--blue-7);
   &:hover {
     background-color: var(--blue-5);
   }

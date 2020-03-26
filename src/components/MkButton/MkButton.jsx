@@ -32,9 +32,11 @@ const MkButton = React.forwardRef(({
             case 'alpha':
                 return 'mk-button-alpha';
             case 'plain':
-                return 'mk-button-plain'
+                return 'mk-button-plain';
             case 'primary':
-                return 'mk-button-primary'    
+                return 'mk-button-primary';
+            case 'floating':
+                return 'mk-button-floating';
             default:
                 return "mk-button-default";
         }

@@ -18,11 +18,11 @@
   height: 64px;
   background-color: white;
 
-  padding-top:12px;
+  padding-top: 12px;
   > button {
     position: relative;
-    left:12px;
-    width:calc(100% - 24px);
+    left: 12px;
+    width: calc(100% - 24px);
   }
 }
 
@@ -82,13 +82,13 @@
   }
 
   &.current {
-    box-shadow: skyblue 4px 0 0 0,var(--gray-3) 4px 4px 0 0;
+    box-shadow: skyblue 4px 0 0 0, var(--gray-3) 6px 2px 0 2px;
   }
   &.applied {
-    box-shadow: lawngreen 4px 0 0 0,var(--gray-3) 4px 4px 0 0;
+    box-shadow: lawngreen 4px 0 0 0, var(--gray-3) 6px 2px 0 2px;
   }
   &.unused {
-    box-shadow: gray 4px 0 0 0,var(--gray-3) 4px 4px 0 0;
+    box-shadow: gray 4px 0 0 0, var(--gray-3) 6px 2px 0 2px;
   }
 
   .content-matches {
