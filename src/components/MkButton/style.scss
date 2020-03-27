@@ -31,18 +31,18 @@
 .mk-button-plain,
 .mk-button-floating {
   color: var(--gray-10); //an <a> link also could add this class
-  background-color: var(--button-color-static);
+  background-color: var(--gray-1);
   &:hover {
-    background-color: var(--button-color-hover);
+    background-color: var(--gray-3);
   }
   &:active,
   &.active {
-    background-color: var(--button-color-active);
+    background-color: var(--gray-5);
   }
 }
 
 .mk-button-plain {
-  border: 1px solid var(--button-color-active);
+  border: 1px solid var(--gray-5);
 }
 
 .mk-button-floating {
@@ -57,7 +57,7 @@
 }
 
 .mk-button-primary {
-  color: white;
+  color: var(--gray-1);
   background-color: var(--blue-7);
   &:hover {
     background-color: var(--blue-5);
@@ -65,20 +65,6 @@
   &:active,
   &.active {
     background-color: var(--blue-10);
-  }
-}
-
-.mk-button-alpha {
-  color: mix(white, transparent, 95%);
-  background-color: var(--button-alpha-color-static);
-  &:hover {
-    color: white;
-    background-color: var(--button-alpha-color-hover);
-  }
-  &:active,
-  &.active {
-    color: white;
-    background-color: var(--button-alpha-color-active);
   }
 }
 

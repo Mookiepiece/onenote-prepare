@@ -1,7 +1,29 @@
 .match-rule-style-match {
-    >span{
-        line-height: 32px;
+  .match-rule-style-match-item {
+    > span {
+      display: inline-block;
+      vertical-align: middle;
     }
-  display: grid;
-  grid-template-columns: auto auto auto auto;
+
+    &.show-2 {
+      > :nth-child(1) {
+        width: 25%;
+        transition: all 0.1s;
+      }
+      > :nth-child(2) {
+        width: 25%;
+        transition: all 0.1s;
+      }
+      > :nth-child(3),
+      > :nth-child(4) {
+        display: none;
+        width: 0;
+      }
+    }
+    &.show-4 {
+      > * {
+        width: 25%;
+      }
+    }
+  }
 }

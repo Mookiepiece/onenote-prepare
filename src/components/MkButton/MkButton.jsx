@@ -29,8 +29,6 @@ const MkButton = React.forwardRef(({
 
     className += ' ' + (_ => {
         switch (type) {
-            case 'alpha':
-                return 'mk-button-alpha';
             case 'plain':
                 return 'mk-button-plain';
             case 'primary':

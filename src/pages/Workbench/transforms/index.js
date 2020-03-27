@@ -2,7 +2,12 @@ import React, { useState, useReducer, useCallback, useMemo, useEffect } from 're
 import { Transforms, Editor, Text, Range, Node, Path } from 'slate';
 
 import {
-    PlusCircleOutlined
+    PlusCircleOutlined,
+    BoldOutlined,
+    ItalicOutlined,
+    UnderlineOutlined,
+    FontColorsOutlined,
+    BgColorsOutlined
 } from '@ant-design/icons';
 
 import Input from '@/components/Input';
@@ -105,7 +110,7 @@ export const M = [
 
             return (
                 <>
-                    <div className="grid" >
+                    <div className="match-rule-grid" >
                         <span>匹配文本:</span>
                         <Input
                             value={value}
@@ -179,7 +184,7 @@ export const M = [
 
             return (
                 <>
-                    <div className="grid" >
+                    <div className="match-rule-grid" >
                         <span>开头限制:</span>
                         <Input value={value} onChange={value => onInput({ value }, true)} onFocus={onMatch} />
                     </div>
@@ -243,7 +248,7 @@ export const M = [
 
             return (
                 <>
-                    <div className="grid">
+                    <div className="match-rule-grid">
                         <span>结尾限制:</span>
                         <Input value={value} onChange={value => onInput({ value }, true)} onFocus={onMatch} />
                     </div>
@@ -257,21 +262,45 @@ export const M = [
         inType: '',
         outType: 'leaf',
 
-        inputs: _ => ({ bold: [false, true], }),
-        match: (editor, prevRanges, { bold }) => {
+        inputs: _ => ({
+            bold: [false, true],
+            italic: [false, true],
+            underline: [false, true],
+            fontColor: [false, true],
+            bgColor: [false, true],
+        }),
+        match: (editor, prevRanges, { bold, italic, underline, fontColor, bgColor }) => {
             const children = editor.children;
 
             console.log(bold);
             const ranges = [];
+
+            if (!(bold[0] || italic[0] || underline[0] || fontColor[0] || bgColor[0]))
+                return [];
 
             children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
                 if (el.text !== undefined) {
                     if (bold[0]) {
                         if (!(el.bold === bold[1] || el.bold === undefined && !bold[1]))  //NOTE: undefined !== false and undefined !== true
                             return false; //NOTE:return 仅仅是表示能不能继续向下循环 //不过这里防止push了
-                    } else {
-                        return false;
                     }
+                    if (italic[0]) {
+                        if (!(el.italic === italic[1] || el.italic === undefined && !italic[1]))
+                            return false;
+                    }
+                    if (underline[0]) {
+                        if (!(el.underline === underline[1] || el.underline === undefined && !underline[1]))
+                            return false;
+                    }
+                    if (fontColor[0]) {
+                        if (!(!!el.fontColor === fontColor[1] || el.fontColor === undefined && !fontColor[1]))
+                            return false;
+                    }
+                    if (bgColor[0]) {
+                        if (!(!!el.bgColor === bgColor[1] || el.bgColor === undefined && !bgColor[1]))
+                            return false;
+                    }
+
 
                     ranges.push({
                         anchor: { path, offset: 0 },
@@ -285,34 +314,78 @@ export const M = [
         },
 
         render({ inputs, onInput, onMatch }) {
-            const { bold } = inputs;
+            const { bold, italic, underline, fontColor, bgColor } = inputs;
 
             const [visible, setVisible] = useState();
 
             return (
                 <>
-                    <div className="grid">
+                    <div className="match-rule-grid">
                         <span>选项:</span>
                         <Button onClick={_ => setVisible(true)}><PlusCircleOutlined /></Button>
                     </div>
                     <AsideDialog visible={visible} setVisible={setVisible}>
                         <div className="match-rule-style-match">
-                            <span>粗体:</span>
-                            <Switch
-                                value={bold[0]}
-                                onChange={v => onInput({ bold: setArrayItem(bold, 0, v) }, true)}
-                            />
-                            {
-                                bold[0] ? (
-                                    <>
-                                        <span>有无</span>
-                                        <Switch
-                                            value={bold[1]}
-                                            onChange={v => onInput({ bold: setArrayItem(bold, 1, v) }, true)}
-                                        />
-                                    </>
-                                ) : null
-                            }
+                            <div className={`match-rule-style-match-item ${bold[0] ? 'show-4' : 'show-2'}`}>
+                                <span style={{ fontWeight: 'bold' }}><BoldOutlined />粗体:</span>
+                                <Switch
+                                    value={bold[0]}
+                                    onChange={v => onInput({ bold: setArrayItem(bold, 0, v) }, true)}
+                                />
+                                <span>有无</span>
+                                <Switch
+                                    value={bold[1]}
+                                    onChange={v => onInput({ bold: setArrayItem(bold, 1, v) }, true)}
+                                />
+                            </div>
+                            <div className={`match-rule-style-match-item ${italic[0] ? 'show-4' : 'show-2'}`}>
+                                <span style={{ fontStyle: 'italic' }}><BoldOutlined />斜体:</span>
+                                <Switch
+                                    value={italic[0]}
+                                    onChange={v => onInput({ italic: setArrayItem(italic, 0, v) }, true)}
+                                />
+                                <span>有无</span>
+                                <Switch
+                                    value={italic[1]}
+                                    onChange={v => onInput({ italic: setArrayItem(italic, 1, v) }, true)}
+                                />
+                            </div>
+                            <div className={`match-rule-style-match-item ${underline[0] ? 'show-4' : 'show-2'}`}>
+                                <span style={{ textDecoration: 'underline' }}><BoldOutlined />下划线:</span>
+                                <Switch
+                                    value={underline[0]}
+                                    onChange={v => onInput({ underline: setArrayItem(underline, 0, v) }, true)}
+                                />
+                                <span>有无</span>
+                                <Switch
+                                    value={underline[1]}
+                                    onChange={v => onInput({ underline: setArrayItem(underline, 1, v) }, true)}
+                                />
+                            </div>
+                            <div className={`match-rule-style-match-item ${fontColor[0] ? 'show-4' : 'show-2'}`}>
+                                <span style={{ color: 'var(--blue-3)' }}><FontColorsOutlined />前景色:</span>
+                                <Switch
+                                    value={fontColor[0]}
+                                    onChange={v => onInput({ fontColor: setArrayItem(fontColor, 0, v) }, true)}
+                                />
+                                <span>有无</span>
+                                <Switch
+                                    value={fontColor[1]}
+                                    onChange={v => onInput({ fontColor: setArrayItem(fontColor, 1, v) }, true)}
+                                />
+                            </div>
+                            <div className={`match-rule-style-match-item ${bgColor[0] ? 'show-4' : 'show-2'}`}>
+                                <span style={{ backgroundColor: 'var(--blue-3)' }}><BgColorsOutlined />背景色:</span>
+                                <Switch
+                                    value={bgColor[0]}
+                                    onChange={v => onInput({ bgColor: setArrayItem(bgColor, 0, v) }, true)}
+                                />
+                                <span>有无</span>
+                                <Switch
+                                    value={bgColor[1]}
+                                    onChange={v => onInput({ bgColor: setArrayItem(bgColor, 1, v) }, true)}
+                                />
+                            </div>
                         </div>
                     </AsideDialog>
                 </>

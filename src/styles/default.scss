@@ -4,7 +4,7 @@
 /* variables */
 
 :root {
-  --gray-1: #ffffff;
+  --gray-1: #fcfcfc;
   --gray-2: #fafafa;
   --gray-3: #f5f5f5;
   --gray-4: #f0f0f0;
@@ -44,16 +44,12 @@
   --button-color-hover: var(--gray-3);
   --button-color-active: var(--gray-5);
 
-  --button-alpha-color-static: transparent;
-  --button-alpha-color-hover: #{mix(transparent, white, 80%)};
-  --button-alpha-color-active: #{mix(transparent, black, 80%)};
-
   --color-onenote: var(--blue-7);
 }
 
-html{
+html {
   font-size: 12px;
-  color:var(--gray-8);
+  color: var(--gray-8);
 }
 
-$app-frame-height:32px;
+$app-frame-height: 32px;

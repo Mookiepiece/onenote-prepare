@@ -311,7 +311,7 @@ const Aside = ({ setSlateValue }) => {
             </div>
             <div className="aside-bottom">
                 <Button
-                    type="plain"
+                    type="floating"
                     onClick={_ => {
                         setDialogVisible(true);
                         setDialogPushTransform(true);
