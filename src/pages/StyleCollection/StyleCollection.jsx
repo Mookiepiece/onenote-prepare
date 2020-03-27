@@ -3,14 +3,58 @@ import { Editable, withReact, Slate } from 'slate-react';
 import './style.scss';
 
 import Editor from '@/components/Editor';
+import Button from '@/components/MkButton';
+import Dialog from '@/components/Dialog';
 
-const Workbench = () => {
+import { Switch } from '@/components/Switch';
+
+const SC = () => {
+    const [dv, sdv] = useState(false);
+
+    const [trible, setTrible] = useState(false);
+
+    const handleChange = value => {
+        setTrible(value);
+    }
+
+    const [leafStyle, setLeafStyle] = useState({
+        fontFamily: undefined,
+        fontSize: undefined,
+        fontColor: undefined,
+        bgColor: undefined,
+        bold: undefined,
+        italic: undefined,
+        underline: undefined,
+    });
+
     return (
-        <>
-            <div className="workbench">
-                <Editor initialValue={initialValue} renderAside={_=><div><p>hahah</p></div>} />
-            </div>
-        </>
+        <div className="style-collection">
+            <br />
+            <br />
+            <br />
+            <br />
+
+            <Button onClick={_ => sdv(true)}>sc</Button>
+            <Switch
+                value={trible}
+                onChange={handleChange}
+                activeColor='var(--purple-5)'
+                reversed
+            />
+            <Dialog visible={dv} setVisible={sdv}>
+                <div className="leaf-style-editor">
+                    <pre><span>对照组</span></pre>
+                    <span>文字样式示例</span>
+                    <pre><span>对照组</span></pre>
+                    <aside>
+
+                    </aside>
+                </div>
+            </Dialog>
+            {/* <Editor initialValue={initialValue} >
+                <div><p>hahah</p></div>
+            </Editor> */}
+        </div>
     )
 }
 
@@ -29,4 +73,4 @@ const initialValue = [
     },
 ];
 
-export default Workbench
+export default SC;

@@ -4,26 +4,5 @@
       display: inline-block;
       vertical-align: middle;
     }
-
-    &.show-2 {
-      > :nth-child(1) {
-        width: 25%;
-        transition: all 0.1s;
-      }
-      > :nth-child(2) {
-        width: 25%;
-        transition: all 0.1s;
-      }
-      > :nth-child(3),
-      > :nth-child(4) {
-        display: none;
-        width: 0;
-      }
-    }
-    &.show-4 {
-      > * {
-        width: 25%;
-      }
-    }
   }
 }

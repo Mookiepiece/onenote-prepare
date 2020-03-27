@@ -12,7 +12,7 @@ import {
 
 import Input from '@/components/Input';
 import Button from "@/components/MkButton";
-import Switch from '@/components/Switch';
+import { Switch, CheckboxButton } from '@/components/Switch';
 import Dialog from "@/components/Dialog";
 import AsideDialog from "@/components/Dialog/asideDialog";
 
@@ -317,6 +317,13 @@ export const M = [
             const { bold, italic, underline, fontColor, bgColor } = inputs;
 
             const [visible, setVisible] = useState();
+            const leafStyles = useMemo(_ => [
+                ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],
+                ['italic', ItalicOutlined, '斜体', { fontStyle: 'italic' }],
+                ['underline', UnderlineOutlined, '底线', { textDecoration: 'underline' }],
+                ['fontColor', FontColorsOutlined, '前景', { color: 'var(--blue-5)' }],
+                ['bgColor', BgColorsOutlined, '背景', { backgroundColor: 'var(--blue-3)' }]
+            ], []);
 
             return (
                 <>
@@ -326,66 +333,24 @@ export const M = [
                     </div>
                     <AsideDialog visible={visible} setVisible={setVisible}>
                         <div className="match-rule-style-match">
-                            <div className={`match-rule-style-match-item ${bold[0] ? 'show-4' : 'show-2'}`}>
-                                <span style={{ fontWeight: 'bold' }}><BoldOutlined />粗体:</span>
-                                <Switch
-                                    value={bold[0]}
-                                    onChange={v => onInput({ bold: setArrayItem(bold, 0, v) }, true)}
-                                />
-                                <span>有无</span>
-                                <Switch
-                                    value={bold[1]}
-                                    onChange={v => onInput({ bold: setArrayItem(bold, 1, v) }, true)}
-                                />
-                            </div>
-                            <div className={`match-rule-style-match-item ${italic[0] ? 'show-4' : 'show-2'}`}>
-                                <span style={{ fontStyle: 'italic' }}><BoldOutlined />斜体:</span>
-                                <Switch
-                                    value={italic[0]}
-                                    onChange={v => onInput({ italic: setArrayItem(italic, 0, v) }, true)}
-                                />
-                                <span>有无</span>
-                                <Switch
-                                    value={italic[1]}
-                                    onChange={v => onInput({ italic: setArrayItem(italic, 1, v) }, true)}
-                                />
-                            </div>
-                            <div className={`match-rule-style-match-item ${underline[0] ? 'show-4' : 'show-2'}`}>
-                                <span style={{ textDecoration: 'underline' }}><BoldOutlined />下划线:</span>
-                                <Switch
-                                    value={underline[0]}
-                                    onChange={v => onInput({ underline: setArrayItem(underline, 0, v) }, true)}
-                                />
-                                <span>有无</span>
-                                <Switch
-                                    value={underline[1]}
-                                    onChange={v => onInput({ underline: setArrayItem(underline, 1, v) }, true)}
-                                />
-                            </div>
-                            <div className={`match-rule-style-match-item ${fontColor[0] ? 'show-4' : 'show-2'}`}>
-                                <span style={{ color: 'var(--blue-3)' }}><FontColorsOutlined />前景色:</span>
-                                <Switch
-                                    value={fontColor[0]}
-                                    onChange={v => onInput({ fontColor: setArrayItem(fontColor, 0, v) }, true)}
-                                />
-                                <span>有无</span>
-                                <Switch
-                                    value={fontColor[1]}
-                                    onChange={v => onInput({ fontColor: setArrayItem(fontColor, 1, v) }, true)}
-                                />
-                            </div>
-                            <div className={`match-rule-style-match-item ${bgColor[0] ? 'show-4' : 'show-2'}`}>
-                                <span style={{ backgroundColor: 'var(--blue-3)' }}><BgColorsOutlined />背景色:</span>
-                                <Switch
-                                    value={bgColor[0]}
-                                    onChange={v => onInput({ bgColor: setArrayItem(bgColor, 0, v) }, true)}
-                                />
-                                <span>有无</span>
-                                <Switch
-                                    value={bgColor[1]}
-                                    onChange={v => onInput({ bgColor: setArrayItem(bgColor, 1, v) }, true)}
-                                />
-                            </div>
+                            {
+                                leafStyles.map(([name, Icon, text, style]) => {
+                                    return (
+                                        <div key={name} className={`match-rule-style-match-item`}>
+                                            <CheckboxButton
+                                                value={inputs[name][0]}
+                                                onChange={v => onInput({ [name]: setArrayItem(inputs[name], 0, v) }, true)}
+                                            ><span style={{ ...style, fontSize: 12 }}><Icon />{text}</span></CheckboxButton>
+                                            <Switch
+                                                value={inputs[name][1]}
+                                                onChange={v => onInput({ [name]: setArrayItem(inputs[name], 1, v) }, true)}
+                                                disabled={!inputs[name][0]}
+                                                inactiveColor={'var(--purple-5)'}
+                                            />
+                                        </div>
+                                    )
+                                })
+                            }
                         </div>
                     </AsideDialog>
                 </>

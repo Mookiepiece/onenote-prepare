@@ -1,43 +1,156 @@
 .switch {
+  --active-color: var(--blue-7);
+  --inactive-color: var(--gray-5);
+
   display: inline-block;
   vertical-align: middle;
   width: 32px;
   height: 32px;
-  > input[type="checkbox"] {
+  > input {
     visibility: hidden;
     width: 0;
     height: 0;
     position: absolute;
   }
 
-  > div {
+  //background
+  &:not(.trident-switch) > div {
+    transition: all 0.1s;
+
     width: 28px;
     height: 10px;
     margin: 11px 4px;
     border-radius: 10px;
 
     &.switch-active {
-      background-color: var(--blue-7);
+      background-color: var(--active-color);
+      border: var(--active-border);
     }
     &.switch-inactive {
-      background-color: var(--gray-8);
+      background-color: var(--inactive-color);
+      border: var(--inactive-border);
     }
 
     position: relative;
-    &::before {
+
+    //circle
+    &::after {
       content: " ";
       width: 16px;
       height: 16px;
       border: 1px solid var(--gray-5);
-      background-color: var(--gray-1);
+      background: repeating-linear-gradient(45deg, var(--gray-1) 0px, var(--gray-1) 2px, var(--gray-5) 4px);
       border-radius: 50%;
       position: absolute;
       left: -3px;
       top: -3px;
       transition: all 0.3s;
     }
-    &.switch-active::before {
+    &.switch-active::after {
       transform: translate(18px);
     }
+  }
+
+  &.reversed {
+    transform: rotate(0.5turn);
+  }
+
+  &.disabled {
+    &:not(.trident-switch) > div {
+      background-color: var(--gray-4);
+      &::after {
+        transition: unset;
+        background: var(--gray-5);
+      }
+    }
+  }
+}
+
+.trident-switch {
+  width: 192px; //64px * 3 = 192px
+  position: relative;
+
+  > .switch-display {
+    height: 10px;
+    top: 11px;
+    position: absolute;
+    left: 28px; //192px - 28px * 2 = 136px
+    right: 28px;
+    border-radius: 10px;
+    pointer-events: none;
+    background-color: var();
+    background: linear-gradient(90deg, var(--gray-8), var(--gray-8));
+
+    //circle
+    &::after {
+      content: " ";
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--gray-5);
+      background: repeating-linear-gradient(45deg, var(--gray-1) 0px, var(--gray-1) 2px, var(--gray-5) 4px);
+      border-radius: 50%;
+      position: absolute;
+      left: 60px; //(136px -16px) / 2
+      top: -3px;
+      transition: all 0.3s;
+    }
+
+    &.switch-negative {
+      background: linear-gradient(270deg, var(--blue-7) 60%, var(--purple-5));
+      &::after {
+        transform: translate(-63px);
+      }
+    }
+    &.switch-active {
+      background: linear-gradient(90deg, var(--blue-7) 60%, var(--purple-5));
+      &::after {
+        transform: translate(63px);
+      }
+    }
+  }
+
+  > .s {
+    position: relative;
+    height: 100%;
+    width: 33.3333333333%;
+    display: inline-block;
+    vertical-align: middle;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      position: absolute;
+      top: 9px;
+      left: 31.5px;
+      width: 1px;
+      height: 2px;
+      background-color: var(--gray-5);
+    }
+  }
+}
+
+.checkbox-button {
+  display: inline-block;
+
+  > input {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+
+  .checkbox-button-active,
+  .checkbox-button-inactive {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 0 11px;
+  }
+  .checkbox-button-active {
+    background-color: var(--blue-5);
+  }
+  .checkbox-button-inactive {
+    border: 1px solid var(--gray-8);
+    // background-color: var(--gray-5);
   }
 }

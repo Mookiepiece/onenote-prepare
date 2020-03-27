@@ -98,14 +98,14 @@ const useAsideState = (initialState, setSlateValue) => {
                     }),
                 };
             }
-            case 'SET_CURRENT_MATCH': {
-                let currentIndex = state.currentIndex;
-                console.log('set cur match', action.value);
-                return {
-                    ...state,
-                    v: setObject(state.v, `${currentIndex}.currentMatch`, action.value)
-                }
-            }
+            // case 'SET_CURRENT_MATCH': {
+            //     let currentIndex = state.currentIndex;
+            //     console.log('set cur match', action.value);
+            //     return {
+            //         ...state,
+            //         v: setObject(state.v, `${currentIndex}.currentMatch`, action.value)
+            //     }
+            // }
             case 'INPUT': {
                 let currentIndex = state.currentIndex;
                 let v = state.v;
@@ -295,13 +295,6 @@ const Aside = ({ setSlateValue }) => {
                                             index
                                         })
                                     }
-
-                                    onMatchChange={
-                                        value => dispatch({
-                                            type: 'SET_CURRENT_MATCH',
-                                            value
-                                        })
-                                    }
                                 />
                             </CSSTransition>
                         )).reverse()
@@ -323,7 +316,7 @@ const Aside = ({ setSlateValue }) => {
     )
 }
 
-const TransformFormularCard = ({ v, color, onClose, onActive, onInput, onMatch, onOpenDialog, onApply, onMatchChange }) => {
+const TransformFormularCard = ({ v, color, onClose, onActive, onInput, onMatch, onOpenDialog, onApply }) => {
     let className = `transform-formular-card${' ' + color}`;
 
     return (
@@ -342,7 +335,7 @@ const TransformFormularCard = ({ v, color, onClose, onActive, onInput, onMatch, 
                                 timeout={300}
                                 classNames="match-item"
                             >
-                                <div className="match-item" onClick={_ => onMatchChange(i)}>
+                                <div className="match-item" >
                                     <p className="match-item-title">✨{v.title}</p>
                                     <V
                                         color={color}

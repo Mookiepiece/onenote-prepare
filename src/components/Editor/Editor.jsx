@@ -5,7 +5,7 @@ import Toolbar from './Toolbar';
 import { createEditor, renderElement, renderLeaf } from './createEditor.js';
 import higherOrderKeydownHandler from './hotkeys';
 
-const Editor = ({ initialValue, renderAside }) => {
+const Editor = ({ initialValue, renderAside,children }) => {
     const [value, setValue] = useState(initialValue);
     const editor = useMemo(createEditor, []);
     const Aside = renderAside;
@@ -24,7 +24,7 @@ const Editor = ({ initialValue, renderAside }) => {
                     onKeyDown={handleKeydown}
                 />
             </div>
-            <Aside setSlateValue={setValue} />
+            {children}
         </Slate>
     )
 }

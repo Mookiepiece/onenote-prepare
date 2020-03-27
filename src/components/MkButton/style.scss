@@ -33,7 +33,7 @@
   color: var(--gray-10); //an <a> link also could add this class
   background-color: var(--gray-1);
   &:hover {
-    background-color: var(--gray-3);
+    background-color: var(--gray-4);
   }
   &:active,
   &.active {
@@ -46,13 +46,13 @@
 }
 
 .mk-button-floating {
-  box-shadow: var(--gray-3) 2px 2px 5px 3px;
+  box-shadow: var(--gray-4) 2px 2px 5px 3px;
   &:hover {
-    box-shadow: var(--gray-3) 0 0 0 0;
+    box-shadow: var(--gray-4) 0 0 0 0;
   }
   &:active,
   &.active {
-    box-shadow: var(--gray-3) 0 0 0 0;
+    box-shadow: var(--gray-4) 0 0 0 0;
   }
 }
 

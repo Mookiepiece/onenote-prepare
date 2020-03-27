@@ -4,7 +4,7 @@
 /* variables */
 
 :root {
-  --gray-1: #fcfcfc;
+  --gray-1: #fbfbfb;
   --gray-2: #fafafa;
   --gray-3: #f5f5f5;
   --gray-4: #f0f0f0;
@@ -40,9 +40,16 @@
   --blue-9: #003a8c;
   --blue-10: #002766;
 
-  --button-color-static: transparent;
-  --button-color-hover: var(--gray-3);
-  --button-color-active: var(--gray-5);
+  --purple-1: #f9f0ff;
+  --purple-2: #efdbff;
+  --purple-3: #d3adf7;
+  --purple-4: #b37feb;
+  --purple-5: #9254de;
+  --purple-6: #722ed1;
+  --purple-7: #531dab;
+  --purple-8: #391085;
+  --purple-9: #22075e;
+  --purple-10: #120338;
 
   --color-onenote: var(--blue-7);
 }

@@ -4,7 +4,7 @@
 .dialog-bg-no-poiner-event {
   z-index: 1000;
   position: fixed;
-  background-color: #0003;
+  background-color: #0002;
   transition: all 0.3s;
 }
 
@@ -33,7 +33,7 @@
   border-radius: 4px;
   box-shadow: var(--gray-6) 0 0 3px 1px;
 
-  border: 1px solid var(--gray-3);
+  border: 1px solid var(--gray-4);
   background-color: var(--gray-1);
 }
 
@@ -50,7 +50,7 @@
   right: 0;
   width: 39%;
   
-  box-shadow: var(--gray-3) 2px 2px 5px 3px;
+  box-shadow: var(--gray-4) 2px 2px 5px 3px;
 
   padding-bottom: 64px;
 

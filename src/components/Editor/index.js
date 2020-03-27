@@ -1,4 +1,4 @@
-import Editor from './Editor.jsx';
+import useSlateEditor from './Editor.jsx';
 import './style.scss';
 
-export default Editor;
+export default useSlateEditor;
