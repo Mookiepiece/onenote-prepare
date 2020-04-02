@@ -9,8 +9,19 @@ in developing...so slow
 
 ## 动机
 
-个人写过自认为不丑的OneNote笔记，习惯在笔记中套用自己的一套格式，但是OneNote for Windows10 中还是暂时不支持自定义格式化，故打算写个网页预处理文本样式，再复制到OneNote中，事实上Office的ppt等等都将可以使用它做富文本样式变换，如果需要
-在WORD的替换功能里有更成熟的文本样式替换功能，但缺乏对目标样式的管理
+个人写过自认为不丑的OneNote笔记，习惯在笔记中套用自己的一套格式，但是OneNote for Windows10 中还是暂时不支持自定义格式化，故打算写个网页预处理文本样式，再复制到OneNote中，事实上Office的ppt等等都将可以使用它做富文本样式变换。其实在WORD的替换功能里有更成熟的文本样式替换功能，但缺乏对目标样式的管理
+
+用例一：网页的重点标记不符合主题，我们复制需要的内容粘贴进来，标记所有粗体，替换为一个主题样式，再粘贴进其它软件
+
+|   网页教程内容    |    替换样式后的笔记示例    |
+|  ----  | ----  |
+| <img src="https://github.com/Mookiepiece/pre-onenote/blob/master/docs/contentFromWeb.jpg" alt="example of web content" height="250">    | <img src="https://github.com/Mookiepiece/pre-onenote/blob/master/docs/contentAfterStyleTransform.jpg" alt="web content after style tranasform" height="250"> |
+
+
+
+用例二：网页上复制的代码块等具有背景色（background-color）。但onenote没有，用户可以用这个软件生成表格和施加表格背景色，以模拟背景色
+
+<img src="https://github.com/Mookiepiece/pre-onenote/blob/master/docs/tableCraft.jpg" alt="use onenote tables to simulate background-color" width="50%">
 
 ## 开发随笔
 
