@@ -9,6 +9,10 @@
   > .slate {
     right: $aside-width;
 
+    .editor-toolbar{
+      padding-top: $app-frame-height;
+    }
+
     + aside {
       width: $aside-width;
 

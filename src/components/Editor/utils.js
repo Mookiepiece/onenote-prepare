@@ -1,5 +1,6 @@
 import { Editor, Transforms } from 'slate';
 import { ReactEditor } from 'slate-react';
+import { useState } from 'react';
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list'];
 
@@ -76,7 +77,7 @@ export const getMarkActiveSet = (editor, format) => {
 let selection;
 export const putSelection = editor => {
     selection = editor.selection;
-    console.debug(selection);
+    console.debug('put selection', selection);
 }
 
 export const getSelection = editor => {
@@ -86,4 +87,18 @@ export const getSelection = editor => {
         return true;
     }
     return false;
+}
+
+export const useSlateSelection = (editor) => {
+    const [selection, setSelection] = useState(null);
+
+    const putSelection = _ => setSelection(editor.selection);
+    const getSelection = _ => {
+        if (selection !== null) {
+            ReactEditor.focus(editor);
+            Transforms.select(editor, selection); //NOTE:setSelection不能即时生效，不明白setSelection和select的区别
+        }
+        return selection;
+    }
+    return [putSelection, getSelection];
 }

@@ -6,10 +6,12 @@ import Aside from './components/Aside';
 import Editor from '@/components/Editor';
 
 const Workbench = () => {
+    const [value, setValue] = useState(initialValue);
+
     return (
         <div className="workbench">
-            <Editor initialValue={initialValue} >
-                <Aside />
+            <Editor value={value} setValue={setValue}>
+                <Aside setSlateValue={setValue} />
             </Editor>
         </div>
     )

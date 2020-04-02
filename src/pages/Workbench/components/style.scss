@@ -180,3 +180,16 @@
   opacity: 0;
   transition: all 0.3s;
 }
+
+.result-editor-dialog {
+  > .slate {
+    right: 300px;
+  }
+  > aside {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 300px;
+    right: 0;
+  }
+}

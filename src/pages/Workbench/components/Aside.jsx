@@ -1,5 +1,4 @@
 import React, { useState, useReducer, useCallback, useMemo, useEffect } from 'react';
-import { Transforms, Editor, Text, Range, Node, Path } from 'slate';
 import {
     CSSTransition,
     TransitionGroup,
@@ -7,27 +6,23 @@ import {
 import { useSlate, useEditor } from 'slate-react';
 import {
     CloseOutlined,
-    ClearOutlined,
-    ApiOutlined,
     BorderOutlined,
     CheckSquareOutlined,
-    BookOutlined,
     PlusCircleOutlined
 } from '@ant-design/icons';
 import { v4 as uuid } from 'uuid';
 
 import Button from "@/components/MkButton";
-import Input from '@/components/Input';
 
 import './style.scss';
 
 import { deepCopy, altArrayItem, setArrayItem, altObject, setObject } from '@/utils';
 
 import { MGet } from '../transforms';
-import { applyMatch, clearUp, applyRender } from '../transforms/sideEffects';
+import { applyMatch, clearUp, applyRender } from '../transforms/slateEffects';
 
 import DialogMatchPicker from './DialogMatchPicker';
-
+import ResultPanel from './ResultPanel';
 let matchedRanges = [];
 
 
@@ -77,7 +72,15 @@ const useAsideState = (initialState, setSlateValue) => {
                     }
                     state = {
                         ...state,
-                        v: [...state.v, { name: action.value.title, matches: [], currentMatch: null, result: '', key: uuid() }],
+                        v: [
+                            ...state.v,
+                            {
+                                name: action.value.title,
+                                matches: [],
+                                currentMatch: null,
+                                result: { nodes: [] }, //nodes会在useEffect里通过INPUT事件传入
+                                key: uuid()
+                            }],
                         currentIndex: state.v.length,
                     }
                 }
@@ -98,14 +101,6 @@ const useAsideState = (initialState, setSlateValue) => {
                     }),
                 };
             }
-            // case 'SET_CURRENT_MATCH': {
-            //     let currentIndex = state.currentIndex;
-            //     console.log('set cur match', action.value);
-            //     return {
-            //         ...state,
-            //         v: setObject(state.v, `${currentIndex}.currentMatch`, action.value)
-            //     }
-            // }
             case 'INPUT': {
                 let currentIndex = state.currentIndex;
                 let v = state.v;
@@ -114,7 +109,7 @@ const useAsideState = (initialState, setSlateValue) => {
                 if (matchIndex < 0) {
                     state = {
                         ...state,
-                        v: setObject(v, `${currentIndex}.result`, action.inputs)
+                        v: altObject(v, `${currentIndex}.result`, action.inputs)
                     };
                 } else {
                     state = {
@@ -170,7 +165,6 @@ const useAsideState = (initialState, setSlateValue) => {
                 return state;
             }
             case 'MATCH':
-                console.log('applyMatcher');
                 state = applyMatcher(editor, state);
                 return state;
             case 'APPLY':
@@ -208,15 +202,6 @@ const Aside = ({ setSlateValue }) => {
             return 'current';
     }, []);
 
-    const handleMatchSelected = (i) => {
-        dispatch({
-            type: 'PUSH_MATCH_RULE',
-            value: MGet(i),
-            pushTransform: dialogPushTransform
-        });
-        setDialogVisible(false);
-    };
-
     return (
         <aside>
             <div className="workbench-aside">
@@ -227,7 +212,7 @@ const Aside = ({ setSlateValue }) => {
                         setDialogPushTransform(true);
                     }}
                     style={{ marginBottom: 12 }}
-                >add rule</Button>
+                >添加规则</Button>
                 <TransitionGroup component={null}>
                     {
                         state.v.map((v, index) => (
@@ -300,7 +285,14 @@ const Aside = ({ setSlateValue }) => {
                         )).reverse()
                     }
                 </TransitionGroup>
-                <DialogMatchPicker visible={dialogVisible} setVisible={setDialogVisible} onApply={handleMatchSelected} />
+                <DialogMatchPicker visible={dialogVisible} setVisible={setDialogVisible} onApply={(i) => {
+                    dispatch({
+                        type: 'PUSH_MATCH_RULE',
+                        value: MGet(i),
+                        pushTransform: dialogPushTransform
+                    });
+                    setDialogVisible(false);
+                }} />
             </div>
             <div className="aside-bottom">
                 <Button
@@ -310,7 +302,7 @@ const Aside = ({ setSlateValue }) => {
                         setDialogPushTransform(true);
                     }}
                     style={{ marginBottom: 12 }}
-                >apply rule</Button>
+                >应用规则</Button>
             </div>
         </aside >
     )
@@ -355,11 +347,10 @@ const TransformFormularCard = ({ v, color, onClose, onActive, onInput, onMatch, 
             {
                 v.matches.length ?
                     (
-                        <div className="content-result" >
-                            <span>结果文本:</span>
-                            <Input value={v.result} onChange={result => onInput(result, false, -1)} />
-                            <Button className="add-match-button" ><BookOutlined /></Button>
-                        </div>
+                        <ResultPanel
+                            v={v}
+                            onChange={result => onInput(result, false, -1)}
+                        />
                     )
                     : null
             }

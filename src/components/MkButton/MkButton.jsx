@@ -9,6 +9,8 @@ const MkButton = React.forwardRef(({
     children,
     size = "small",
     round,
+    disabled = false,
+    onClick,
     ...others
 }, ref) => {
     className = className + ' ' + "mk-button";
@@ -49,9 +51,21 @@ const MkButton = React.forwardRef(({
         }
     })();
 
+    className += ' ' + (disabled ? 'disabled' : '');
+
+
 
     return (
-        <button ref={ref} className={className} tabIndex={unfocusable ? '-1' : null} {...others}>
+        <button ref={ref} className={className} tabIndex={unfocusable ? '-1' : null} onClick={
+            e => {
+                if (disabled) {
+                    e.preventDefault();
+                }
+                else {
+                    onClick&&onClick(e);
+                }
+            }
+        } {...others}>
             {children}
         </button>
     )

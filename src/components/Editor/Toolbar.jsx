@@ -3,8 +3,7 @@ import { useSlate, DefaultElement, ReactEditor } from 'slate-react';
 import { Editor, Transforms, Range, Text, Path, Location, Point } from 'slate';
 import { SketchPicker } from 'react-color';
 
-import DropdownButtonMousedownSelect from '@/components/DropdownButton/DropdownButtonMousedownSelect';
-import DropdownButtonMousedown from '@/components/DropdownButton/DropdownButtonMousedown';
+import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
 import Button from '@/components/MkButton';
 
 import {
@@ -13,6 +12,7 @@ import {
     UnderlineOutlined,
     FontSizeOutlined,
     ContainerOutlined,
+    StrikethroughOutlined,
     OrderedListOutlined,
     UnorderedListOutlined,
     CaretRightOutlined,
@@ -26,6 +26,8 @@ import {
 
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
 
+import { fontSizeOptions, fontFamilyOptions, DEAFULT_FONT_FAMILY, DEAFULT_FONT_SIZE } from '@/utils/userSettings';
+
 const Toolbar = () => {
 
     return (
@@ -36,6 +38,7 @@ const Toolbar = () => {
                 <MarkButton format="bold" icon={BoldOutlined} />
                 <MarkButton format="italic" icon={ItalicOutlined} />
                 <MarkButton format="underline" icon={UnderlineOutlined} />
+                <MarkButton format="strike" icon={StrikethroughOutlined} />
             </div>
             {/* <div className="toolbar-group">
 
@@ -52,8 +55,8 @@ const Toolbar = () => {
                 <BlockButton formatKey="align" format="left" icon={AlignLeftOutlined} />
                 <BlockButton formatKey="align" format="center" icon={AlignCenterOutlined} />
                 <BlockButton formatKey="align" format="right" icon={AlignRightOutlined} />
-                {/* <ActionButton />
-                <ActionButtonX /> */}
+                <ActionButton />
+                <ActionButtonX />
             </div>
             <div className="toolbar-group">
                 <ColorButton
@@ -173,7 +176,8 @@ const ColorButton = ({ format, icon }) => {
                 <Icon />
             </Button>
 
-            <DropdownButtonMousedown
+            <DropdownButton
+                trigger='mousedown'
                 active={pickerActive}
                 setActive={_ => setPickerActive(_)}
                 beforeClick={_ => putSelection(editor)}
@@ -208,7 +212,6 @@ const ColorButton = ({ format, icon }) => {
                                         action(hex);
                                     }}
                                 />
-                                }
                             </div>
                         )
                     }
@@ -218,19 +221,16 @@ const ColorButton = ({ format, icon }) => {
     )
 }
 
-const DEAFULT_FONT_FAMILY = "等线 Light";
-const DEAFULT_FONT_SIZE = 12;
-
 const FontComponent = ({
     format = "fontFamily",
     defaultValue = DEAFULT_FONT_FAMILY,
     renderLabel = ({ value, label }) => (<span style={{ fontFamily: value }}>{label}</span>),
-    options = [
-        { label: `${defaultValue}（默认）`, value: defaultValue },
-        { label: '微软雅黑', value: '微软雅黑' },
-        { label: '等线', value: '等线' },
-        { label: '宋体', value: '宋体' }
-    ]
+    options = fontFamilyOptions.map(v => {
+        return {
+            label: DEAFULT_FONT_FAMILY === v ? v + ' (默认)' : v,
+            value: v
+        };
+    })
 }) => {
     const editor = useSlate();
     let value = '/';
@@ -253,13 +253,14 @@ const FontComponent = ({
     };
 
     return (
-        <DropdownButtonMousedownSelect
+        <DropdownButtonSelect
+            trigger='mousedown'
             width={120}
             beforeClick={_ => putSelection(editor)}
-            text={value}
+            value={value}
             options={options}
             renderLabel={renderLabel}
-            action={action}
+            onChange={action}
         />
     )
 }
@@ -267,16 +268,12 @@ const FontComponent = ({
 const FontSizeComponent = ({
     format = "fontSize",
     defaultValue = DEAFULT_FONT_SIZE,
-    options = [
-        { label: `14（默认）`, value: 14 },
-        { label: '16', value: 16 },
-        { label: '18', value: 18 },
-        { label: '20', value: 20 },
-        { label: '22', value: 22 },
-        { label: '24', value: 24 },
-        { label: '26', value: 26 },
-        { label: '28', value: 28 },
-    ]
+    options = fontSizeOptions.map(v => {
+        return {
+            label: DEAFULT_FONT_SIZE === v ? v + ' (默认)' : v,
+            value: v
+        };
+    })
 }) => {
     const editor = useSlate();
     let value = '/';
@@ -299,12 +296,13 @@ const FontSizeComponent = ({
     };
 
     return (
-        <DropdownButtonMousedownSelect
+        <DropdownButtonSelect
+            trigger='mousedown'
             width={80}
             beforeClick={_ => putSelection(editor)}
-            text={value}
+            value={value}
             options={options}
-            action={action}
+            onChange={action}
         />
     )
 }

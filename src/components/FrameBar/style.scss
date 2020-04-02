@@ -1,8 +1,5 @@
 @import "@/styles/default.scss";
 
-:root {
-  --frame-bar-drag-place: 4px;
-}
 .frame-bar {
   user-select: none;
   position: absolute;
@@ -13,6 +10,8 @@
   z-index: 100;
 
   .frame-bar-drag-place {
+    --frame-bar-drag-place: 4px;
+
     -webkit-app-region: drag;
     position: absolute;
     top: var(--frame-bar-drag-place);
@@ -39,10 +38,10 @@
       line-height: 16px;
       background: transparent;
       &:hover {
-        background-color: mix(black,transparent,5%);
+        background-color: mix(black, transparent, 5%);
       }
       &:active {
-        background-color: mix(black,transparent,15%);
+        background-color: mix(black, transparent, 15%);
       }
     }
 

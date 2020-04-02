@@ -33,9 +33,9 @@ export const M = [
         inType: '',
         outType: 'leaf',
 
-        inputs: _ => ({ value: '', matchAll: true }),
+        inputs: _ => ({ value: '' }),
 
-        match: (editor, prevRanges, { value, matchAll }) => {
+        match: (editor, prevRanges, { value }) => {
             if (!value) return [];
             const children = editor.children;
 
@@ -109,21 +109,14 @@ export const M = [
             const { value, matchAll } = inputs;
 
             return (
-                <>
-                    <div className="match-rule-grid" >
-                        <span>匹配文本:</span>
-                        <Input
-                            value={value}
-                            onChange={value => onInput({ value }, true)}
-                            onFocus={onMatch}
-                        />
-                        <span>匹配所有:</span>
-                        <Switch
-                            value={matchAll}
-                            onChange={matchAll => onInput({ matchAll })}
-                        />
-                    </div>
-                </>
+                <div className="match-rule-grid" >
+                    <span>匹配文本:</span>
+                    <Input
+                        value={value}
+                        onChange={value => onInput({ value }, true)}
+                        onFocus={onMatch}
+                    />
+                </div>
             )
         }
     },
@@ -183,12 +176,10 @@ export const M = [
             const { value } = inputs;
 
             return (
-                <>
-                    <div className="match-rule-grid" >
-                        <span>开头限制:</span>
-                        <Input value={value} onChange={value => onInput({ value }, true)} onFocus={onMatch} />
-                    </div>
-                </>
+                <div className="match-rule-grid" >
+                    <span>开头限制:</span>
+                    <Input value={value} onChange={value => onInput({ value }, true)} onFocus={onMatch} />
+                </div>
             )
         }
     },
@@ -247,12 +238,10 @@ export const M = [
             const { value } = inputs;
 
             return (
-                <>
-                    <div className="match-rule-grid">
-                        <span>结尾限制:</span>
-                        <Input value={value} onChange={value => onInput({ value }, true)} onFocus={onMatch} />
-                    </div>
-                </>
+                <div className="match-rule-grid">
+                    <span>结尾限制:</span>
+                    <Input value={value} onChange={value => onInput({ value }, true)} onFocus={onMatch} />
+                </div>
             )
         }
     },

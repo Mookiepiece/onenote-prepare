@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { closest } from '@/components/util';
 
+/**
+ * 
+ * @param {*} panelActive 
+ * @param {*} setPanelActive 
+ * @param {String} eventName trigger
+ */
 const useDropdown = (panelActive, setPanelActive, eventName = "click") => {
     const buttonRef = useRef();
     let top = 0;

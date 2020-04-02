@@ -5,6 +5,8 @@ const Dialog = ({
     visible,
     setVisible,
     children,
+    full,
+    unmountOnExit = true,
     ...others
 }) => {
     return (
@@ -14,9 +16,9 @@ const Dialog = ({
                     in={visible}
                     timeout={300}
                     classNames='ani-dialog-bg'
-                    unmountOnExit
+                    unmountOnExit={unmountOnExit}
                 >
-                    <div className="dialog-bg-no-poiner-event"
+                    <div className={`dialog-bg dialog-bg-no-poiner-event ${visible ? '' : 'hidden'}`}
                         onMouseDown={_ => {
                             setVisible(false);
                         }}
@@ -27,9 +29,9 @@ const Dialog = ({
                     in={visible}
                     timeout={300}
                     classNames='ani-dialog-bg'
-                    unmountOnExit
+                    unmountOnExit={unmountOnExit}
                 >
-                    <div className="dialog-bg"
+                    <div className={`dialog-bg ${visible ? '' : 'hidden'}`}
                         onMouseDown={_ => {
                             setVisible(false);
                         }}
@@ -40,9 +42,9 @@ const Dialog = ({
                     in={visible}
                     timeout={300}
                     classNames='ani-dialog'
-                    unmountOnExit
+                    unmountOnExit={unmountOnExit}
                 >
-                    <div {...others} className="dialog dialog-default">
+                    <div {...others} className={`dialog dialog-default ${full ? 'full' : null} ${visible ? '' : 'hidden'}`}>
                         {children}
                     </div>
                 </CSSTransition>

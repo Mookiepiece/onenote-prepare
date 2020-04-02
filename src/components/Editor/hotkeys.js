@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey';
-import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
+import { toggleBlock, toggleMark } from './utils';
 
 const HOTKEYS_MARK = {
     'mod+b': 'bold',

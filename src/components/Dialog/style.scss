@@ -1,14 +1,15 @@
 @import "~@/styles/default";
 
-.dialog-bg,
-.dialog-bg-no-poiner-event {
+//dialog background
+
+.dialog-bg {
   z-index: 1000;
   position: fixed;
   background-color: #0002;
   transition: all 0.3s;
 }
 
-.dialog-bg {
+.dialog-bg:not(.dialog-bg-no-poiner-event) {
   top: 32px;
   left: 0;
   right: 0;
@@ -22,6 +23,8 @@
   right: 0;
   height: 32px;
 }
+
+//dialog: dialog-default & aside-dialog
 
 .dialog {
   z-index: 1001;
@@ -42,6 +45,10 @@
   left: 8px;
   width: calc(100vw - 16px);
   max-height: calc(100% - 72px);
+
+  &.full {
+    height: calc(100% - 72px);
+  }
 }
 
 .aside-dialog {
@@ -49,15 +56,28 @@
   bottom: 0;
   right: 0;
   width: 39%;
-  
+
   box-shadow: var(--gray-4) 2px 2px 5px 3px;
 
   padding-bottom: 64px;
 
   .aside-dialog-button-close {
-    margin-top:24px;
+    margin-top: 24px;
   }
 }
+
+.dialog-bg {
+  &.hidden:not(.ani-dialog-bg-exit):not(.ani-dialog-bg-exit-active) {
+    display: none;
+  }
+}
+.dialog {
+  &.hidden:not(.ani-dialog-exit):not(.ani-dialog-exit-active) {
+    display: none;
+  }
+}
+
+//ani
 
 .ani-dialog-bg-enter {
   opacity: 0;
@@ -93,7 +113,7 @@
 
 .ani-aside-dialog-enter {
   transform: translate(500px);
-  opacity: .5;
+  opacity: 0.5;
   transition: transform 0.3s cubic-bezier(0.1, 1, 0.5, 1), opacity 0.3s;
 }
 .ani-aside-dialog-enter-active {
@@ -107,5 +127,5 @@
 }
 .ani-aside-dialog-exit-active {
   transform: translate(500px);
-  opacity: .5;
+  opacity: 0.5;
 }

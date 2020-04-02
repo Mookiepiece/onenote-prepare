@@ -1,6 +1,7 @@
 .mk-button {
   font-size: 14px;
-
+  vertical-align: middle;
+  
   position: relative;
   display: inline-block;
 
@@ -25,6 +26,11 @@
   &.active {
     transition: all 0;
   }
+
+  &.disabled {
+    pointer-events: none;
+    background-color: var(--gray-4);
+  }
 }
 
 .mk-button-default,
@@ -41,11 +47,11 @@
   }
 }
 
-.mk-button-plain {
+.mk-button-plain:not(.disabled) {
   border: 1px solid var(--gray-5);
 }
 
-.mk-button-floating {
+.mk-button-floating:not(.disabled) {
   box-shadow: var(--gray-4) 2px 2px 5px 3px;
   &:hover {
     box-shadow: var(--gray-4) 0 0 0 0;
@@ -56,7 +62,7 @@
   }
 }
 
-.mk-button-primary {
+.mk-button-primary:not(.disabled) {
   color: var(--gray-1);
   background-color: var(--blue-7);
   &:hover {

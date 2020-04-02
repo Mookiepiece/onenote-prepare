@@ -1,20 +1,24 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Editable, withReact, Slate } from 'slate-react';
+import { withReact, useSelected, useFocused, useSlate, ReactEditor } from 'slate-react';
 import { createEditor as _createEditor, Range, Editor, Point, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
+
+import { TinyEmitter } from '@/utils/index';
+import { DropdownButtonSelect } from '@/components/DropdownButton';
+import Button from '@/components/MkButton';
 
 export const createEditor = () => withPlaceholders(withTables(withHistory(withReact(_createEditor()))));
 
 const withTables = editor => {
-    const { deleteBackward, deleteForward, insertBreak } = editor
+    const { deleteBackward, deleteForward, insertBreak } = editor;
 
     editor.deleteBackward = unit => {
-        const { selection } = editor
+        const { selection } = editor;
 
         if (selection && Range.isCollapsed(selection)) {
             const [cell] = Editor.nodes(editor, {
                 match: n => n.type === 'table-cell',
-            })
+            });
 
             if (cell) {
                 const [, cellPath] = cell;
@@ -80,31 +84,109 @@ const withPlaceholders = editor => {
     const { isInline, isVoid } = editor
 
     editor.isInline = element => {
-        return element.type === 'bling-placeholder' ? true : isInline(element)
+        return (
+            element.type === 'bling-placeholder' ||
+            element.type === 'transform-placeholder'
+        ) ? true : isInline(element)
     }
 
     editor.isVoid = element => {
-        return element.type === 'bling-placeholder' ? true : isVoid(element)
+        return (
+            element.type === 'bling-placeholder' ||
+            element.type === 'transform-placeholder'
+        ) ? true : isVoid(element)
     }
 
     return editor
 }
 
-export const renderLeaf = props => <Leaf {...props} />;
-const Leaf = ({ attributes, children, leaf }) => {
-    let style = {};
-    let className = '';
+//Transform Placeholder Element (TPE)
+const TransformPlaceholderElement = ({ attributes, children, element }) => {
+    const editor = useSlate();
+    const selected = useSelected();
+    const focused = useFocused();
 
-    if (leaf.bold) {
-        style = { ...style, fontWeight: 700 };
+    const [active, setActive] = useState(false);
+
+    const handleChange = value => {
+        let [[node, path]] = Editor.nodes(editor, {
+            match: n => n.type === "transform-placeholder",
+            mode: 'all',
+        });
+        if (value === 'CLOSE') {
+            Transforms.removeNodes(editor, { at: path });
+        } else {
+            TinyEmitter.emit("TPEclick", [node, path]);
+        }
+    };
+
+    let style = {};
+
+    if (element.meta.style) {
+        style = computeLeafStyle(element.meta.style);
     }
 
+    return (
+        <div
+            className={`transform-placeholder ${selected && focused ? 'focused' : ''}`}
+            {...attributes}
+        >
+            <DropdownButtonSelect
+                value="HAPPY"
+                active={active}
+                setActive={setActive}
+                options={[
+                    { label: '样式', value: 'STYLE' },
+                    { label: '✘', value: 'CLOSE' },
+                ]}
+                onChange={handleChange}
+
+                renderButton={ref => (
+                    <Button
+                        className={active ? '__dropdown dropdown-button' : "dropdown-button"}
+                        ref={ref}
+                        onMouseDown={event => {
+                            event.preventDefault(); // slate.js
+                            setActive(!active);
+                        }}
+
+                    >
+                        <span style={style}> {"HAPPY"} </span>
+                    </Button>
+                )}
+            />
+            {children}
+        </div>
+    )
+}
+
+export const renderLeaf = props => <Leaf {...props} />;
+const Leaf = ({ attributes, children, leaf }) => {
+    let style = computeLeafStyle(leaf);
+    let className = '';
+
+    //matched text
+    if (leaf.bling) {
+        className += ' bling';
+        leaf.bling % 2 && (className += ' odd')
+    }
+
+    return <span {...attributes} style={style} className={className ? className : null}>{children}</span>;
+};
+
+export const computeLeafStyle = (leaf) => {
+    let style = {};
+    if (leaf.bold) {
+        style = { ...style, fontWeight: 'bold' };
+    }
     if (leaf.italic) {
         style = { ...style, fontStyle: 'italic' };
     }
-
     if (leaf.underline) {
         style = { ...style, textDecorationLine: 'underline' };
+    }
+    if (leaf.strike) {
+        style = { ...style, textDecorationLine: style.textDecorationLine ? style.textDecorationLine + ' line-through' : 'line-through' };
     }
 
     if (leaf.fontColor) {
@@ -120,17 +202,12 @@ const Leaf = ({ attributes, children, leaf }) => {
         style = { ...style, fontSize: leaf.fontSize + 'pt' };
     }
 
-    //matched text
-    if (leaf.bling) {
-        className += ' bling';
-        leaf.bling % 2 && (className += ' odd')
-    }
-
-    return <span {...attributes} style={style} className={className ? className : null}>{children}</span>;
-};
+    return style;
+}
 
 export const renderElement = props => <Element {...props} />;
-const Element = ({ attributes, children, element }) => {
+const Element = (props) => {
+    let { attributes, children, element } = props;
 
     let style = {};
     style = { ...style, textAlign: element.align ? element.align : null };
@@ -165,9 +242,6 @@ const Element = ({ attributes, children, element }) => {
 
         //placeholder
         case 'bling-placeholder':
-            // switch (element.placeholderType) {
-            //     case 'bling':
-            //     }
             return (
                 <div
                     className="bling-placeholder"
@@ -176,6 +250,8 @@ const Element = ({ attributes, children, element }) => {
                     {children}
                 </div>
             )
+        case 'transform-placeholder':
+            return <TransformPlaceholderElement {...props} />
 
         default:
             return <pre {...attributes}>{children}</pre>;

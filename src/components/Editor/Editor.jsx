@@ -4,11 +4,12 @@ import { Editable, withReact, Slate } from 'slate-react';
 import Toolbar from './Toolbar';
 import { createEditor, renderElement, renderLeaf } from './createEditor.js';
 import higherOrderKeydownHandler from './hotkeys';
+import Dialog from '../Dialog/Dialog';
 
-const Editor = ({ initialValue, renderAside,children }) => {
-    const [value, setValue] = useState(initialValue);
+const Editor = ({ value, setValue, children }) => {
     const editor = useMemo(createEditor, []);
-    const Aside = renderAside;
+
+    const [debug, setDebug] = useState(false);
 
     const handleKeydown = event => higherOrderKeydownHandler(editor)(event);
 
@@ -23,9 +24,16 @@ const Editor = ({ initialValue, renderAside,children }) => {
                     placeholder="Enter some rich text…"
                     onKeyDown={handleKeydown}
                 />
+                <input type="checkbox" value={debug} onChange={_ => setDebug(true)} />
+                <Dialog visible={debug} setVisible={setDebug}>
+                    <div style={{whiteSpace:'pre-wrap'}}>
+                        {JSON.stringify(value, null, 4)}
+                    </div>
+                </Dialog>
             </div>
+
             {children}
-        </Slate>
+        </Slate >
     )
 }
 

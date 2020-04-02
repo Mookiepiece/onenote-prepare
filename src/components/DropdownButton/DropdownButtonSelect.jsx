@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 
 import Button from '@/components/MkButton';
-import DropdownButtonMousedown from './DropdownButtonMousedown';
+import DropdownButton from './DropdownButton';
 import './style.scss';
 
-const DropdownButtonMousedownSelect = ({
+const DropdownButtonSelect = ({
     options = [],
-    action,
+    onChange,
     renderLabel = ({ label }) => (<span>{label}</span>),
     ...others
 }) => {
     const [active, setActive] = useState(false)
     return (
-        <DropdownButtonMousedown
+        <DropdownButton
             active={active}
-            setActive={_=>setActive(_)}
+            setActive={v => setActive(v)}
 
             {...others}
 
@@ -26,7 +26,7 @@ const DropdownButtonMousedownSelect = ({
                         onMouseDown={
                             event => {
                                 event.preventDefault();
-                                action(option.value);
+                                onChange(option.value);
                                 setPanelActive(false);
                             }
                         }
@@ -36,4 +36,4 @@ const DropdownButtonMousedownSelect = ({
         />)
 }
 
-export default DropdownButtonMousedownSelect;
+export default DropdownButtonSelect;

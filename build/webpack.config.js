@@ -12,9 +12,9 @@ module.exports = {
         // chunkFilename: "js/[name]/[name]-bundle.js",
     },
     resolve: {
-        extensions: ['.js', '.jsx'], // 默认后缀名
+        extensions: ['.js', '.jsx'],
         alias: {
-            '@': path.resolve(__dirname, '../src'), // 别名
+            '@': path.resolve(__dirname, '../src'),
         }
     },
     devServer: {

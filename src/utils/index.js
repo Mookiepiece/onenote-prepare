@@ -1,3 +1,6 @@
+import { TinyEmitter as _TinyEmitter } from 'tiny-emitter';
+import * as immutable from 'object-path-immutable';
+
 export const deepCopy = v => JSON.parse(JSON.stringify(v));
 
 /**
@@ -62,6 +65,15 @@ export const altObject = (rootObject, key, item) => {
     return R(rootObject, 0);
 }
 
+export const alt = {
+    nearleaf(object, path) {
+        if (path.length === 0)
+            throw new Error('[alt] param $path not valid');
+        return path.slice(0, path.length - 1).reduce((obj, p) => obj[p], object);
+    },
+    set: immutable.set
+}
+
 /**
  * dig into the key specified in root object and replace it with item, pure function
  */
@@ -94,3 +106,5 @@ export const removeArrayItem = (array, index) => {
         ...array.slice(index + 1, array.length)
     ];
 }
+
+export const TinyEmitter = new _TinyEmitter();
