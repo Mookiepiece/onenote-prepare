@@ -27,7 +27,7 @@ export const mockedCustomStyles = [
         style: {
             fontColor: '#0b6',
             bgColor: '#eff',
-            fontFamliy: '等线'
+            fontFamily: '等线'
         }
     }
 ]

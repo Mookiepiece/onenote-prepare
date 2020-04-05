@@ -14,14 +14,26 @@ import SlateEditor from '@/components/Editor';
 import { Switch } from '@/components/Switch';
 
 import { mockedCustomStyles } from '@/utils/userSettings';
+import { alt } from '@/utils';
 
-const ResultPanel = ({ v, onChange }) => {
+const ResultPanel = ({ result, onResultChange }) => {
     const [dialogVisible, setDialogVisible] = useState(false);
 
-    const [value, setValue] = useState([{ children: [{ text: '' }, { type: 'transform-placeholder', meta: { mirror: 'ORIGIN' }, children: [{ text: '' }] }, { text: '' }] }]);
+    const [value, setValue] = useState([
+        {
+            children: [
+                { text: '' },
+                {
+                    type: 'transform-placeholder',
+                    meta: { mirror: 'ORIGIN' },
+                    children: [{ text: '' }]
+                },
+                { text: '' }
+            ]
+        }]);
 
     useEffect(_ => {
-        !dialogVisible && onChange({ nodes: value });
+        !dialogVisible && onResultChange(alt.set(result, 'nodes', value));
     }, [dialogVisible]);
 
     return (
@@ -36,7 +48,7 @@ const ResultPanel = ({ v, onChange }) => {
             <Dialog full visible={dialogVisible} setVisible={setDialogVisible} >
                 <div className="result-editor-dialog">
                     <SlateEditor value={value} setValue={setValue}>
-                        <Aside />
+                        <Aside result={result} onResultChange={onResultChange} />
                     </SlateEditor>
                 </div>
             </Dialog>
@@ -45,7 +57,7 @@ const ResultPanel = ({ v, onChange }) => {
     )
 }
 
-const Aside = () => {
+const Aside = ({ result, onResultChange }) => {
     // const [switchValue, setSwitchValue] = useState(false);
     const editor = useSlate();
 
@@ -67,11 +79,15 @@ const Aside = () => {
         <aside>
             <ExtraToolbar />
             {/* <span>输入多行</span><Switch value={switchValue} onChange={setSwitchValue} /> */}
+            <span>完全覆盖原样式</span><Switch value={result.options.overrideStyle} onChange={v => onResultChange(alt.merge(result, `options`, { overrideStyle: v }))} />
             <StylePickerDialog
                 onApply={
                     index => {
                         Transforms.setNodes(editor, {
-                            meta: { style: mockedCustomStyles[index].style, mirror: 'ORIGIN' }
+                            meta: {
+                                style: mockedCustomStyles[index].style,
+                                mirror: 'ORIGIN'
+                            }
                         }, {
                             at: path
                         });
@@ -109,7 +125,7 @@ const StylePickerDialog = ({ visible, setVisible, onApply }) => {
 
     return (
         <Dialog full visible={visible} setVisible={setVisible}>
-            <div className="dialog-select-transform">
+            <div className="dialog-style-picker">
                 {
                     mockedCustomStyles.map((l, i) => (<LeafStyleCard key={i} leafStyle={l} onClick={_ => onApply(i)} />))
                 }
@@ -120,7 +136,7 @@ const StylePickerDialog = ({ visible, setVisible, onApply }) => {
 
 const LeafStyleCard = ({ leafStyle, onClick }) => {
     return (
-        <div className="dialog-style-picker" onClick={onClick}>
+        <div className="leaf-style-card" onClick={onClick}>
             <div></div>
             <h6>{leafStyle.title}</h6>
             <p>{leafStyle.desc}</p>

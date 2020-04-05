@@ -91,8 +91,8 @@ export const applyRender = (editor, result) => { //TODO support node result and 
                         swapArray = setArrayItem(swapArray, -1, [
                             swapArray[swapArray.length - 1][0],
                             {
-                                anchor:swapArray[swapArray.length - 1][1].anchor,
-                                focus:at.focus
+                                anchor: swapArray[swapArray.length - 1][1].anchor,
+                                focus: at.focus
                             },
                             [...swapArray[swapArray.length - 1][2], node],
                         ]);
@@ -143,7 +143,6 @@ export const applyRender = (editor, result) => { //TODO support node result and 
         // TODO if (result.type = 'withStyle') {
         let nodes = swapResultFunc(origin, index);
 
-        console.log(at);
         Transforms.insertNodes(editor, nodes, { at });
     });
 
@@ -166,7 +165,9 @@ const getSwapResultCallback = (result) => {
         return true;
     }));
 
-    return (origin, index) => {
+    let { overrideStyle } = result.options;
+
+    return (originArray, index) => {
         let newNodes = [...result.nodes[0].children];
         placeholders.forEach(([phElem, path]) => {
 
@@ -182,11 +183,16 @@ const getSwapResultCallback = (result) => {
 
             const placeholderIndex = path[path.length - 1];
 
-            origin.reduce((a, el) => { return a + el.text }, '');
-
             const preElemChildrenAfterSwap = [
                 ...preElemChildren.slice(0, placeholderIndex),
-                ...origin.map(v => { return { ...v, ...phElem.meta.style, bling: false } }),
+                ...originArray.map(originLeaf => {
+                    let v = originLeaf;
+                    if (overrideStyle) {
+                        v = { text: v.text };
+                    }
+
+                    return { ...v, ...phElem.meta.style, bling: false }
+                }),
                 ...preElemChildren.slice(placeholderIndex + 1, preElemChildren.length)
             ];
             // const preElemChildrenAfterSwap=origin;

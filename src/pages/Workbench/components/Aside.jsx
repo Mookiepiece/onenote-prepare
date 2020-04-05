@@ -16,7 +16,7 @@ import Button from "@/components/MkButton";
 
 import './style.scss';
 
-import { deepCopy, altArrayItem, setArrayItem, altObject, setObject } from '@/utils';
+import { deepCopy, altArrayItem, setArrayItem, altObject, setObject, alt } from '@/utils';
 
 import { MGet } from '../transforms';
 import { applyMatch, clearUp, applyRender } from '../transforms/slateEffects';
@@ -78,7 +78,12 @@ const useAsideState = (initialState, setSlateValue) => {
                                 name: action.value.title,
                                 matches: [],
                                 currentMatch: null,
-                                result: { nodes: [] }, //nodes会在useEffect里通过INPUT事件传入
+                                result: {
+                                    nodes: [],
+                                    options: {
+                                        overrideStyle: false,
+                                    }
+                                }, //nodes会在useEffect里通过INPUT事件传入
                                 key: uuid()
                             }],
                         currentIndex: state.v.length,
@@ -109,12 +114,12 @@ const useAsideState = (initialState, setSlateValue) => {
                 if (matchIndex < 0) {
                     state = {
                         ...state,
-                        v: altObject(v, `${currentIndex}.result`, action.inputs)
+                        v: alt.set(v, `${currentIndex}.result`, action.inputs)
                     };
                 } else {
                     state = {
                         ...state,
-                        v: altObject(v, `${currentIndex}.matches.${matchIndex}.inputs`, action.inputs)
+                        v: alt.set(v, `${currentIndex}.matches.${matchIndex}.inputs`, action.inputs)
                     };
                     if (action.rematch) {
                         state = applyMatcher(editor, state);
@@ -348,8 +353,8 @@ const TransformFormularCard = ({ v, color, onClose, onActive, onInput, onMatch, 
                 v.matches.length ?
                     (
                         <ResultPanel
-                            v={v}
-                            onChange={result => onInput(result, false, -1)}
+                            result={v.result}
+                            onResultChange={result => onInput(result, false, -1)}
                         />
                     )
                     : null

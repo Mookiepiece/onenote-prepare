@@ -71,7 +71,8 @@ export const alt = {
             throw new Error('[alt] param $path not valid');
         return path.slice(0, path.length - 1).reduce((obj, p) => obj[p], object);
     },
-    set: immutable.set
+    set: immutable.set,
+    merge:immutable.merge
 }
 
 /**
