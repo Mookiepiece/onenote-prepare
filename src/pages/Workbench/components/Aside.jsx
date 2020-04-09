@@ -224,9 +224,9 @@ const Aside = ({ setSlateValue }) => {
                             <CSSTransition
                                 key={v.key}
                                 timeout={300}
-                                classNames="transform-formular-item"
+                                classNames="transform-card"
                             >
-                                <TransformFormularCard
+                                <TransformCard
                                     v={v}
 
                                     onInput={(inputs, rematch = false, matchIndex) => dispatch({
@@ -313,8 +313,8 @@ const Aside = ({ setSlateValue }) => {
     )
 }
 
-const TransformFormularCard = ({ v, color, onClose, onActive, onInput, onMatch, onOpenDialog, onApply }) => {
-    let className = `transform-formular-card${' ' + color}`;
+const TransformCard = ({ v, color, onClose, onActive, onInput, onMatch, onOpenDialog, onApply }) => {
+    let className = `transform-card${' ' + color}`;
 
     return (
         <div className={className}>

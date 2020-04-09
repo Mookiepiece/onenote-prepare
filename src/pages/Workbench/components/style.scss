@@ -197,19 +197,19 @@
   transition: all 0.3s;
 }
 
-.transform-formular-item-enter {
+.transform-card-enter {
   opacity: 0;
   transform: translate(100px);
 }
-.transform-formular-item-enter-active {
+.transform-card-enter-active {
   opacity: 1;
   transform: unset;
   transition: all 0.3s;
 }
-.transform-formular-item-exit {
+.transform-card-exit {
   opacity: 1;
 }
-.transform-formular-item-exit-active {
+.transform-card-exit-active {
   opacity: 0;
   transition: all 0.3s;
 }
