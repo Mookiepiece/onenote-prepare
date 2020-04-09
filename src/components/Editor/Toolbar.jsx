@@ -21,7 +21,8 @@ import {
     SwapRightOutlined,
     AlignLeftOutlined,
     AlignCenterOutlined,
-    AlignRightOutlined
+    AlignRightOutlined,
+    TableOutlined
 } from '@ant-design/icons';
 
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
@@ -57,6 +58,7 @@ const Toolbar = () => {
                 <BlockButton formatKey="align" format="right" icon={AlignRightOutlined} />
                 <ActionButton />
                 <ActionButtonX />
+                <TableButton />
             </div>
             <div className="toolbar-group">
                 <ColorButton
@@ -105,6 +107,26 @@ const MarkButton = ({ format, icon }) => {
             <Icon />
         </Button>
     );
+}
+
+const TableButton = () => {
+    const editor = useSlate();
+    return (
+        <Button
+            className="editor-button"
+            onMouseDown={
+                event => {
+                    event.preventDefault();
+                    Transforms.wrapNodes(editor, { type: 'table-cell', children: [] });
+                    Transforms.wrapNodes(editor, { type: 'table-row', children: [] });
+                    Transforms.wrapNodes(editor, { type: 'table', children: [] });
+
+                }
+            }
+        >
+            <TableOutlined />
+        </Button>
+    )
 }
 
 const ActionButton = () => {

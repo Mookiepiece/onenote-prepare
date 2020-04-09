@@ -10,7 +10,7 @@ import Button from '@/components/MkButton';
 export const createEditor = () => withPlaceholders(withTables(withHistory(withReact(_createEditor()))));
 
 const withTables = editor => {
-    const { deleteBackward, deleteForward, insertBreak } = editor;
+    const { deleteBackward, deleteForward, insertBreak, normalizeNode } = editor;
 
     editor.deleteBackward = unit => {
         const { selection } = editor;
@@ -63,19 +63,48 @@ const withTables = editor => {
         deleteForward(unit)
     }
 
-    // editor.insertBreak = () => {
-    //     const { selection } = editor
+    editor.normalizeNode = ([node, path]) => {
+        if (node.type === 'table') {
+            const rowMatches = [...Editor.nodes(editor, {
+                at: path,
+                match: node => node.type === 'table-row'
+            })].filter(([node, rowPath]) => rowPath.length === path.length + 1);
 
-    //     if (selection) {
-    //         const [table] = Editor.nodes(editor, { match: n => n.type === 'table' })
+            const cellMatches = [...Editor.nodes(editor, {
+                at: path,
+                match: node => node.type === 'table-cell'
+            })].filter(([node, cellPath]) => cellPath.length === path.length + 2);
 
-    //         if (table) {
-    //             return
-    //         }
-    //     }
+            const arr = [];
 
-    //     insertBreak()
-    // }
+            let count = 1;
+            cellMatches.forEach(([node, cellPath], i) => {
+                if (cellPath[cellPath.length - 1] === 0) {
+                    arr.push(count);
+                    count = 1;
+                } else {
+                    count++;
+                }
+            });
+            arr.push(count);
+            arr.shift();
+
+            const maxColCount = Math.max(...arr);
+
+            arr.forEach((curColCount, i) => {
+                if (curColCount < maxColCount) {
+                    Transforms.insertNodes(editor, [{ type: "table-cell", children: [{ text: '' }] }], {
+                        at: [...rowMatches[i][1], curColCount],
+                    });
+
+                }
+            });
+        }
+
+        return normalizeNode([node, path])
+    }
+
+    // TODO: tables
 
     return editor
 }
