@@ -199,14 +199,6 @@ const Aside = ({ setSlateValue }) => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogPushTransform, setDialogPushTransform] = useState(false);
 
-    //dupulicated
-    const currentState = useCallback(state => {
-        if (state.memory.length > state.currentIndex + 1)
-            return 'applied';
-        else
-            return 'current';
-    }, []);
-
     return (
         <aside>
             <div className="workbench-aside">

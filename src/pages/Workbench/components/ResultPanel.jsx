@@ -65,10 +65,10 @@ const Aside = ({ result, onResultChange }) => {
 
     const [path, setPath] = useState(null);
 
-    const showStyleDialog = useCallback(([node, path]) => {
+    const showStyleDialog = ([node, path]) => {
         setStylePickerDialogVisible(true);
         setPath(path);
-    }, []);
+    };
 
     useEffect(_ => {
         TinyEmitter.on('TPEclick', showStyleDialog);
