@@ -23,13 +23,13 @@ const useDropdown = (panelActive, setPanelActive, eventName = "click") => {
                 setPanelActive(false);
                 document.body.removeEventListener(eventName, handler);
             }
-            
+
             document.body.addEventListener(eventName, handler);
             return _ => {
                 document.body.removeEventListener(eventName, handler);
             }
         }
-    }, [panelActive]);
+    }, [panelActive, setPanelActive]);
 
     if (panelActive) {
         const rect = buttonRef.current.getBoundingClientRect();
