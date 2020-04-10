@@ -1,7 +1,7 @@
 .mk-button {
   font-size: 14px;
   vertical-align: middle;
-  
+
   position: relative;
   display: inline-block;
 
@@ -29,7 +29,7 @@
 
   &.disabled {
     pointer-events: none;
-    background-color: var(--gray-4);
+    opacity: 0.65;
   }
 }
 
@@ -38,12 +38,15 @@
 .mk-button-floating {
   color: var(--gray-10); //an <a> link also could add this class
   background-color: var(--gray-1);
-  &:hover {
-    background-color: var(--gray-4);
-  }
-  &:active,
-  &.active {
-    background-color: var(--gray-5);
+
+  &:not(.disabled) {
+    &:hover {
+      background-color: var(--gray-4);
+    }
+    &:active,
+    &.active {
+      background-color: var(--gray-5);
+    }
   }
 }
 
@@ -53,24 +56,28 @@
 
 .mk-button-floating:not(.disabled) {
   box-shadow: var(--gray-4) 2px 2px 5px 3px;
-  &:hover {
-    box-shadow: var(--gray-4) 0 0 0 0;
-  }
-  &:active,
-  &.active {
-    box-shadow: var(--gray-4) 0 0 0 0;
+  &:not(.disabled) {
+    &:hover {
+      box-shadow: var(--gray-4) 0 0 0 0;
+    }
+    &:active,
+    &.active {
+      box-shadow: var(--gray-4) 0 0 0 0;
+    }
   }
 }
 
 .mk-button-primary:not(.disabled) {
   color: var(--gray-1);
   background-color: var(--blue-7);
-  &:hover {
-    background-color: var(--blue-5);
-  }
-  &:active,
-  &.active {
-    background-color: var(--blue-10);
+  &:not(.disabled) {
+    &:hover {
+      background-color: var(--blue-5);
+    }
+    &:active,
+    &.active {
+      background-color: var(--blue-10);
+    }
   }
 }
 

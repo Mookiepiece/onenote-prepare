@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Editable, withReact, Slate } from 'slate-react';
 
 import Toolbar from './Toolbar';
@@ -26,7 +26,7 @@ const Editor = ({ value, setValue, children }) => {
                 />
                 <input type="checkbox" value={debug} onChange={_ => setDebug(true)} />
                 <Dialog visible={debug} setVisible={setDebug}>
-                    <div style={{whiteSpace:'pre-wrap'}}>
+                    <div style={{ whiteSpace: 'pre-wrap' }}>
                         {JSON.stringify(value, null, 4)}
                     </div>
                 </Dialog>

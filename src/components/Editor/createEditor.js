@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { withReact, useSelected, useFocused, useSlate, ReactEditor } from 'slate-react';
 import { createEditor as _createEditor, Range, Editor, Point, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
@@ -64,7 +64,7 @@ const withTables = editor => {
     }
 
     editor.normalizeNode = ([node, path]) => {
-        if (node.type === 'table') {
+        if (node.type === 'table') { // 表格不准缺格漏格  tables like this ▛ will be fixed
             const rowMatches = [...Editor.nodes(editor, {
                 at: path,
                 match: node => node.type === 'table-row'
@@ -90,13 +90,13 @@ const withTables = editor => {
             arr.shift();
 
             const maxColCount = Math.max(...arr);
-
             arr.forEach((curColCount, i) => {
-                if (curColCount < maxColCount) {
-                    Transforms.insertNodes(editor, [{ type: "table-cell", children: [{ text: '' }] }], {
-                        at: [...rowMatches[i][1], curColCount],
+                let j = curColCount;
+                while (j < maxColCount) {
+                    Transforms.insertNodes(editor, [{ type: "table-cell", children: [{ type: 'paragraph', children: [{ text: '' }] }] }], {
+                        at: [...rowMatches[i][1], j],
                     });
-
+                    j++;
                 }
             });
         }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSlate, DefaultElement, ReactEditor } from 'slate-react';
 import { Editor, Transforms, Range, Text, Path, Location, Point } from 'slate';
 import { SketchPicker } from 'react-color';
@@ -22,7 +22,13 @@ import {
     AlignLeftOutlined,
     AlignCenterOutlined,
     AlignRightOutlined,
-    TableOutlined
+    TableOutlined,
+    InsertRowAboveOutlined,
+    InsertRowBelowOutlined,
+    InsertRowLeftOutlined,
+    InsertRowRightOutlined,
+    DeleteColumnOutlined,
+    DeleteRowOutlined
 } from '@ant-design/icons';
 
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
@@ -59,16 +65,17 @@ const Toolbar = () => {
                 <ActionButton />
                 <ActionButtonX />
                 <TableButton />
+                <TableButtonGroup />
             </div>
             <div className="toolbar-group">
                 <ColorButton
                     format="fontColor"
                     icon={FontColorsOutlined}
                 />
-                <ColorButton
+                {/* <ColorButton
                     format="bgColor"
                     icon={BgColorsOutlined}
-                />
+                /> */}
             </div>
         </div>
     );
@@ -117,9 +124,233 @@ const TableButton = () => {
             onMouseDown={
                 event => {
                     event.preventDefault();
-                    Transforms.wrapNodes(editor, { type: 'table-cell', children: [] });
-                    Transforms.wrapNodes(editor, { type: 'table-row', children: [] });
+                    // TODO: if(Range.isCollapsed(editor.selection)){ 
                     Transforms.wrapNodes(editor, { type: 'table', children: [] });
+                    Transforms.wrapNodes(editor, { type: 'table-row', children: [] });
+                    Transforms.wrapNodes(editor, { type: 'table-cell', children: [] });
+                }
+            }
+        >
+            <TableOutlined />
+        </Button>
+    )
+}
+
+const getInsertRowHandlers = (editor, match) => {
+    if (!match) return [];
+
+    const [tableNode, tablePath] = match;
+    const arrayRowsAndCells = [...Editor.nodes(editor, {
+        at: tablePath,
+        match: n => n.type === 'table-row' || n.type === 'table-cell'
+    })].filter(([_, path]) => path.length - tablePath.length <= 2);
+
+    const rows = [...Editor.nodes(editor, {
+        at: tablePath,
+        match: n => n.type === 'table-row'
+    })].filter(([_, path]) => path.length - tablePath.length === 1);
+
+    const cells = [...Editor.nodes(editor, {
+        at: tablePath,
+        match: n => n.type === 'table-cell'
+    })].filter(([_, path]) => path.length - tablePath.length === 2);
+
+    let colsCount = cells.length / rows.length;
+
+    // ▔👆
+    const insertRowAbove = () => {
+        Transforms.insertNodes(editor, [{
+            type: 'table-row', children: [...Array(colsCount).keys()].map(_ => ({
+                type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: '' }] }]
+            }))
+        }], {
+            at: editor.selection.anchor.path.slice(0, tablePath.length + 1)
+        });
+    };
+
+    // ▁👇
+    const insertRowBelow = () => {
+        Transforms.insertNodes(editor, [{
+            type: 'table-row', children: [...Array(colsCount).keys()].map(_ => ({
+                type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: '' }] }]
+            }))
+        }], {
+            at: [...tablePath, editor.selection.anchor.path[tablePath.length] + 1]
+        });
+    }
+
+    // ▏👈
+    const insertRowLeft = () => {
+        //insert new col to the end(with the help of normalize)
+        Transforms.insertNodes(editor, [{
+            type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: '' }] }]
+        }], {
+            at: [...tablePath, 0, colsCount]
+        });
+
+        //then move next to the current column
+        let curCol = editor.selection.anchor.path[tablePath.length + 1];
+        rows.forEach(([_, rowPath]) => {
+            Transforms.moveNodes(editor, {
+                at: [...rowPath, colsCount],
+                to: [...rowPath, curCol]
+            });
+        });
+    };
+
+    // 👉▕
+    const insertRowRight = () => {
+        //insert new col to the end(with the help of normalize)
+        Transforms.insertNodes(editor, [{
+            type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: '' }] }]
+        }], {
+            at: [...tablePath, 0, colsCount]
+        });
+
+        //then move next to the current column
+        let curCol = editor.selection.anchor.path[tablePath.length + 1] + 1;
+        rows.forEach(([_, rowPath]) => {
+            Transforms.moveNodes(editor, {
+                at: [...rowPath, colsCount],
+                to: [...rowPath, curCol]
+            });
+        });
+    };
+
+    // | ❎
+    const deleteColumn = () => {
+        if (colsCount === 1) { // delete this table
+            Transforms.insertNodes(editor, [{ type: 'paragraph', children: [{ text: '' }] }], { at: tablePath });
+            Transforms.removeNodes(editor, { at: Path.next(tablePath) });
+        } else {
+            let curCol = editor.selection.anchor.path[tablePath.length + 1];
+            rows.forEach(([_, rowPath]) => {
+                Transforms.setNodes(editor, { '🖤': true }, { at: [...rowPath, curCol], });
+            });
+            Transforms.removeNodes(editor, { at: tablePath, match: ({ '🖤': v }) => v });
+        }
+    };
+
+    // — ❎
+    const deleteRow = () => {
+        if (rows.length === 1) {
+            Transforms.insertNodes(editor, [{ type: 'paragraph', children: [{ text: '' }] }], { at: tablePath });
+            Transforms.removeNodes(editor, { at: Path.next(tablePath) });
+        } else {
+            Transforms.removeNodes(editor, { at: editor.selection.anchor.path.slice(0, tablePath.length + 1) });
+        }
+    };
+
+    return [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight, deleteColumn, deleteRow];
+}
+
+const TableButtonGroup = () => {
+    const editor = useSlate();
+
+    const matches = [...Editor.nodes(editor, {
+        match: n => n.type === 'table'
+    })];
+
+    const disabled = matches.length === 0;
+    const match = matches[matches.length - 1];
+
+    return (
+        <>
+            <Button
+                className="editor-button"
+                disabled={disabled}
+                onMouseDown={
+                    event => {
+                        event.preventDefault();
+                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight] = getInsertRowHandlers(editor, match);
+                        insertRowAbove && insertRowAbove();
+                    }
+                }
+            >
+                <InsertRowAboveOutlined />
+            </Button>
+            <Button
+                className="editor-button"
+                disabled={disabled}
+                onMouseDown={
+                    event => {
+                        event.preventDefault();
+                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight] = getInsertRowHandlers(editor, match);
+                        insertRowBelow && insertRowBelow();
+                    }
+                }
+            >
+                <InsertRowBelowOutlined />
+            </Button>
+            <Button
+                className="editor-button"
+                disabled={disabled}
+                onMouseDown={
+                    event => {
+                        event.preventDefault();
+                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight] = getInsertRowHandlers(editor, match);
+                        insertRowLeft && insertRowLeft();
+                    }
+                }
+            >
+                <InsertRowLeftOutlined />
+            </Button>
+            <Button
+                className="editor-button"
+                disabled={disabled}
+                onMouseDown={
+                    event => {
+                        event.preventDefault();
+                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight] = getInsertRowHandlers(editor, match);
+                        insertRowRight && insertRowRight();
+                    }
+                }
+            >
+                <InsertRowRightOutlined />
+            </Button>
+            <Button
+                className="editor-button"
+                disabled={disabled}
+                onMouseDown={
+                    event => {
+                        event.preventDefault();
+                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight, deleteColumn] = getInsertRowHandlers(editor, match);
+                        deleteColumn && deleteColumn();
+                    }
+                }
+            >
+                <DeleteColumnOutlined />
+            </Button>
+            <Button
+                className="editor-button"
+                disabled={disabled}
+                onMouseDown={
+                    event => {
+                        event.preventDefault();
+                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight, deleteColumn, deleteRow] = getInsertRowHandlers(editor, match);
+                        deleteRow && deleteRow();
+                    }
+                }
+            >
+                <DeleteRowOutlined />
+            </Button>
+        </>
+    )
+}
+
+const TableStyleButton = () => {
+    const editor = useSlate();
+    return (
+        <Button
+            className="editor-button"
+            onMouseDown={
+                event => {
+                    event.preventDefault();
+
+                    const [match] = Editor.nodes(editor, {
+                        match: n => n[key] === 'table',
+                    });
+                    return !!match;
 
                 }
             }
@@ -137,7 +368,7 @@ const ActionButton = () => {
             onMouseDown={
                 event => {
                     event.preventDefault();
-
+                    getSelection(editor);
                 }
             }
         >
@@ -157,6 +388,7 @@ const ActionButtonX = () => {
             onMouseDown={
                 event => {
                     event.preventDefault();
+                    putSelection(editor);
 
                 }
             }
@@ -171,18 +403,15 @@ const ColorButton = ({ format, icon }) => {
     const [pickerActive, setPickerActive] = useState(false);
     const [color, setColor] = useState('#f90');
 
-    const action = (newColor = color) => {
-        // getSelection(editor);
-        setColor(newColor);
-        // toggleMark(editor, format, newColor);
-    }
-    const actionX = (newColor = color) => {
-        // getSelection(editor);
-        setColor(newColor);
-        toggleMark(editor, format, newColor);
-    }
-
     const Icon = icon;
+
+    const setActiveForDropdown = v => {
+        setPickerActive(v);
+        if (v === false) {
+            getSelection(editor);
+            toggleMark(editor, format, color);
+        }
+    };
 
     return (
         <>
@@ -191,7 +420,7 @@ const ColorButton = ({ format, icon }) => {
                 active={isMarkActive(editor, format, color)}
                 onMouseDown={event => {
                     event.preventDefault();
-                    actionX();
+                    toggleMark(editor, format, color);
                     setPickerActive(false);
                 }}>
                 <div style={{ background: color }}></div>
@@ -201,17 +430,19 @@ const ColorButton = ({ format, icon }) => {
             <DropdownButton
                 trigger='mousedown'
                 active={pickerActive}
-                setActive={_ => setPickerActive(_)}
-                beforeClick={_ => putSelection(editor)}
+                setActive={setActiveForDropdown}
 
                 renderButton={
                     (buttonRef) => {
                         return (
                             <Button
-                                className={`editor-button editor-button-color-r${pickerActive ? " __dropdown" : ""}`}
+                                className={`editor-button editor-button-color-r ${pickerActive ? "__dropdown" : ""}`}
                                 active={pickerActive}
                                 onMouseDown={event => {
                                     event.preventDefault();
+                                    if (!pickerActive) {
+                                        putSelection(editor);
+                                    }
                                     setPickerActive(!pickerActive);
                                 }}
                                 ref={buttonRef}
@@ -230,9 +461,7 @@ const ColorButton = ({ format, icon }) => {
                             >
                                 <SketchPicker
                                     color={color}
-                                    onChange={({ hex }) => {
-                                        action(hex);
-                                    }}
+                                    onChange={({ hex }) => setColor(hex)}
                                 />
                             </div>
                         )
