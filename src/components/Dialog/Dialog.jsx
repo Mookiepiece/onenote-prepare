@@ -1,17 +1,34 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Portal, closest } from '@/components/util';
 import { CSSTransition } from 'react-transition-group';
+
+// every visible dialog will have z-index great than the prev visible one, reduce z-index when invisible
+// z-index dropdown(1100) > dialog(1000+), so do not let 100+ dialog shows at the same time
+// not an t o d o: layout manager could also manage zindex for dropdown, or dropdown should portal to it's parent node
+let dialogLayoutManager = 1000;
+
 const Dialog = ({
     visible,
     setVisible,
     children,
     full,
-    unmountOnExit = true,
+    unmountOnExit = false,
     ...others
 }) => {
+
+    const [zIndex, setZIndex] = useState(dialogLayoutManager);
+
+    useEffect(_ => {
+        if (visible === true) {
+            dialogLayoutManager++;
+            setZIndex(dialogLayoutManager);
+            return _ => dialogLayoutManager--;
+        }
+    }, [visible]);
+
     return (
         <Portal>
-            <div>
+            <div className='dialog-container' style={{ 'zIndex': zIndex }}>
                 <CSSTransition
                     in={visible}
                     timeout={300}

@@ -1,5 +1,13 @@
 @import "~@/styles/default";
 
+.dialog-container{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+}
+
 //dialog background
 
 .dialog-bg {
@@ -44,10 +52,10 @@
   top: 64px;
   left: 8px;
   width: calc(100vw - 16px);
-  max-height: calc(100% - 72px);
+  max-height: calc(100vh - 72px);
 
   &.full {
-    height: calc(100% - 72px);
+    height: calc(100vh - 72px);
   }
 }
 
