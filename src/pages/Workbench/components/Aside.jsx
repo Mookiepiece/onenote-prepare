@@ -16,7 +16,7 @@ import Button from "@/components/MkButton";
 
 import './style.scss';
 
-import { deepCopy, altArrayItem, setArrayItem, altObject, setObject, alt } from '@/utils';
+import { deepCopy, alt } from '@/utils';
 
 import { MGet } from '../transforms';
 import { applyMatch, clearUp, applyRender } from '../transforms/slateEffects';
@@ -96,7 +96,7 @@ const useAsideState = (initialState, setSlateValue) => {
 
                 return {
                     ...state,
-                    v: altArrayItem(v, currentIndex, {
+                    v: alt.merge(v, currentIndex, {
                         matches: [...v[currentIndex].matches, {
                             ...action.value,
                             inputs: { ...action.value.inputs, title: action.value.title },
@@ -119,7 +119,7 @@ const useAsideState = (initialState, setSlateValue) => {
                 } else {
                     state = {
                         ...state,
-                        v: alt.set(v, `${currentIndex}.matches.${matchIndex}.inputs`, action.inputs)
+                        v: alt.merge(v, `${currentIndex}.matches.${matchIndex}.inputs`, action.inputs)
                     };
                     if (action.rematch) {
                         state = applyMatcher(editor, state);

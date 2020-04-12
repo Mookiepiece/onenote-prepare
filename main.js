@@ -28,7 +28,7 @@ function createMainWindow() {
   }
 
   if (isDevelopment) {
-    BrowserWindow.addDevToolsExtension("C:/Users/Mookiepiece/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.5.0_0")
+    BrowserWindow.addDevToolsExtension("C:/Users/Mookiepiece/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.6.0_0")
     window.loadURL(`http://localhost:9001`)
   }
   else {
