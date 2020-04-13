@@ -140,11 +140,7 @@ const getInsertRowHandlers = (editor, match) => {
     if (!match) return [];
 
     const [tableNode, tablePath] = match;
-    const arrayRowsAndCells = [...Editor.nodes(editor, {
-        at: tablePath,
-        match: n => n.type === 'table-row' || n.type === 'table-cell'
-    })].filter(([_, path]) => path.length - tablePath.length <= 2);
-
+    
     const rows = [...Editor.nodes(editor, {
         at: tablePath,
         match: n => n.type === 'table-row'
@@ -456,9 +452,7 @@ const ColorButton = ({ format, icon }) => {
                 renderDropdown={
                     (setPickerActive) => {
                         return (
-                            <div
-                                className="color-picker"
-                            >
+                            <div>
                                 <SketchPicker
                                     color={color}
                                     onChange={({ hex }) => setColor(hex)}

@@ -15,9 +15,10 @@ const DropdownButton = ({
     beforeClick,
     trigger = 'click',
     renderDropdown = _ => "",
-    disabled = false
+    disabled = false,
+    position
 }) => {
-    const [buttonRef, top, left] = useDropdown(active, setActive, trigger);
+    const [buttonRef, top, left, transform] = useDropdown(active, setActive, trigger, position);
 
     let btn;
     if (renderButton !== undefined) {
@@ -71,6 +72,7 @@ const DropdownButton = ({
                     style={{
                         top,
                         left,
+                        transform,
                         display: active ? null : "none",
                         maxWidth: dropdownWidth
                     }}>

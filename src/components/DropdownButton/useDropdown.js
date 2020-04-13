@@ -7,10 +7,11 @@ import { closest } from '@/components/util';
  * @param {*} setPanelActive 
  * @param {String} eventName trigger
  */
-const useDropdown = (panelActive, setPanelActive, eventName = "click") => {
+const useDropdown = (panelActive, setPanelActive, eventName = 'click', position = '↘') => {
     const buttonRef = useRef();
-    let top = 0;
-    let left = 0;
+    let top = null;
+    let left = null;
+    let transform = '';
 
     //click anywhere to hide dropdown
     useEffect(_ => {
@@ -33,11 +34,32 @@ const useDropdown = (panelActive, setPanelActive, eventName = "click") => {
 
     if (panelActive) {
         const rect = buttonRef.current.getBoundingClientRect();
-        top = rect.top + rect.height;
-        left = rect.left;
+        console.log(rect);
+
+        switch (position) {
+            case '↘':
+                top = rect.bottom;
+                left = rect.left;
+                break;
+            case '↙':
+                top = rect.bottom;
+                left = rect.right;
+                transform += 'translateX(-100%)';
+                break;
+            case '↖':
+                top = rect.top;
+                left = rect.right;
+                transform += 'translate(-100%, -100%)';
+                break;
+            case '↗':
+                top = rect.top;
+                left = rect.left;
+                transform += 'translateY(-100%)';
+                break;
+        }
     }
 
-    return [buttonRef, top, left];
+    return [buttonRef, top, left, transform];
 }
 
 export default useDropdown;
