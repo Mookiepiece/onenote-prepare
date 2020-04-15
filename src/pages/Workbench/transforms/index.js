@@ -7,7 +7,8 @@ import {
     ItalicOutlined,
     UnderlineOutlined,
     FontColorsOutlined,
-    BgColorsOutlined
+    BgColorsOutlined,
+    StrikethroughOutlined
 } from '@ant-design/icons';
 
 import Input from '@/components/Input';
@@ -19,7 +20,7 @@ import AsideDialog from "@/components/Dialog/asideDialog";
 import './style.scss';
 
 import { interator } from './utils';
-import { setArrayItem } from '@/utils';
+import { alt } from '@/utils';
 
 export const MGet = (i) => {
     let { inputs, ...staticAttrs } = M[i];
@@ -255,16 +256,16 @@ export const M = [
             bold: [false, true],
             italic: [false, true],
             underline: [false, true],
+            strike: [false, true],
             fontColor: [false, true],
             bgColor: [false, true],
         }),
-        match: (editor, prevRanges, { bold, italic, underline, fontColor, bgColor }) => {
+        match: (editor, prevRanges, { bold, italic, underline, strike, fontColor, bgColor }) => {
             const children = editor.children;
 
-            console.log(bold);
             const ranges = [];
 
-            if (!(bold[0] || italic[0] || underline[0] || fontColor[0] || bgColor[0]))
+            if (!(bold[0] || italic[0] || underline[0] || strike[0] || fontColor[0] || bgColor[0]))
                 return [];
 
             children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
@@ -279,6 +280,10 @@ export const M = [
                     }
                     if (underline[0]) {
                         if (!(el.underline === underline[1] || el.underline === undefined && !underline[1]))
+                            return false;
+                    }
+                    if (strike[0]) {
+                        if (!(el.strike === strike[1] || el.strike === undefined && !strike[1]))
                             return false;
                     }
                     if (fontColor[0]) {
@@ -303,13 +308,14 @@ export const M = [
         },
 
         render({ inputs, onInput, onMatch }) {
-            const { bold, italic, underline, fontColor, bgColor } = inputs;
+            const { bold, italic, underline, strike, fontColor, bgColor } = inputs;
 
             const [visible, setVisible] = useState();
             const leafStyles = useMemo(_ => [
                 ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],
                 ['italic', ItalicOutlined, '斜体', { fontStyle: 'italic' }],
                 ['underline', UnderlineOutlined, '底线', { textDecoration: 'underline' }],
+                ['strike', StrikethroughOutlined, '删除', { textDecoration: 'line-through' }],
                 ['fontColor', FontColorsOutlined, '前景', { color: 'var(--blue-5)' }],
                 ['bgColor', BgColorsOutlined, '背景', { backgroundColor: 'var(--blue-3)' }]
             ], []);
@@ -328,11 +334,11 @@ export const M = [
                                         <div key={name} className={`match-rule-style-match-item`}>
                                             <CheckboxButton
                                                 value={inputs[name][0]}
-                                                onChange={v => onInput({ [name]: setArrayItem(inputs[name], 0, v) }, true)}
+                                                onChange={v => onInput({ [name]: alt.set(inputs[name], 0, v) }, true)}
                                             ><span style={{ ...style, fontSize: 12 }}><Icon />{text}</span></CheckboxButton>
                                             <Switch
                                                 value={inputs[name][1]}
-                                                onChange={v => onInput({ [name]: setArrayItem(inputs[name], 1, v) }, true)}
+                                                onChange={v => onInput({ [name]: alt.set(inputs[name], 1, v) }, true)}
                                                 disabled={!inputs[name][0]}
                                                 inactiveColor={'var(--purple-5)'}
                                             />
@@ -344,6 +350,30 @@ export const M = [
                     </AsideDialog>
                 </>
             )
+        }
+    },
+    {
+        title: "空行匹配",
+        desc: '筛选空行',
+        inType: '',
+        outType: 'p',
+        inputs: _ => { },
+        match: (editor, prevRanges, { bold, italic, underline, fontColor, bgColor }) => {
+            const children = editor.children;
+            const ranges = [];
+
+            children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+                if (el.type === 'paragraph' || (el.type === undefined && el.text === undefined)) {
+                    if (el.children.length === 1 && el.children[0].text === '') {
+                        ranges.push(path);
+                    }
+                }
+                return true;
+            }));
+            return ranges;
+        },
+        render({ onInput }) {
+            return (<p onClick={_ => onInput({}, true)}>hello</p>)
         }
     }
 ]

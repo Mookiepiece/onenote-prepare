@@ -28,12 +28,15 @@ import {
     InsertRowLeftOutlined,
     InsertRowRightOutlined,
     DeleteColumnOutlined,
-    DeleteRowOutlined
+    DeleteRowOutlined,
+    CreditCardOutlined,
+    StarOutlined
 } from '@ant-design/icons';
 
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
 
 import { fontSizeOptions, fontFamilyOptions, DEAFULT_FONT_FAMILY, DEAFULT_FONT_SIZE } from '@/utils/userSettings';
+import Dialog from '../Dialog';
 
 const Toolbar = () => {
 
@@ -140,7 +143,7 @@ const getInsertRowHandlers = (editor, match) => {
     if (!match) return [];
 
     const [tableNode, tablePath] = match;
-    
+
     const rows = [...Editor.nodes(editor, {
         at: tablePath,
         match: n => n.type === 'table-row'
@@ -336,6 +339,36 @@ const TableButtonGroup = () => {
 
 const TableStyleButton = () => {
     const editor = useSlate();
+    const matches = [...Editor.nodes(editor, {
+        match: n => n.type === 'table'
+    })];
+
+    const disabled = matches.length === 0;
+    const match = matches[matches.length - 1];
+
+    return (
+        <>
+            <Button
+                className="editor-button"
+                onMouseDown={
+                    event => {
+                        event.preventDefault();
+
+                    }
+                }
+            >
+                <TableOutlined />
+            </Button>
+            <Dialog full unmountOnExit>
+                
+            </Dialog>
+        </>
+    )
+}
+
+const FontStyleButton = () => {
+    const editor = useSlate();
+
     return (
         <Button
             className="editor-button"
@@ -343,17 +376,13 @@ const TableStyleButton = () => {
                 event => {
                     event.preventDefault();
 
-                    const [match] = Editor.nodes(editor, {
-                        match: n => n[key] === 'table',
-                    });
-                    return !!match;
 
                 }
             }
         >
             <TableOutlined />
         </Button>
-    )
+    );
 }
 
 const ActionButton = () => {

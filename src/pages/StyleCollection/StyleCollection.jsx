@@ -5,6 +5,7 @@ import {
     BoldOutlined,
     ItalicOutlined,
     UnderlineOutlined,
+    StrikethroughOutlined,
     FontColorsOutlined,
     BgColorsOutlined,
     FieldStringOutlined,
@@ -20,10 +21,20 @@ import Button from '@/components/MkButton';
 import Dialog from '@/components/Dialog';
 import { ColorPicker } from '@/components/ColorPicker';
 
+import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
+
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { setArrayItem, setObject } from '@/utils';
 import { DropdownButtonSelect, DropdownButton } from '@/components/DropdownButton';
 import { fontFamilyOptions, DEAFULT_FONT_FAMILY, fontSizeOptions, DEAFULT_FONT_SIZE } from '@/utils/userSettings';
+
+
+const leafStylesO = [
+    ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],
+    ['italic', ItalicOutlined, '斜体', { fontStyle: 'italic' }],
+    ['underline', UnderlineOutlined, '底线', { textDecoration: 'underline' }],
+    ['strike', StrikethroughOutlined, '删除', { textDecoration: 'line-through' }],
+];
 
 const SC = () => {
     const [dv, sdv] = useState(false);
@@ -38,16 +49,17 @@ const SC = () => {
         bold: [false, true],
         italic: [false, true],
         underline: [false, true],
+        strike: [false, true],
         fontFamily: [false, DEAFULT_FONT_FAMILY],
         fontSize: [false, DEAFULT_FONT_SIZE],
         fontColor: [false, '#000'],
         bgColor: [false, '#fff'],
     });
-    const leafStylesO = useMemo(_ => [
-        ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],
-        ['italic', ItalicOutlined, '斜体', { fontStyle: 'italic' }],
-        ['underline', UnderlineOutlined, '底线', { textDecoration: 'underline' }],
-    ], []);
+
+    const leafStlyePreview = {};
+    Object.keys(customLeafStyle).forEach(key =>
+        customLeafStyle[key][0] && (leafStlyePreview[key] = customLeafStyle[key][1])
+    );
 
     return (
         <div className="style-collection">
@@ -58,13 +70,8 @@ const SC = () => {
 
             <Button onClick={_ => sdv(true)}>sc</Button>
             <ColorPicker value={trible} onChange={setTrible} />
-            <Dialog visible={dv} setVisible={sdv}>
-                <div className="leaf-style-editor">
-                    <div className="sample slate-normalize">
-                        <pre><span>对照组</span></pre>
-                        <span>文字样式示例</span>
-                        <pre><span>对照组</span></pre>
-                    </div>
+            <Dialog full visible={dv} setVisible={sdv}>
+                <div className="leaf-style-editor clearfix">
                     <aside>
                         {
                             leafStylesO.map(([name, Icon, text, style]) => {
@@ -156,6 +163,11 @@ const SC = () => {
                             />
                         </div>
                     </aside>
+                    <div className="sample slate-normalize">
+                        <pre><span>对照组</span></pre>
+                        <pre><Leaf leaf={leafStlyePreview}>文字样式示例</Leaf></pre>
+                        <pre><span>对照组</span></pre>
+                    </div>
                 </div>
             </Dialog>
             {/* <Editor initialValue={initialValue} >
@@ -203,7 +215,7 @@ const ColorPickerButton = ({ disabled, value, onChange }) => {
             renderDropdown={
                 (setPickerActive) => {
                     return (
-                        <div className="color-picker">
+                        <div>
                             <SketchPicker
                                 color={value}
                                 onChange={({ hex }) => {

@@ -194,7 +194,7 @@ const Leaf = ({ attributes, children, leaf }) => {
     let style = computeLeafStyle(leaf);
     let className = '';
 
-    //matched text
+    //matched text ✨
     if (leaf.bling) {
         className += ' bling';
         leaf.bling % 2 && (className += ' odd')
@@ -240,8 +240,9 @@ const Element = (props) => {
 
     let style = {};
     style = { ...style, textAlign: element.align ? element.align : null };
+    let className = `${element.bling ? 'bling' : ''}`;
 
-    attributes = { ...attributes, style }
+    attributes = { ...attributes, style, className };
 
     switch (element.type) {
         //richtext
@@ -271,9 +272,9 @@ const Element = (props) => {
 
         //placeholder
         case 'bling-placeholder':
+            attributes.className += 'bling-placeholder';
             return (
                 <div
-                    className="bling-placeholder"
                     {...attributes}
                 >
                     {children}
