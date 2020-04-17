@@ -8,68 +8,81 @@ const DEFAULT_KEY_MAP = new Map([
     ['align', 'left'],
 ]);
 
-export const toggleBlock = (editor, key, format) => {
-
+export const toggleBlock = (editor, key, value) => {
     if (key === "type") {
-        const isActive = isBlockActive(editor, key, format);
-        const isList = LIST_TYPES.includes(format);
+        const isActive = isBlockActive(editor, key, value);
+        const isList = LIST_TYPES.includes(value);
 
-        //无论什么情况，取消列表包装
+        // 无论什么情况，取消列表包装
         Transforms.unwrapNodes(editor, {
             match: n => LIST_TYPES.includes(n.type),
             split: true,
         });
 
-        //列表的情况更复杂：如果是列表，设置为li并用该列表（ol ul）包住（下一句）
-        //否则是简单的换成p或者该format
+        // 列表的情况更复杂：如果是列表，设置为li并用该列表（ol ul）包住（下一句）
+        // 否则是简单的换成p或者该value
         Transforms.setNodes(editor, {
-            type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+            type: isActive ? 'paragraph' : isList ? 'list-item' : value,
         });
 
         if (!isActive && isList) {
-            const block = { type: format, children: [] };
+            const block = { type: value, children: [] };
             Transforms.wrapNodes(editor, block);
         }
     } else {
-        const isActive = isBlockActive(editor, key, format);
+        const isActive = isBlockActive(editor, key, value);
         Transforms.setNodes(editor, {
-            [key]: isActive ? DEFAULT_KEY_MAP.get(key) : format
+            [key]: isActive ? DEFAULT_KEY_MAP.get(key) : value
         });
     }
-
 }
 
-export const toggleMark = (editor, format, value = true) => {
-    const isActive = isMarkActive(editor, format, value);
+export const toggleMark = (editor, key, value = true) => {
+    const isActive = isMarkActive(editor, key, value);
     if (isActive) {
-        Editor.removeMark(editor, format);
+        Editor.removeMark(editor, key);
     } else {
-        Editor.addMark(editor, format, value);
+        Editor.addMark(editor, key, value);
     }
 }
 
-export const isBlockActive = (editor, key, format) => {
+export const isBlockActive = (editor, key, value) => {
     const [match] = Editor.nodes(editor, {
-        match: n => n[key] === format,
+        match: n => n[key] === value,
     });
     return !!match;
 }
 
-export const isMarkActive = (editor, format, value = true) => {
+export const getElement = (editor) => {
+    const matches = [...Editor.nodes(editor, {
+        match: n => !!n.children,
+        mode:'lowest'
+    })];
+    if (matches) {
+        const [node] = matches[0];
+        return node;
+    }
+    return null;
+}
+
+export const isMarkActive = (editor, key, value = true) => {
     const [match] = Editor.nodes(editor, {
-        match: n => n[format] === value,
+        match: n => n[key] === value,
         mode: 'all',
     });
     return !!match;
 }
 
-export const getMarkActiveSet = (editor, format) => {
+/**
+ * for font
+ */
+export const getMarkActiveSet = (editor, value) => {
     //遍历顺序是从根到内一直到选中区域，并将所有节点放进此列表
     const set = Editor.nodes(editor, {
         match: n => n.text !== undefined,
     });
     // set 剔重
-    return [...new Set([...set].map(v => v[0][format] === undefined ? '' : v[0][format]))];
+    return [...new Set([...set].map(v => v[0][value] === undefined ? '' : v[0][value]))];
 }
 
 //https://github.com/ianstormtaylor/slate/issues/3412

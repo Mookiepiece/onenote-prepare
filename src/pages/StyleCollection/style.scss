@@ -1,16 +1,19 @@
 .leaf-style-editor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
   > .sample {
-    width: 300px;
+    margin-left: 324px;
   }
 
   aside {
+    float: left;
     overflow: auto;
     box-shadow: var(--gray-4) 0 0 4px 2px;
     border-right: 1px solid var(--gray-4);
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
     width: 300px;
 
     .checkbox-button {

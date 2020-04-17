@@ -25,13 +25,13 @@
   }
 }
 
-.dialog-select-transform {
+@mixin pick-one-dialog($item-name) {
   display: flex;
   flex-wrap: wrap;
   justify-content: start;
   align-items: stretch;
 
-  .dialog-select-transform-option {
+  #{$item-name}{
     display: inline-block;
     flex-basis: 200px;
     flex-grow: 0;
@@ -62,37 +62,12 @@
   }
 }
 
-.dialog-style-picker {
-  .leaf-style-card {
-    display: inline-block;
-    flex-basis: 200px;
-    flex-grow: 0;
-    border: 2px solid transparent;
-    
-    > div {
-      background-color: aliceblue;
-      width: 200px;
-      height: 200px;
-    }
-    > h6 {
-      font-size: 12px;
-      margin: 10px 0;
-      user-select: none;
-    }
-    > p {
-      margin: 0;
-      font-size: 12px;
-      color: gray;
-      user-select: none;
-    }
+.dialog-select-transform {
+  @include pick-one-dialog('.dialog-select-transform-option');
+}
 
-    &:hover {
-      border-color: var(--gray-5);
-    }
-    &:active {
-      border-color: var(--gray-8);
-    }
-  }
+.dialog-style-picker {
+  @include pick-one-dialog('.leaf-style-card');
 }
 
 .transform-card {

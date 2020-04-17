@@ -95,9 +95,21 @@
   }
   td {
     border: 1px solid;
-    min-width:25px;
+    min-width: 25px;
   }
 
+  pre,
+  table,
+  ul,
+  ol {
+    --tab-base: 0in;
+    --tabs: 0in;
+    margin-left: calc(var(--tabs) + var(--tab-base));
+  }
+  ul,
+  ol {
+    --tab-base: 0.375in;
+  }
   .bling-placeholder {
     width: 0.1ex;
     height: 1em;
@@ -131,15 +143,12 @@
 
   @keyframes bling-shining {
     0% {
-
       box-shadow: rgba(0, 170, 255, 1) 0 0 0 2px;
     }
     50% {
-
-      box-shadow: rgba(0, 170, 255, .5) 0 0 0 2px;
+      box-shadow: rgba(0, 170, 255, 0.5) 0 0 0 2px;
     }
     100% {
-
       box-shadow: rgba(0, 170, 255, 1) 0 0 0 2px;
     }
   }
@@ -152,7 +161,7 @@
     margin: 0 30px;
 
     .dropdown-button {
-      border:unset;
+      border: unset;
       width: 100%;
       height: 100%;
       vertical-align: top;

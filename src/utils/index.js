@@ -72,7 +72,9 @@ export const alt = {
         return path.slice(0, path.length - 1).reduce((obj, p) => obj[p], object);
     },
     set: immutable.set,
-    merge:immutable.merge
+    merge:immutable.merge,
+    insert:immutable.insert,
+    push:immutable.push
 }
 
 /**

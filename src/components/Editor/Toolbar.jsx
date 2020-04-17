@@ -75,10 +75,10 @@ const Toolbar = () => {
                     format="fontColor"
                     icon={FontColorsOutlined}
                 />
-                {/* <ColorButton
+                <ColorButton
                     format="bgColor"
                     icon={BgColorsOutlined}
-                /> */}
+                />
             </div>
         </div>
     );

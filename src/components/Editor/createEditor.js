@@ -238,8 +238,11 @@ export const renderElement = props => <Element {...props} />;
 const Element = (props) => {
     let { attributes, children, element } = props;
 
-    let style = {};
-    style = { ...style, textAlign: element.align ? element.align : null };
+    let style = {
+        '--tabs': `${0.375 * (element.tabs ? element.tabs : 0)}in`,
+        textAlign: element.align ? element.align : null
+    };
+
     let className = `${element.bling ? 'bling' : ''}`;
 
     attributes = { ...attributes, style, className };
@@ -272,7 +275,7 @@ const Element = (props) => {
 
         //placeholder
         case 'bling-placeholder':
-            attributes.className += 'bling-placeholder';
+            attributes.className += ' bling-placeholder';
             return (
                 <div
                     {...attributes}
