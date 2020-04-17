@@ -14,26 +14,31 @@ function useWindowMaximize() {
         if (bool) {
             currentWindow.maximize();
             _setWindowMaximize(true);
-            document.documentElement.style.setProperty('--frame-bar-drag-place','0');
+            document.documentElement.style.setProperty('--frame-bar-drag-place', '0');
         } else {
             currentWindow.unmaximize();
             _setWindowMaximize(false);
-            document.documentElement.style.setProperty('--frame-bar-drag-place','4px');
+            document.documentElement.style.setProperty('--frame-bar-drag-place', '4px');
         }
     }
 
     const handleMaximize = _ => {
         _setWindowMaximize(true);
-        document.documentElement.style.setProperty('--frame-bar-drag-place','0');
+        document.documentElement.style.setProperty('--frame-bar-drag-place', '0');
     };
     const handleUnmaximize = _ => {
         _setWindowMaximize(false);
-        document.documentElement.style.setProperty('--frame-bar-drag-place','4px');
+        document.documentElement.style.setProperty('--frame-bar-drag-place', '4px');
     };
 
     useEffect(_ => {
         currentWindow.on('maximize', handleMaximize);
         currentWindow.on('unmaximize', handleUnmaximize);
+        if (currentWindow.isMaximized()) {
+            document.documentElement.style.setProperty('--frame-bar-drag-place', '0');
+        } else {
+            document.documentElement.style.setProperty('--frame-bar-drag-place', '4px');
+        }
         return _ => {
             currentWindow.off('maximize', handleMaximize);
             currentWindow.off('unmaximize', handleUnmaximize);
@@ -50,6 +55,7 @@ export default function FrameBar() {
     return (
         <header className="frame-bar">
             <div className="frame-bar-drag-place"></div>
+            <div className="frame-bar-no-drag-place"></div>
             <div role="os-menu">
 
                 {/* minimize button */}

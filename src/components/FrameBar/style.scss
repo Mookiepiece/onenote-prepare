@@ -10,8 +10,6 @@
   z-index: 100;
 
   .frame-bar-drag-place {
-    --frame-bar-drag-place: 4px;
-
     -webkit-app-region: drag;
     position: absolute;
     top: var(--frame-bar-drag-place);
