@@ -45,10 +45,6 @@ const Toolbar = () => {
             <div className="toolbar-group">
                 <FontComponent />
                 <FontSizeComponent />
-                <MarkButton format="bold" icon={BoldOutlined} />
-                <MarkButton format="italic" icon={ItalicOutlined} />
-                <MarkButton format="underline" icon={UnderlineOutlined} />
-                <MarkButton format="strike" icon={StrikethroughOutlined} />
             </div>
             {/* <div className="toolbar-group">
 
@@ -61,14 +57,19 @@ const Toolbar = () => {
                 <BlockButton format="bulleted-list" icon={UnorderedListOutlined} />
             </div>
             <div className="toolbar-group">
-
                 <BlockButton formatKey="align" format="left" icon={AlignLeftOutlined} />
                 <BlockButton formatKey="align" format="center" icon={AlignCenterOutlined} />
                 <BlockButton formatKey="align" format="right" icon={AlignRightOutlined} />
-                <ActionButton />
-                <ActionButtonX />
+            </div>
+            <div className="toolbar-group">
                 <TableButton />
                 <TableButtonGroup />
+            </div>
+            <div className="toolbar-group">
+                <MarkButton format="bold" icon={BoldOutlined} />
+                <MarkButton format="italic" icon={ItalicOutlined} />
+                <MarkButton format="underline" icon={UnderlineOutlined} />
+                <MarkButton format="strike" icon={StrikethroughOutlined} />
             </div>
             <div className="toolbar-group">
                 <ColorButton
@@ -79,6 +80,10 @@ const Toolbar = () => {
                     format="bgColor"
                     icon={BgColorsOutlined}
                 />
+            </div>
+            <div className="toolbar-group">
+                <ActionButton />
+                <ActionButtonX />
             </div>
         </div>
     );
@@ -360,7 +365,7 @@ const TableStyleButton = () => {
                 <TableOutlined />
             </Button>
             <Dialog full unmountOnExit>
-                
+
             </Dialog>
         </>
     )

@@ -1,18 +1,20 @@
 import React from 'react';
 
-const Input = ({
+const Input = React.forwardRef(({
     value,
     onChange,
-    s,
-    l,
+    full = false,
+    onEnterKey,
     ...others
-}) => {
+}, ref) => {
+    let className = `input${full ? ' full' : ''}`;
 
-    let className = 'input';
-    if (s) {
-        className += ' input-size-small'
-    } else if (l) {
-        className += ' input-size-large'
+    //merge enter key down (keyCode: 13) to on key down
+    let { onKeyDown } = others;
+    if (onKeyDown) {
+        if (onEnterKey) onKeyDown = e => e.keyCode === 13 ? onEnterKey() : onKeyDown(e);
+    } else {
+        if (onEnterKey) onKeyDown = e => e.keyCode === 13 && onEnterKey();
     }
 
     return (
@@ -21,10 +23,11 @@ const Input = ({
                 value={value}
                 onChange={e => onChange(e.target.value)}
                 {...others}
+                onKeyDown={onKeyDown}
+                ref={ref}
             />
-            <span></span>
         </div>
     )
-}
+})
 
 export default Input;

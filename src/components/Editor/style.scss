@@ -10,7 +10,7 @@
 }
 
 .editor-toolbar {
-  padding: 12px 8px;
+  padding: 0 8px;
   width: 100%;
 
   display: flex;
@@ -25,16 +25,7 @@
     justify-content: start;
     align-items: center;
     position: relative;
-    &:not(:last-child)::after {
-      content: "";
-      width: 1px;
-      height: 30px;
-      position: absolute;
-      right: 0;
-      top: 5px;
-
-      background: var(--gray-6);
-    }
+    margin-right: 5px;
   }
 
   .editor-button {

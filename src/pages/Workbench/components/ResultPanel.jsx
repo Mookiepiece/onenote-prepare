@@ -8,7 +8,6 @@ import {
 
 import { TinyEmitter } from '@/utils/index';
 import Button from "@/components/MkButton";
-import Input from '@/components/Input';
 import Dialog from '@/components/Dialog';
 import SlateEditor from '@/components/Editor';
 import { Switch } from '@/components/Switch';
@@ -107,7 +106,8 @@ const ExtraToolbar = () => {
     return (
         <>
             <div className="editor-toolbar">
-                <Button className="editor-button" onMouseDown={_ => {
+                <Button className="editor-button" onMouseDown={e => {
+                    e.preventDefault();
                     insertTransformPlaceholder(editor);
                 }}>
                     <ApiOutlined />

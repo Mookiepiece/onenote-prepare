@@ -129,7 +129,7 @@ const withPlaceholders = editor => {
     return editor
 }
 
-//Transform Placeholder Element (TPE)
+//Transform Placeholder Element (TPE) only occurs in ✨result✨ editor
 const TransformPlaceholderElement = ({ attributes, children, element }) => {
     const editor = useSlate();
     const selected = useSelected();

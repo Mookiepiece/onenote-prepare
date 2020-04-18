@@ -61,7 +61,7 @@ const Dialog = ({
                     classNames='ani-dialog'
                     unmountOnExit={unmountOnExit}
                 >
-                    <div {...others} className={`dialog dialog-default ${full ? 'full' : null} ${visible ? '' : 'hidden'}`}>
+                    <div {...others} className={`dialog dialog-default${full ? ' full' : ''}${visible ? '' : ' hidden'}`}>
                         {children}
                     </div>
                 </CSSTransition>

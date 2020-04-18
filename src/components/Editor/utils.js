@@ -56,10 +56,10 @@ export const isBlockActive = (editor, key, value) => {
 export const getElement = (editor) => {
     const matches = [...Editor.nodes(editor, {
         match: n => !!n.children,
-        mode:'lowest'
+        mode: 'lowest'
     })];
-    if (matches) {
-        const [node] = matches[0];
+    if (matches && matches[0]) {
+        const [[node]] = matches;
         return node;
     }
     return null;
