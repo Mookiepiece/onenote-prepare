@@ -8,6 +8,7 @@ import { DropdownButtonSelect } from '@/components/DropdownButton';
 import Button from '@/components/MkButton';
 
 export const createEditor = () => withPlaceholders(withTables(withHistory(withReact(_createEditor()))));
+export const createNoHistoryEditor = () => withPlaceholders(withTables(withReact(_createEditor())));
 
 const withTables = editor => {
     const { deleteBackward, deleteForward, insertBreak, normalizeNode } = editor;
@@ -191,19 +192,13 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
 
 export const renderLeaf = props => <Leaf {...props} />;
 const Leaf = ({ attributes, children, leaf }) => {
-    let style = computeLeafStyle(leaf);
-    let className = '';
-
-    //matched text ✨
-    if (leaf.bling) {
-        className += ' bling';
-        leaf.bling % 2 && (className += ' odd')
-    }
+    let [style, className] = computeLeafStyleAndClassName(leaf);
 
     return <span {...attributes} style={style} className={className ? className : null}>{children}</span>;
 };
 
-export const computeLeafStyle = (leaf) => {
+export const computeLeafStyleAndClassName = (leaf) => {
+    let className = '';
     let style = {};
     if (leaf.bold) {
         style = { ...style, fontWeight: 'bold' };
@@ -226,12 +221,22 @@ export const computeLeafStyle = (leaf) => {
     }
     if (leaf.fontFamily) {
         style = { ...style, fontFamily: leaf.fontFamily };
+    } else {
+        style = { ...style, fontFamily: 'var(--slate-default-font-family)' };
     }
     if (leaf.fontSize) {
         style = { ...style, fontSize: leaf.fontSize + 'pt' };
+    } else {
+        style = { ...style, fontSize: 'var(--slate-default-font-size)' };
     }
 
-    return style;
+    //matched text ✨
+    if (leaf.bling) {
+        className += ' bling';
+        leaf.bling % 2 && (className += ' odd')
+    }
+
+    return [style, className];
 }
 
 export const renderElement = props => <Element {...props} />;

@@ -28,7 +28,7 @@ import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { setArrayItem } from '@/utils';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import { fontFamilyOptions, DEAFULT_FONT_FAMILY, fontSizeOptions, DEAFULT_FONT_SIZE, mockedCustomStyles } from '@/utils/userSettings';
+import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, mockedCustomStyles } from '@/utils/userSettings';
 import { Editor } from 'slate';
 
 const leafStylesO = [
@@ -41,7 +41,7 @@ const leafStylesO = [
 
 const DialogNewLeafStyle = ({ visible, setVisible, onApply }) => {
     const editor = useSlate();
-    
+
     const [title, setTitle] = useState('');
     const [group, setGroup] = useState('');
     const [visibleDialogSave, setVisibleDialogSave] = useState(false);
@@ -54,8 +54,8 @@ const DialogNewLeafStyle = ({ visible, setVisible, onApply }) => {
         italic: [false, true],
         underline: [false, true],
         strike: [false, true],
-        fontFamily: [false, DEAFULT_FONT_FAMILY],
-        fontSize: [false, DEAFULT_FONT_SIZE],
+        fontFamily: [false, SLATE_DEFAULTS.FONT_FAMILY],
+        fontSize: [false, SLATE_DEFAULTS.FONT_SIZE],
         fontColor: [false, '#000'],
         bgColor: [false, '#fff'],
     });
@@ -123,7 +123,7 @@ const DialogNewLeafStyle = ({ visible, setVisible, onApply }) => {
                                 options={
                                     fontFamilyOptions.map(v => {
                                         return {
-                                            label: DEAFULT_FONT_FAMILY === v ? v + ' (默认)' : v,
+                                            label: SLATE_DEFAULTS.FONT_FAMILY === v ? v + ' (默认)' : v,
                                             value: v
                                         };
                                     })
@@ -145,7 +145,7 @@ const DialogNewLeafStyle = ({ visible, setVisible, onApply }) => {
                                 options={
                                     fontSizeOptions.map(v => {
                                         return {
-                                            label: DEAFULT_FONT_SIZE === v ? v + ' (默认)' : v,
+                                            label: SLATE_DEFAULTS.FONT_SIZE === v ? v + ' (默认)' : v,
                                             value: v
                                         };
                                     })

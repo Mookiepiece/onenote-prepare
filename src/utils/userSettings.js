@@ -9,8 +9,31 @@ export const fontFamilyOptions = [
     '等线 Light'
 ]
 
-export const DEAFULT_FONT_FAMILY = "等线 Light";
-export const DEAFULT_FONT_SIZE = 12;
+const _SLATE_DEFAULTS = {
+    FONT_FAMILY: null,
+    FONT_SIZE: null,
+}
+
+export const SLATE_DEFAULTS = new Proxy(_SLATE_DEFAULTS, {
+    get(target, key) {
+        return target[key];
+    },
+    set(target, key, value) {
+        if (key === 'FONT_FAMILY') {
+            target[key] = value;
+            document.documentElement.style.setProperty('--slate-default-font-family', `'${value}'`);
+        } else if (key === 'FONT_SIZE') {
+            target[key] = value;
+            document.documentElement.style.setProperty('--slate-default-font-size', value + 'pt');
+        } else
+            target[key] = value;
+        return true;
+    }
+});
+SLATE_DEFAULTS.init = () => {
+    SLATE_DEFAULTS.FONT_FAMILY = '微软雅黑';
+    SLATE_DEFAULTS.FONT_SIZE = 12;
+}
 
 export const mockedCustomStyles = [
     {
@@ -35,21 +58,21 @@ export const mockedCustomStyles = [
 export const mockedCustomTableBackground = [
     [
         {
-            target:[2,1],
-            type:'row',
-            style:'#ddffcc',
+            target: [2, 1],
+            type: 'row',
+            style: '#ddffcc',
             priority: 1
         },
         {
-            target:[2,0],
-            type:'row',
-            style:'#dd99ff',
+            target: [2, 0],
+            type: 'row',
+            style: '#dd99ff',
             priority: 1
         },
         {
-            target:[0,0],
-            type:'row',
-            style:'#99ddff',
+            target: [0, 0],
+            type: 'row',
+            style: '#99ddff',
             priority: 1
         },
     ],

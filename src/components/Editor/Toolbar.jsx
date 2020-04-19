@@ -35,7 +35,7 @@ import {
 
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
 
-import { fontSizeOptions, fontFamilyOptions, DEAFULT_FONT_FAMILY, DEAFULT_FONT_SIZE } from '@/utils/userSettings';
+import { fontSizeOptions, fontFamilyOptions, SLATE_DEFAULTS } from '@/utils/userSettings';
 import Dialog from '../Dialog';
 
 const Toolbar = () => {
@@ -502,11 +502,11 @@ const ColorButton = ({ format, icon }) => {
 
 const FontComponent = ({
     format = "fontFamily",
-    defaultValue = DEAFULT_FONT_FAMILY,
+    defaultValue = SLATE_DEFAULTS.FONT_FAMILY,
     renderLabel = ({ value, label }) => (<span style={{ fontFamily: value }}>{label}</span>),
     options = fontFamilyOptions.map(v => {
         return {
-            label: DEAFULT_FONT_FAMILY === v ? v + ' (默认)' : v,
+            label: SLATE_DEFAULTS.FONT_FAMILY === v ? v + ' (默认)' : v,
             value: v
         };
     })
@@ -546,10 +546,10 @@ const FontComponent = ({
 
 const FontSizeComponent = ({
     format = "fontSize",
-    defaultValue = DEAFULT_FONT_SIZE,
+    defaultValue = SLATE_DEFAULTS.FONT_SIZE,
     options = fontSizeOptions.map(v => {
         return {
-            label: DEAFULT_FONT_SIZE === v ? v + ' (默认)' : v,
+            label: SLATE_DEFAULTS.FONT_SIZE === v ? v + ' (默认)' : v,
             value: v
         };
     })

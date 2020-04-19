@@ -31,7 +31,6 @@ const Editor = ({ value, setValue, children }) => {
                     </div>
                 </Dialog>
             </div>
-
             {children}
         </Slate >
     )

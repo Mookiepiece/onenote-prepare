@@ -1,12 +1,14 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { Editable, withReact, Slate } from 'slate-react';
+import React, {  useState } from 'react';
 import './style.scss';
 
 import Aside from './components/Aside';
 import Editor from '@/components/Editor';
+import { connect } from 'react-redux';
 
-const Workbench = _ => {
+const Workbench = ({ state }) => {
     const [value, setValue] = useState(initialValue);
+
+    const readOnly = state.v === null;
 
     return (
         <div className="workbench">
@@ -183,4 +185,8 @@ const initialValue = [
     },
 ];
 
-export default Workbench
+const mapStateToProps = (state) => ({
+    state: state.workbenchAside
+});
+
+export default connect(mapStateToProps)(Workbench);

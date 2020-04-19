@@ -139,7 +139,7 @@ const LeafStyleCard = ({ leafStyle, onClick }) => {
         <div className="leaf-style-card" onClick={onClick}>
             <div></div>
             <h6>{leafStyle.title}</h6>
-            <p>{leafStyle.desc}</p>
+            <p>{leafStyle.group}</p>
         </div>
     )
 }
