@@ -39,11 +39,14 @@ const leafStylesO = [
 ];
 // mockedCustomTableBackground
 
-const DialogNewLeafStyle = ({ editor, visible, setVisible, onApply }) => {
-    const [sampleText, setSampleText] = useState('文字样式示例');
+const DialogNewLeafStyle = ({ visible, setVisible, onApply }) => {
+    const editor = useSlate();
+    
     const [title, setTitle] = useState('');
     const [group, setGroup] = useState('');
     const [visibleDialogSave, setVisibleDialogSave] = useState(false);
+
+    const [sampleText, setSampleText] = useState('文字样式示例');
     const [sampleTextEditable, setSampleTextEditable] = useState(false);
 
     const [customLeafStyle, setcustomLeafStyle] = useState({
@@ -279,7 +282,6 @@ const ColorPickerButton = ({ disabled, value, onChange }) => {
 }
 
 const ExtraToolbar = () => {
-    const editor = useSlate();
     const [visibleDialogNewLeafStyle, setVisibleDialogNewLeafStyle] = useState();
 
     return (
@@ -296,7 +298,6 @@ const ExtraToolbar = () => {
                 onApply={
                     (title, group, style) => mockedCustomStyles.push({ title, group, style })
                 }
-                editor={editor}
                 visible={visibleDialogNewLeafStyle}
                 setVisible={setVisibleDialogNewLeafStyle}
             />

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { SketchPicker } from 'react-color';
-import  Input from '@/components/Input';
+import Input from '@/components/Input';
 
-const Settings = () => {
+const Settings = _ => {
     const [v, s] = useState("#666");
     return (
         <div>

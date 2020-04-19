@@ -1,11 +1,12 @@
-import React from 'react';
-import { Router, Link, Redirect, createHistory, createMemorySource, LocationProvider } from '@reach/router';
+import React, { useState, useContext } from 'react';
 import {
     TranslationOutlined,
     ScheduleOutlined,
     SettingOutlined
 } from '@ant-design/icons'
 
+// import store from './store';
+// import { Provider } from 'react-redux';
 
 import FrameBar from './components/FrameBar/FrameBar';
 import Workbench from './pages/Workbench/Workbench';
@@ -15,43 +16,62 @@ import logo from '@/images/logo.png';
 
 import './style.scss';
 
-//reach router setup
-let source = createMemorySource("/workbench")
-let history = createHistory(source);
-const Main = ({ children }) => (<div className="app">{children}</div>);
-const NavLink = props => (
-    <Link
-        {...props}
-        getProps={({ isCurrent }) => {
-            // the object returned here is passed to the
-            // anchor element's props
-            return {
-                className: isCurrent ? "mk-button mk-button-default router-active" : 'mk-button mk-button-default'
-            };
-        }}
-    />
-);
+const routerContext = React.createContext(0);
+
+const Main = ({ children }) => {
+    const context = useContext(routerContext);
+
+    return (
+        <div className="app">{children}</div>
+    );
+};
+
+const NavLink = ({ index, children }) => {
+    const [routerValue, setRouterValue] = useContext(routerContext);
+    const isCurrent = routerValue === index;
+    return (
+        <a
+            onClick={e => { e.preventDefault(); setRouterValue(index); }}
+            className={isCurrent ? "mk-button mk-button-default router-active" : 'mk-button mk-button-default'}
+        >
+            {children}
+        </a>
+    );
+}
+
+const Page = ({ index, children }) => {
+    const [routerValue] = useContext(routerContext);
+    const isCurrent = routerValue === index;
+    return (
+        <div className="page" style={{ display: isCurrent ? '' : 'none' }}>{children}</div>
+    )
+}
 
 const App = () => {
+    const useRouterValueState = useState(0);
 
     return (
         <>
-            <LocationProvider history={history}>
+            {/* <Provider store={store}> */}
+            <routerContext.Provider value={useRouterValueState}>
                 <FrameBar />
                 <img src={logo} className="app-logo" />
                 <nav>
-                    <NavLink to="/workbench"><TranslationOutlined /></NavLink>
-                    <NavLink to="/styles"><ScheduleOutlined /></NavLink>
-                    <NavLink to="/settings"><SettingOutlined /></NavLink>
+                    <NavLink index={0} ><TranslationOutlined /></NavLink>
+                    <NavLink index={1} ><ScheduleOutlined /></NavLink>
+                    <NavLink index={2} ><SettingOutlined /></NavLink>
                 </nav>
-                <Router>
-                    <Main path='/'>
-                        <Workbench path='workbench' />
-                        <StyleCollection path='styles' />
-                        <Settings path='settings' />
-                    </Main>
-                </Router>
-            </LocationProvider>
+                <Page index={0}>
+                    <Workbench />
+                </Page>
+                <Page index={1}>
+                    <StyleCollection />
+                </Page>
+                <Page index={2}>
+                    <Settings />
+                </Page>
+            </routerContext.Provider>
+            {/* </Provider> */}
         </>
     )
 }

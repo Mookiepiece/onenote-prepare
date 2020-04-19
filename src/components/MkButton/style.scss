@@ -1,21 +1,21 @@
 .mk-button {
-  font-size: 14px;
-  vertical-align: middle;
-
-  position: relative;
   display: inline-block;
+  position: relative;
 
+  font-size: 14px;
   border: 0;
-  text-align: center;
   padding: 6px;
-
   min-width: 32px;
   height: 32px;
+  vertical-align: middle;
+  text-align: center;
+
+  text-decoration: none;
+
   .mk-button-large {
     height: 40px;
   }
 
-  text-decoration: none;
   transition: all 0.1s, color 0.3s, box-shadow 0.3s;
 
   &.mk-button-fullwidth {

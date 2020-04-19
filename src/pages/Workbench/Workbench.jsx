@@ -5,7 +5,7 @@ import './style.scss';
 import Aside from './components/Aside';
 import Editor from '@/components/Editor';
 
-const Workbench = () => {
+const Workbench = _ => {
     const [value, setValue] = useState(initialValue);
 
     return (

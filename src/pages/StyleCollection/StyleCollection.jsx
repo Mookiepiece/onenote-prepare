@@ -9,7 +9,7 @@ import { ColorPicker } from '@/components/ColorPicker';
 
 import { DropdownButton } from '@/components/DropdownButton';
 
-const SC = () => {
+const SC = _ => {
     const [trible, setTrible] = useState('#dddd66');
 
     return (
@@ -19,7 +19,6 @@ const SC = () => {
             <br />
             <br />
             <ColorPicker value={trible} onChange={setTrible} />
- 
 
         </div>
     )
