@@ -3,10 +3,10 @@ import {
     TranslationOutlined,
     ScheduleOutlined,
     SettingOutlined
-} from '@ant-design/icons'
+} from '@ant-design/icons';
 
-// import store from './store';
-// import { Provider } from 'react-redux';
+import store from './redux';
+import { Provider } from 'react-redux';
 
 import FrameBar from './components/FrameBar/FrameBar';
 import Workbench from './pages/Workbench/Workbench';
@@ -17,14 +17,6 @@ import logo from '@/images/logo.png';
 import './style.scss';
 
 const routerContext = React.createContext(0);
-
-const Main = ({ children }) => {
-    const context = useContext(routerContext);
-
-    return (
-        <div className="app">{children}</div>
-    );
-};
 
 const NavLink = ({ index, children }) => {
     const [routerValue, setRouterValue] = useContext(routerContext);
@@ -52,26 +44,26 @@ const App = () => {
 
     return (
         <>
-            {/* <Provider store={store}> */}
-            <routerContext.Provider value={useRouterValueState}>
-                <FrameBar />
-                <img src={logo} className="app-logo" />
-                <nav>
-                    <NavLink index={0} ><TranslationOutlined /></NavLink>
-                    <NavLink index={1} ><ScheduleOutlined /></NavLink>
-                    <NavLink index={2} ><SettingOutlined /></NavLink>
-                </nav>
-                <Page index={0}>
-                    <Workbench />
-                </Page>
-                <Page index={1}>
-                    <StyleCollection />
-                </Page>
-                <Page index={2}>
-                    <Settings />
-                </Page>
-            </routerContext.Provider>
-            {/* </Provider> */}
+            <Provider store={store}>
+                <routerContext.Provider value={useRouterValueState}>
+                    <FrameBar />
+                    <img src={logo} className="app-logo" />
+                    <nav>
+                        <NavLink index={0} ><TranslationOutlined /></NavLink>
+                        <NavLink index={1} ><ScheduleOutlined /></NavLink>
+                        <NavLink index={2} ><SettingOutlined /></NavLink>
+                    </nav>
+                    <Page index={0}>
+                        <Workbench />
+                    </Page>
+                    <Page index={1}>
+                        <StyleCollection />
+                    </Page>
+                    <Page index={2}>
+                        <Settings />
+                    </Page>
+                </routerContext.Provider>
+            </Provider>
         </>
     )
 }

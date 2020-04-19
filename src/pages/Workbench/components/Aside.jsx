@@ -1,38 +1,37 @@
-import React, { useState, useReducer, useCallback, useMemo, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     CSSTransition,
     TransitionGroup,
 } from 'react-transition-group';
-import { useSlate, useEditor } from 'slate-react';
+import { useSlate } from 'slate-react';
 import {
     CloseOutlined,
     BorderOutlined,
     CheckSquareOutlined,
     PlusCircleOutlined
 } from '@ant-design/icons';
-import { v4 as uuid } from 'uuid';
 
-import Button from "@/components/MkButton";
-
-import './style.scss';
 
 import { deepCopy, alt } from '@/utils';
 
 import { MGet } from '../transforms';
 import { applyMatch, clearUp, applyRender } from '../transforms/slateEffects';
 
+import Button from "@/components/MkButton";
+import ExtraToolbar from './ExtraToolbar';
 import DialogMatchPicker from './DialogMatchPicker';
 import ResultPanel from './ResultPanel';
+import { connect } from 'react-redux';
 let matchedRanges = [];
 
+import ActionTypes from '@/redux/actions';
+
+import './style.scss';
 
 const applyChange = (editor, state, index = state.currentIndex) => {
     applyMatcher(editor, state, index)
     applyRender(editor, state.v[index].result);
-    return {
-        ...state,
-        memory: [...state.memory, deepCopy(editor.children)]
-    };
+    return alt.push(state, `memory`, deepCopy(editor.children));
 };
 
 const applyMatcher = (editor, state, index = state.currentIndex) => {
@@ -50,158 +49,33 @@ const currentState = state => {
         return 'current';
 };
 
-const useAsideState = (initialState, setSlateValue) => {
-    const editor = useSlate();
-    const [_state, _setState] = useState(initialState);
-
-    const setState = v => {
-        _setState(v);
-    }
-
-    let state = _state;
-
-    const dispatch = action => setState((_ => {
-        switch (action.type) {
-            case 'DELETE':
-                //TODO 
-                return state;
-            case 'PUSH_MATCH_RULE': {
-                if (action.pushTransform) { //PUSH_TRANSFORM 如果是点击add transform 按钮，则要新建一个transform
-                    if (state.currentIndex !== null && currentState(state) === 'current') { //save prev transform
-                        state = applyChange(editor, state);
-                    }
-                    state = {
-                        ...state,
-                        v: [
-                            ...state.v,
-                            {
-                                name: action.value.title,
-                                matches: [],
-                                currentMatch: null,
-                                result: {
-                                    nodes: [],
-                                    options: {
-                                        overrideStyle: false,
-                                    }
-                                }, //nodes会在useEffect里通过INPUT事件传入
-                                key: uuid()
-                            }],
-                        currentIndex: state.v.length,
-                    }
-                }
-
-                let currentIndex = state.currentIndex;
-                let v = state.v;
-                let currentMatch = v[currentIndex].currentMatch;
-
-                return {
-                    ...state,
-                    v: alt.merge(v, currentIndex, {
-                        matches: [...v[currentIndex].matches, {
-                            ...action.value,
-                            inputs: { ...action.value.inputs, title: action.value.title },
-                            key: uuid()
-                        }],
-                        currentMatch: currentMatch === null ? 0 : currentMatch + 1
-                    }),
-                };
-            }
-            case 'INPUT': {
-                let currentIndex = state.currentIndex;
-                let v = state.v;
-                let matchIndex = action.matchIndex; //-1 result >=0 matches
-
-                if (matchIndex < 0) {
-                    state = {
-                        ...state,
-                        v: alt.set(v, `${currentIndex}.result`, action.inputs)
-                    };
-                } else {
-                    state = {
-                        ...state,
-                        v: alt.merge(v, `${currentIndex}.matches.${matchIndex}.inputs`, action.inputs)
-                    };
-                    if (action.rematch) {
-                        state = applyMatcher(editor, state);
-                    }
-                }
-                return state;
-            }
-            case 'TOGGLE_ACTIVE': {
-
-                let index = action.index;
-
-                if (index < state.currentIndex) {
-                    //一步到位还原状态，
-                    setSlateValue(state.memory[index]);
-                    state = {
-                        ...state,
-                        currentIndex: index,
-                        memory: [...state.memory].slice(0, index + 1)
-                    };
-
-                } else if (index === state.currentIndex) {
-                    if (currentState(state) === "current") {
-                        state = applyChange(editor, state);
-                        return state;
-                    } else {
-                        setSlateValue(state.memory[index]); //setSlateValue后无法激活match要下一个阶段激活 
-                        state = {
-                            ...state,
-                            memory: [...state.memory].slice(0, index + 1)
-                        };
-                        return state;
-                    }
-                } else {
-                    //逐步应用
-                    if (currentState(state) === "current") {
-                        state = applyChange(editor, state);
-                    }
-                    for (let i = state.currentIndex + 1; i !== index; i++) {
-                        state = applyChange(editor, state, i);
-                    }
-
-                    state = {
-                        ...state,
-                        currentIndex: index,
-                    }
-
-                }
-                return state;
-            }
-            case 'MATCH':
-                state = applyMatcher(editor, state);
-                return state;
-            case 'APPLY':
-                state = applyChange(editor, state);
-                return state;
-            case 'SET_CURRENT_INDEX':
-                return { ...state, currentIndex: action.index }
-            default:
-                console.error('[pre-onenote] incorrent action type:', action.type);
-                return state;
-        }
-    })());
-
-    return [_state, dispatch];
-}
-
-
 //current 正在match，新建的话自动apply, apply已拥有
-const Aside = ({ setSlateValue }) => {
+const Aside = ({ setSlateValue, state, dispatch: _dispatch }) => {
     const editor = useSlate();
-    const [state, dispatch] = useAsideState({
-        v: [],
-        memory: [deepCopy(editor.children)],
-        currentIndex: null,
-    }, setSlateValue);
+    // const [state, _dispatch] = useAsideState({
+    //     v: [],
+    //     memory: [[{ type: 'paragraph', children: [{ text: '' }] }]],
+    //     currentIndex: null,
+    // }, setSlateValue);
+
+    console.log(state);
 
     const [dialogVisible, setDialogVisible] = useState(false);
     const [dialogPushTransform, setDialogPushTransform] = useState(false);
 
+    let dispatch = arg => _dispatch({
+        ...arg,
+        callback: {
+            match: state => applyMatcher(editor, state),
+            change: state => applyChange(editor, state),
+            slate: value => setSlateValue(value)
+        }
+    });
+
     return (
         <aside>
             <div className="workbench-aside">
+                <ExtraToolbar />
                 <Button
                     full
                     onClick={_ => {
@@ -222,7 +96,7 @@ const Aside = ({ setSlateValue }) => {
                                     v={v}
 
                                     onInput={(inputs, rematch = false, matchIndex) => dispatch({
-                                        type: 'INPUT',
+                                        type: ActionTypes.INPUT,
                                         index,
                                         inputs,
                                         rematch,
@@ -245,7 +119,7 @@ const Aside = ({ setSlateValue }) => {
 
                                     onOpenDialog={_ => {
                                         dispatch({
-                                            type: 'SET_CURRENT_INDEX',
+                                            type: ActionTypes.SET_CURRENT_INDEX,
                                             index
                                         })
                                         setDialogVisible(true);
@@ -253,27 +127,27 @@ const Aside = ({ setSlateValue }) => {
                                     }}
 
                                     onClose={_ => dispatch({
-                                        type: 'DELETE',
+                                        type: ActionTypes.DELETE,
                                         index
                                     })}
 
                                     onActive={
                                         _ => dispatch({
-                                            type: 'TOGGLE_ACTIVE',
+                                            type: ActionTypes.TOGGLE_ACTIVE,
                                             index
                                         })
                                     }
 
                                     onMatch={
                                         _ => dispatch({
-                                            type: 'MATCH',
+                                            type: ActionTypes.MATCH,
                                             index
                                         })
                                     }
 
                                     onApply={
                                         _ => dispatch({
-                                            type: 'APPLY',
+                                            type: ActionTypes.APPLY,
                                             index
                                         })
                                     }
@@ -284,7 +158,7 @@ const Aside = ({ setSlateValue }) => {
                 </TransitionGroup>
                 <DialogMatchPicker visible={dialogVisible} setVisible={setDialogVisible} onApply={(i) => {
                     dispatch({
-                        type: 'PUSH_MATCH_RULE',
+                        type: ActionTypes.PUSH_MATCH_RULE,
                         value: MGet(i),
                         pushTransform: dialogPushTransform
                     });
@@ -340,7 +214,7 @@ const TransformCard = ({ v, color, onClose, onActive, onInput, onMatch, onOpenDi
                     })
                 }
             </TransitionGroup>
-            <Button className="add-match-button" onClick={onOpenDialog} ><PlusCircleOutlined /></Button>
+            <Button className="add-match-button" onClick={onOpenDialog} disabled ><PlusCircleOutlined /></Button>
             {
                 v.matches.length ?
                     (
@@ -356,4 +230,8 @@ const TransformCard = ({ v, color, onClose, onActive, onInput, onMatch, onOpenDi
     )
 }
 
-export default Aside;
+const mapStateToProps = state => ({
+    state: state.workbenchAside
+})
+
+export default connect(mapStateToProps)(Aside);
