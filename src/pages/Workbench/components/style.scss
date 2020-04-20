@@ -31,7 +31,7 @@
   justify-content: start;
   align-items: stretch;
 
-  #{$item-name}{
+  #{$item-name} {
     display: inline-block;
     flex-basis: 200px;
     flex-grow: 0;
@@ -56,18 +56,19 @@
     &:hover {
       border-color: var(--gray-5);
     }
-    &:active {
+    &:active,
+    &.active {
       border-color: var(--gray-8);
     }
   }
 }
 
 .dialog-select-transform {
-  @include pick-one-dialog('.dialog-select-transform-option');
+  @include pick-one-dialog(".dialog-select-transform-option");
 }
 
 .dialog-style-picker {
-  @include pick-one-dialog('.leaf-style-card');
+  @include pick-one-dialog(".leaf-style-card");
 }
 
 .transform-card {
@@ -157,6 +158,16 @@
   }
 }
 
+.history-list {
+  float: left;
+  width: 300px;
+}
+
+.history-preview {
+  position: relative;
+  margin-left: 300px;
+}
+
 .match-item-enter {
   opacity: 0;
 }
@@ -191,7 +202,11 @@
 
 .result-editor-dialog {
   > .slate {
+    position: absolute;
+    top: 0;
+    left: 0;
     right: 300px;
+    bottom: 0;
   }
   > aside {
     position: absolute;

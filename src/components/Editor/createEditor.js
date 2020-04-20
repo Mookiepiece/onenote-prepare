@@ -3,7 +3,7 @@ import { withReact, useSelected, useFocused, useSlate, ReactEditor } from 'slate
 import { createEditor as _createEditor, Range, Editor, Point, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
 
-import { TinyEmitter } from '@/utils/index';
+import { TinyEmitter, EVENTS } from '@/utils/index';
 import { DropdownButtonSelect } from '@/components/DropdownButton';
 import Button from '@/components/MkButton';
 
@@ -146,14 +146,14 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
         if (value === 'CLOSE') {
             Transforms.removeNodes(editor, { at: path });
         } else {
-            TinyEmitter.emit("TPEclick", [node, path]);
+            TinyEmitter.emit(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_CLICK, [node, path]);
         }
     };
 
-    let style = {};
+    let style = {}, className = '';
 
     if (element.meta.style) {
-        style = computeLeafStyle(element.meta.style);
+        [style, className] = computeLeafStyleAndClassName(element.meta.style);
     }
 
     return (
@@ -181,7 +181,7 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
                         }}
 
                     >
-                        <span style={style}> {"HAPPY"} </span>
+                        <span style={style} className={className}> {"HAPPY"} </span>
                     </Button>
                 )}
             />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Transforms } from 'slate';
 import { useSlate } from 'slate-react';
 import {
@@ -6,10 +6,10 @@ import {
     BookOutlined,
 } from '@ant-design/icons';
 
-import { TinyEmitter } from '@/utils/index';
+import { TinyEmitter, EVENTS } from '@/utils/index';
 import Button from "@/components/MkButton";
 import Dialog from '@/components/Dialog';
-import SlateEditor from '@/components/Editor';
+import { SlateEditor } from '@/components/Editor';
 import { Switch } from '@/components/Switch';
 
 import { mockedCustomStyles } from '@/utils/userSettings';
@@ -70,8 +70,8 @@ const Aside = ({ result, onResultChange }) => {
     };
 
     useEffect(_ => {
-        TinyEmitter.on('TPEclick', showStyleDialog);
-        return _ => TinyEmitter.off('TPEclick', showStyleDialog);
+        TinyEmitter.on(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_CLICK, showStyleDialog);
+        return _ => TinyEmitter.off(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_CLICK, showStyleDialog);
     }, []);
 
     return (

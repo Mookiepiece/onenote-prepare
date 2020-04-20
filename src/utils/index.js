@@ -72,9 +72,10 @@ export const alt = {
         return path.slice(0, path.length - 1).reduce((obj, p) => obj[p], object);
     },
     set: immutable.set,
-    merge:immutable.merge,
-    insert:immutable.insert,
-    push:immutable.push
+    merge: immutable.merge,
+    insert: immutable.insert,
+    push: immutable.push,
+    del: immutable.del
 }
 
 /**
@@ -109,5 +110,9 @@ export const removeArrayItem = (array, index) => {
         ...array.slice(index + 1, array.length)
     ];
 }
+
+export const EVENTS = {
+    TRANSFORM_PLACEHOLDER_ELEMENT_CLICK: 'TRANSFORM_PLACEHOLDER_ELEMENT_CLICK',
+};
 
 export const TinyEmitter = new _TinyEmitter();

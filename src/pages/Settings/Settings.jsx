@@ -43,7 +43,7 @@ const Settings = _ => {
                     <DropdownButtonSelect
                         value={slateFontSize}
                         width={120}
-                        renderLabel={({ value, label }) => (<span style={{ fontSize: value }}>{label}</span>)}
+                        renderLabel={({ value, label }) => (<span>{label}</span>)}
                         options={
                             fontSizeOptions.map(v => {
                                 return {

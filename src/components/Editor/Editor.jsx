@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { Editable, withReact, Slate } from 'slate-react';
+import { Editable, Slate } from 'slate-react';
 
 import Toolbar from './Toolbar';
-import { createEditor, renderElement, renderLeaf } from './createEditor.js';
+import { createEditor, renderElement, renderLeaf, createNoHistoryEditor } from './createEditor.js';
 import higherOrderKeydownHandler from './hotkeys';
-import Dialog from '../Dialog/Dialog';
+import Dialog from '../Dialog';
 
-const Editor = ({ value, setValue, children }) => {
+export const SlateEditor = ({ value, setValue, children }) => {
     const editor = useMemo(createEditor, []);
 
     const [debug, setDebug] = useState(false);
@@ -32,8 +32,33 @@ const Editor = ({ value, setValue, children }) => {
                 </Dialog>
             </div>
             {children}
-        </Slate >
+        </Slate>
     )
 }
 
-export default Editor;
+export const ReadOnlySlateEditor = ({ value, setValue, showToolbar = false, children }) => {
+    const editor = useMemo(createNoHistoryEditor, []);
+    const [debug, setDebug] = useState(false);
+
+    return (
+        <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+            <div className="slate slate-disabled">
+                {showToolbar ? <Toolbar /> : null}
+                <Editable
+                    readOnly
+                    className="slate-editable"
+                    renderElement={renderElement}
+                    renderLeaf={renderLeaf}
+                />
+                <input type="checkbox" value={debug} onChange={_ => setDebug(true)} />
+                <Dialog visible={debug} setVisible={setDebug}>
+                    <div style={{ whiteSpace: 'pre-wrap' }}>
+                        {JSON.stringify(value, null, 4)}
+                    </div>
+                </Dialog>
+            </div>
+            {children}
+        </Slate>
+    )
+}
+

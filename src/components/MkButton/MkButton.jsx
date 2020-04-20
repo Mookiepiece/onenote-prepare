@@ -53,8 +53,6 @@ const MkButton = React.forwardRef(({
 
     className += ' ' + (disabled ? 'disabled' : '');
 
-
-
     return (
         <button ref={ref} className={className} tabIndex={unfocusable ? '-1' : null} onClick={
             e => {

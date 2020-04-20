@@ -12,16 +12,19 @@ import {
     SwapRightOutlined,
     ApiOutlined,
     AppstoreAddOutlined,
-    EditOutlined
+    EditOutlined,
+    HistoryOutlined
 } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { useSlate } from 'slate-react';
+import { ReadOnlySlateEditor, SlateEditor } from '@/components/Editor';
 
 import Dialog from "@/components/Dialog";
 import Button from "@/components/MkButton";
 import Input from '@/components/Input';
 
-import { alt } from '@/utils';
+import { alt, deepCopy } from '@/utils';
+import { connect } from 'react-redux';
 
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
@@ -30,6 +33,7 @@ import { setArrayItem } from '@/utils';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
 import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, mockedCustomStyles } from '@/utils/userSettings';
 import { Editor } from 'slate';
+import ActionTypes from '@/redux/actions';
 
 const leafStylesO = [
     ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],
@@ -281,8 +285,79 @@ const ColorPickerButton = ({ disabled, value, onChange }) => {
     )
 }
 
-const ExtraToolbar = () => {
+const _DialogHistory = ({ visible, setVisible, setSlateValue, history, dispatch }) => {
+    const [value, setValue] = useState([{ children: [{ text: '' }] }]);
+    const [index, setIndex] = useState(-1);
+
+    const editor = useSlate();
+
+    useEffect(_ => {
+        if (visible) {
+            setValue(deepCopy(editor.children));
+            setIndex(-1);
+        }
+    }, [visible]);
+
+    useEffect(_ => {
+        if (index === -1) {
+            setValue(deepCopy(editor.children));
+        } else {
+            setValue(history[index].value);
+        }
+    }, [index]);
+
+    return (
+        <Dialog visible={visible} setVisible={setVisible} style={{ paddingBottom: 48 }}>
+            <div className="history-list">
+                <Button
+                    full
+                    active={index === -1}
+                    key='👻'
+                    onClick={_ => setIndex(-1)}
+                >目前</Button>
+                {history.map((h, i) => (
+                    <Button
+                        full
+                        active={index === i}
+                        key={h.time.toString()}
+                        onClick={_ => setIndex(i)}>
+                        {h.time.Format('hh:mm:ss')}
+                    </Button>
+                )).reverse()}
+            </div>
+            <div className="history-preview">
+                <ReadOnlySlateEditor value={value} setValue={setValue}>
+                    <div></div>
+                </ReadOnlySlateEditor>
+            </div>
+            <div style={{ position: 'absolute', right: 24, bottom: 0, width: 100 }}>
+                <Button
+                    disabled={index === -1}
+                    full
+                    onClick={_ => {
+                        setVisible(false);
+                        setSlateValue(value);
+                        dispatch({
+                            type: ActionTypes.PUSH_MEMORY,
+                            callback: { children: () => editor.children }
+                        })
+                    }}
+                    type="primary"
+                >回溯</Button>
+            </div>
+        </Dialog>
+    )
+};
+
+const mapStateToProps = state => ({
+    history: state.workbenchAside.memory
+});
+
+const DialogHistory = connect(mapStateToProps)(_DialogHistory);
+
+const ExtraToolbar = ({ setSlateValue }) => {
     const [visibleDialogNewLeafStyle, setVisibleDialogNewLeafStyle] = useState();
+    const [visibleDialogHistory, setVisibleDialogHistory] = useState();
 
     return (
         <>
@@ -293,6 +368,13 @@ const ExtraToolbar = () => {
                 }}>
                     <AppstoreAddOutlined />
                 </Button>
+                <Button className="editor-button" onMouseDown={e => {
+                    // NOTE: SELECTION
+                    window.getSelection().removeAllRanges();
+                    setVisibleDialogHistory(true);
+                }}>
+                    <HistoryOutlined />
+                </Button>
             </div>
             <DialogNewLeafStyle
                 onApply={
@@ -301,6 +383,7 @@ const ExtraToolbar = () => {
                 visible={visibleDialogNewLeafStyle}
                 setVisible={setVisibleDialogNewLeafStyle}
             />
+            <DialogHistory setSlateValue={setSlateValue} visible={visibleDialogHistory} setVisible={setVisibleDialogHistory} />
         </>
     );
 };

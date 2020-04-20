@@ -1,23 +1,58 @@
-import React, {  useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './style.scss';
 
 import Aside from './components/Aside';
-import Editor from '@/components/Editor';
+import { SlateEditor, ReadOnlySlateEditor } from '@/components/Editor';
+import ActionTypes from '@/redux/actions';
+import { deepCopy } from '@/utils';
+
 import { connect } from 'react-redux';
 
-const Workbench = ({ state }) => {
+const Workbench = ({ state, dispatch }) => {
     const [value, setValue] = useState(initialValue);
+    const [value1, setValue1] = useState(initialValue);
 
-    const readOnly = state.v === null;
+
+
+    let shouldDelete = !!(state.v && state.v.shouldDelete)
+    useEffect(_ => {
+        if (shouldDelete) {
+            dispatch((dispatch, getState) => {
+                setTimeout(_ => dispatch({ type: ActionTypes.APPLY_FINISH }), 0); // FIXME: how to know slate transform complete
+            });
+        }
+    }, [shouldDelete]);
+
+    const readOnly = state.v !== null;
+    useEffect(_ => {
+        if (shouldDelete) return;
+        if (readOnly) {
+            setValue1(deepCopy(value));
+        } else {
+            setValue(deepCopy(value1));
+        }
+    }, [shouldDelete, readOnly]);
 
     return (
         <div className="workbench">
-            <Editor value={value} setValue={setValue}>
-                <Aside setSlateValue={setValue} />
-            </Editor>
+            {
+                !readOnly ?
+                    <SlateEditor value={value} setValue={setValue}>
+                        <Aside setSlateValue={setValue} />
+                    </SlateEditor> :
+                    <ReadOnlySlateEditor showToolbar value={value1} setValue={setValue1}>
+                        <Aside setSlateValue={setValue1} />
+                    </ReadOnlySlateEditor>
+            }
         </div>
-    )
+    );
 }
+
+const mapStateToProps = (state) => ({
+    state: state.workbenchAside
+});
+
+export default connect(mapStateToProps)(Workbench);
 
 const initialValue = [
     {
@@ -184,9 +219,3 @@ const initialValue = [
         ],
     },
 ];
-
-const mapStateToProps = (state) => ({
-    state: state.workbenchAside
-});
-
-export default connect(mapStateToProps)(Workbench);

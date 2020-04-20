@@ -5,7 +5,6 @@ import { M } from '../transforms';
 
 const DialogMatchPicker = ({ visible, setVisible, onSelect, onApply }) => {
 
-
     return (
         <Dialog visible={visible} setVisible={setVisible}>
             <div className="dialog-select-transform">
