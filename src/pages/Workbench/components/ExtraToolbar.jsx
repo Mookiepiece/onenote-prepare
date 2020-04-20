@@ -321,7 +321,7 @@ const _DialogHistory = ({ visible, setVisible, setSlateValue, history, dispatch 
                         active={index === i}
                         key={h.time.toString()}
                         onClick={_ => setIndex(i)}>
-                        {h.time.Format('hh:mm:ss')}
+                        {h.time.toTimeString().slice(0,8)}
                     </Button>
                 )).reverse()}
             </div>
@@ -355,13 +355,13 @@ const mapStateToProps = state => ({
 
 const DialogHistory = connect(mapStateToProps)(_DialogHistory);
 
-const ExtraToolbar = ({ setSlateValue }) => {
+const ExtraToolbar = ({ readOnly, setSlateValue }) => {
     const [visibleDialogNewLeafStyle, setVisibleDialogNewLeafStyle] = useState();
     const [visibleDialogHistory, setVisibleDialogHistory] = useState();
 
     return (
         <>
-            <div className="editor-toolbar">
+            <div className={`editor-toolbar${readOnly ? ' editor-toolbar-disabled' : ''}`}>
                 <Button className="editor-button" onMouseDown={e => {
                     e.preventDefault();
                     setVisibleDialogNewLeafStyle(true);

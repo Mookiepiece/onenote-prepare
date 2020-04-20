@@ -41,7 +41,7 @@ const Workbench = ({ state, dispatch }) => {
                         <Aside setSlateValue={setValue} />
                     </SlateEditor> :
                     <ReadOnlySlateEditor showToolbar value={value1} setValue={setValue1}>
-                        <Aside setSlateValue={setValue1} />
+                        <Aside readOnly setSlateValue={setValue1} />
                     </ReadOnlySlateEditor>
             }
         </div>

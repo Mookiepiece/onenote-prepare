@@ -39,7 +39,7 @@ const applyMatcher = (editor, state) => {
 };
 
 //current 正在match，新建的话自动apply, apply已拥有
-const Aside = ({ setSlateValue, state, dispatch: _dispatch }) => {
+const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
     const editor = useSlate();
 
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -59,7 +59,7 @@ const Aside = ({ setSlateValue, state, dispatch: _dispatch }) => {
     return (
         <aside>
             <div className="workbench-aside">
-                <ExtraToolbar setSlateValue={setSlateValue} />
+                <ExtraToolbar readOnly={readOnly} setSlateValue={setSlateValue} />
                 {
                     state.v === null ?
                         <Button
@@ -142,7 +142,7 @@ const Aside = ({ setSlateValue, state, dispatch: _dispatch }) => {
                 <Button
                     type="floating"
                     onClick={_ => dispatch({ type: ActionTypes.APPLY })}
-                    style={{ marginBottom: 12 }}
+                    style={{ marginBottom: 12, display: readOnly && state.v.result.nodes.length !== 0 ? null : 'none' }}
                 >应用规则</Button>
             </div>
         </aside >

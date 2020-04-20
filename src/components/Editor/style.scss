@@ -1,14 +1,6 @@
 .slate {
   display: flex;
   flex-direction: column;
-
-  &.slate-disabled{
-    .editor-toolbar{
-      pointer-events: none;
-      user-select: none;
-      opacity: .35;
-    }
-  }
 }
 
 .editor-toolbar {
@@ -63,6 +55,12 @@
     & > span.anticon {
       transform: translate(-5px) rotate(90deg);
     }
+  }
+
+  &.editor-toolbar-disabled {
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.35;
   }
 }
 

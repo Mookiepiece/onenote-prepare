@@ -18,7 +18,8 @@ const workbenchAside = (state = {
             return state;
         case ActionTypes.DELETE:
             action.callback.slate(state.memory[state.memory.length - 1].value);
-            state = alt.del(state, `memory`, state.memory.length - 1);
+            // state = alt.del(state, `memory`, state.memory.length - 1);
+            state = alt.set(state, 'memory', state.memory.slice(0, state.memory.length - 1));
             state = alt.set(state, 'v.shouldDelete', true);
             return state;
         case ActionTypes.PUSH_MATCH_RULE: {

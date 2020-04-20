@@ -38,10 +38,10 @@ import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet,
 import { fontSizeOptions, fontFamilyOptions, SLATE_DEFAULTS } from '@/utils/userSettings';
 import Dialog from '../Dialog';
 
-const Toolbar = () => {
+const Toolbar = ({ readOnly }) => {
 
     return (
-        <div className="editor-toolbar">
+        <div className={`editor-toolbar${readOnly ? ' editor-toolbar-disabled' : ''}`}>
             <div className="toolbar-group">
                 <FontComponent />
                 <FontSizeComponent />

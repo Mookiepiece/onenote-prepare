@@ -42,8 +42,8 @@ export const ReadOnlySlateEditor = ({ value, setValue, showToolbar = false, chil
 
     return (
         <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-            <div className="slate slate-disabled">
-                {showToolbar ? <Toolbar /> : null}
+            <div className="slate">
+                {showToolbar ? <Toolbar readOnly /> : null}
                 <Editable
                     readOnly
                     className="slate-editable"
