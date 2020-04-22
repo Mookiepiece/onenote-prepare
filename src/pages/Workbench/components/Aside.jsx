@@ -16,7 +16,7 @@ import { applyMatch, clearUp, applyRender } from '../transforms/slateEffects';
 
 import Button from "@/components/MkButton";
 import ExtraToolbar from './ExtraToolbar';
-import DialogMatchPicker from './DialogMatchPicker';
+import MatchPickerDialog from './MatchPickerDialog';
 import ResultPanel from './ResultPanel';
 import { connect } from 'react-redux';
 let matchedRanges = [];
@@ -129,7 +129,7 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
                         )).reverse()
                     }
                 </TransitionGroup>
-                <DialogMatchPicker visible={dialogVisible} setVisible={setDialogVisible} onApply={(i) => {
+                <MatchPickerDialog visible={dialogVisible} setVisible={setDialogVisible} onApply={(i) => {
                     dispatch({
                         type: ActionTypes.PUSH_MATCH_RULE,
                         value: MGet(i),
