@@ -28,12 +28,10 @@ const Settings = _ => {
                         width={120}
                         renderLabel={({ value, label }) => (<span style={{ fontFamily: value }}>{label}</span>)}
                         options={
-                            fontFamilyOptions.map(v => {
-                                return {
-                                    label: SLATE_DEFAULTS.FONT_FAMILY === v ? v + ' (默认)' : v,
-                                    value: v
-                                };
-                            })
+                            fontFamilyOptions.map(v => ({
+                                label: SLATE_DEFAULTS.FONT_FAMILY === v ? v + ' (默认)' : v,
+                                value: v
+                            }))
                         }
                         onChange={setSlateFontFamily}
                     />
@@ -45,12 +43,10 @@ const Settings = _ => {
                         width={120}
                         renderLabel={({ value, label }) => (<span>{label}</span>)}
                         options={
-                            fontSizeOptions.map(v => {
-                                return {
-                                    label: SLATE_DEFAULTS.FONT_SIZE === v ? v + ' (默认)' : v,
-                                    value: v
-                                };
-                            })
+                            fontSizeOptions.map(v => ({
+                                label: SLATE_DEFAULTS.FONT_SIZE === v ? v + ' (默认)' : v,
+                                value: v
+                            }))
                         }
                         onChange={setSlateFontSize}
                     />

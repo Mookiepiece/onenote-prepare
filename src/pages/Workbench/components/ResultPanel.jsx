@@ -122,21 +122,26 @@ const insertTransformPlaceholder = (editor) => {
 };
 
 const StylePickerDialog = ({ visible, setVisible, onApply }) => {
+
     return (
         <Dialog full visible={visible} setVisible={setVisible}>
             <div className="dialog-style-picker">
                 {
-                    mockedCustomStyles.map((leafStyle, i) => (
-                        <div className="leaf-style-card" key={i} onClick={_ => onApply(i)}>
-                            <div></div>
-                            <h6>{leafStyle.title}</h6>
-                            <p>{leafStyle.group}</p>
-                        </div>
-                    ))
+                    mockedCustomStyles.map((l, i) => (<LeafStyleCard key={i} leafStyle={l} onClick={_ => onApply(i)} />))
                 }
             </div>
         </Dialog>
     )
 };
+
+const LeafStyleCard = ({ leafStyle, onClick }) => {
+    return (
+        <div className="leaf-style-card" onClick={onClick}>
+            <div></div>
+            <h6>{leafStyle.title}</h6>
+            <p>{leafStyle.group}</p>
+        </div>
+    )
+}
 
 export default ResultPanel;
