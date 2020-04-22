@@ -1,3 +1,5 @@
+import store from '@/store';
+
 export const fontSizeOptions = [
     8, 9, 9.5, 10, 10.5, 11, 11.5, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
 ]
@@ -9,31 +11,27 @@ export const fontFamilyOptions = [
     '等线 Light'
 ]
 
-const _SLATE_DEFAULTS = {
-    FONT_FAMILY: null,
-    FONT_SIZE: null,
-}
-
-export const SLATE_DEFAULTS = new Proxy(_SLATE_DEFAULTS, {
+export const SLATE_DEFAULTS = new Proxy({}, {
     get(target, key) {
         return target[key];
     },
     set(target, key, value) {
         if (key === 'FONT_FAMILY') {
             target[key] = value;
+            // not sure whether there's an case that our <html> not finished rendering yet while we modify its style
             document.documentElement.style.setProperty('--slate-default-font-family', `'${value}'`);
+            store.set('settings.slateDefaultFontFamily', value);
         } else if (key === 'FONT_SIZE') {
             target[key] = value;
             document.documentElement.style.setProperty('--slate-default-font-size', value + 'pt');
+            store.set('settings.slateDefaultFontSize', value);
         } else
             target[key] = value;
         return true;
     }
 });
-SLATE_DEFAULTS.init = () => {
-    SLATE_DEFAULTS.FONT_FAMILY = '微软雅黑';
-    SLATE_DEFAULTS.FONT_SIZE = 12;
-}
+SLATE_DEFAULTS.FONT_FAMILY = store.get('settings.slateDefaultFontFamily');
+SLATE_DEFAULTS.FONT_SIZE = store.get('settings.slateDefaultFontSize');
 
 export const mockedCustomStyles = [
     {
@@ -61,19 +59,16 @@ export const mockedCustomTableBackground = [
             target: [2, 1],
             type: 'row',
             style: '#ddffcc',
-            priority: 1
         },
         {
             target: [2, 0],
             type: 'row',
             style: '#dd99ff',
-            priority: 1
         },
         {
             target: [0, 0],
             type: 'row',
             style: '#99ddff',
-            priority: 1
         },
     ],
 ]

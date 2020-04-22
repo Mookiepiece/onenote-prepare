@@ -35,15 +35,9 @@ const Workbench = ({ state, dispatch }) => {
 
     return (
         <div className="workbench">
-            {
-                !readOnly ?
-                    <SlateEditor value={value} setValue={setValue}>
-                        <Aside setSlateValue={setValue} />
-                    </SlateEditor> :
-                    <ReadOnlySlateEditor showToolbar value={value1} setValue={setValue1}>
-                        <Aside readOnly setSlateValue={setValue1} />
-                    </ReadOnlySlateEditor>
-            }
+            <SlateEditor showToolbar readOnly={readOnly} value={readOnly ? value1 : value} setValue={readOnly ? setValue1 : setValue}>
+                <Aside readOnly={readOnly} setSlateValue={setValue} />
+            </SlateEditor>
         </div>
     );
 }

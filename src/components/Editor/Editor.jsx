@@ -6,17 +6,19 @@ import { createEditor, renderElement, renderLeaf, createNoHistoryEditor } from '
 import higherOrderKeydownHandler from './hotkeys';
 import Dialog from '../Dialog';
 
-export const SlateEditor = ({ value, setValue, children }) => {
+export const SlateEditor = ({ value, setValue,readOnly,showToolbar, children }) => {
     const editor = useMemo(createEditor, []);
 
     const [debug, setDebug] = useState(false);
 
     const handleKeydown = event => higherOrderKeydownHandler(editor)(event);
 
+    const toolbar = readOnly ? (showToolbar ? <Toolbar readOnly /> : null) : <Toolbar />
+
     return (
         <Slate editor={editor} value={value} onChange={value => setValue(value)}>
             <div className="slate">
-                <Toolbar />
+                {toolbar}
                 <Editable
                     className="slate-editable"
                     renderElement={renderElement}
