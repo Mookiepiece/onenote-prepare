@@ -13,7 +13,11 @@ import {
     ApiOutlined,
     AppstoreAddOutlined,
     EditOutlined,
-    HistoryOutlined
+    HistoryOutlined,
+    PlusOutlined,
+    UpOutlined,
+    DownOutlined,
+    CloseOutlined
 } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { useSlate } from 'slate-react';
@@ -34,6 +38,9 @@ import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButto
 import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, mockedCustomStyles } from '@/utils/userSettings';
 import { Editor } from 'slate';
 import ActionTypes from '@/redux/actions';
+import { v4 as uuid } from 'uuid';
+import CachedInput from '@/components/Input/cachedInput';
+import StylePickerDialog from './StylePickerDialog';
 
 const leafStylesO = [
     ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],
@@ -41,9 +48,8 @@ const leafStylesO = [
     ['underline', UnderlineOutlined, '底线', { textDecoration: 'underline' }],
     ['strike', StrikethroughOutlined, '删除', { textDecoration: 'line-through' }],
 ];
-// mockedCustomTableBackground
 
-const DialogNewLeafStyle = ({ visible, setVisible, onApply }) => {
+const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
     const editor = useSlate();
 
     const [title, setTitle] = useState('');
@@ -213,12 +219,12 @@ const DialogNewLeafStyle = ({ visible, setVisible, onApply }) => {
             <Dialog visible={visibleDialogSave} setVisible={setVisibleDialogSave}>
                 <div className="form-like">
                     <span>标题 *</span>
-                    <div style={{ display: 'inline-block' }}>
-                        <Input full value={title} onChange={setTitle} onEnterKey={_ => setSampleTextEditable(false)} />
+                    <div>
+                        <Input full value={title} onChange={setTitle} />
                     </div>
                     <span>分组 *</span>
-                    <div style={{ display: 'inline-block' }}>
-                        <Input full value={group} onChange={setGroup} onEnterKey={_ => setSampleTextEditable(false)} />
+                    <div>
+                        <Input full value={group} onChange={setGroup} />
                     </div>
                 </div>
                 <Button disabled={!title.trim() || !group.trim()} onClick={_ => {
@@ -232,6 +238,231 @@ const DialogNewLeafStyle = ({ visible, setVisible, onApply }) => {
         </>
     )
 };
+
+const TableStyleDialog = ({ visible, setVisible }) => {
+    const [rules, setRules] = useState([]);
+    const [tableRows, setTableRows] = useState(5);
+    const [tableCols, setTableCols] = useState(5);
+
+    const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState(false);
+    const [leafStlyeDialogOnApply, setLeafStlyeDialogOnApply] = useState([_ => _]);
+
+    const computedTableStyle = (r, c) => {
+        for (let rule of rules) {
+            const result = [
+                rule.inputs.cellColor[0] ? rule.inputs.cellColor[1] : null,
+                rule.inputs.style[0] ? rule.inputs.style[1] : {}
+            ];
+
+            switch (rule.inputs.mode) {
+                case 'row':
+                    if (rule.inputs.inputs1 === 1) {
+                        if (rule.inputs.inputs0 % 2 === r % 2)
+                            return result;
+                    } else if (rule.inputs.inputs0 === r) {
+                        return result;
+                    }
+                    break;
+                case 'col':
+                    if (rule.inputs.inputs1 === 1) {
+                        if (rule.inputs.inputs0 % 2 === c % 2)
+                            return result;
+                    } else if (rule.inputs.inputs0 === c) {
+                        return result;
+                    }
+                    break;
+                case 'cell':
+                    if (rule.inputs.inputs1 === c && rule.inputs.inputs0 === c) return result;
+                    break;
+            }
+        };
+        return [null, {}];
+    };
+
+    return (
+        <Dialog full visible={visible} setVisible={setVisible}>
+            <div className='table-style-editor'>
+                <aside>
+                    <Button
+                        disabled={rules.length === 10}
+                        onClick={
+                            _ => setRules([...rules, {
+                                id: uuid(),
+                                inputs: {
+                                    inputs0: 1,
+                                    inputs1: 1,
+                                    mode: 'row',
+                                    cellColor: [false, '#ddd'],
+                                    style: [false, {}]
+                                },
+                                bg: '#ccf'
+                            }])
+                        }><PlusOutlined /></Button>
+                    <div className="table-style-list">
+                        {rules.map((rule, i, rules) => {
+                            let bottomInputs;
+                            switch (rule.inputs.mode) {
+                                case 'row':
+                                case 'col':
+                                    bottomInputs = (
+                                        <>
+                                            <span>目标-第：</span>
+                                            <CachedInput
+                                                width={120}
+                                                rule={v => {
+                                                    let vv = Number.parseInt(v);
+                                                    if (vv === Number.NaN || !Number.isFinite(vv) || vv <= 0) {
+                                                        return 1;
+                                                    } else return vv;
+                                                }}
+                                                value={rule.inputs.inputs0}
+                                                onChange={v => setRules(alt.set(rules, `${i}.inputs.inputs0`, v))}
+                                            />
+                                            <span>目标-斑马纹：</span>
+                                            <Switch value={!!rule.inputs.inputs1} onChange={v => setRules(alt.set(rules, `${i}.inputs.inputs1`, v ? 1 : 0))}></Switch>
+                                        </>
+                                    )
+                                    break;
+                                case 'cell':
+                                    bottomInputs = (
+                                        <>
+                                            <span>目标-X：</span>
+                                            <CachedInput
+                                                width={120}
+                                                rule={v => {
+                                                    let vv = Number.parseInt(v);
+                                                    if (vv === Number.NaN || !Number.isFinite(vv) || vv <= 0) {
+                                                        return 1;
+                                                    } else return vv;
+                                                }}
+                                                value={rule.inputs.inputs0}
+                                                onChange={v => setRules(alt.set(rules, `${i}.inputs.inputs0`, v))}
+                                            />
+                                            <span>目标-Y：</span>
+                                            <CachedInput
+                                                width={120}
+                                                rule={v => {
+                                                    let vv = Number.parseInt(v);
+                                                    if (vv === Number.NaN || !Number.isFinite(vv) || vv <= 0) {
+                                                        return 1;
+                                                    } else return vv;
+                                                }}
+                                                value={rule.inputs.inputs1}
+                                                onChange={v => setRules(alt.set(rules, `${i}.inputs.inputs1`, v))}
+                                            />
+                                        </>
+                                    )
+                                    break;
+                            }
+                            return (
+                                <div key={rule.id}>
+                                    <Button
+                                        onClick={_ => {
+                                            setRules([...rules.slice(0, i), ...rules.slice(i + 1)])
+                                        }}><CloseOutlined /></Button>
+                                    <div>
+                                        <Button
+                                            full
+                                            disabled={i === 0}
+                                            onClick={_ => {
+                                                setRules([...rules.slice(0, i - 1), rules[i], rules[i - 1], ...rules.slice(i + 1)])
+                                            }}><UpOutlined /></Button>
+                                        <Button
+                                            full
+                                            disabled={i === rules.length - 1}
+                                            onClick={_ => {
+                                                setRules([...rules.slice(0, i), rules[i + 1], rules[i], ...rules.slice(i + 2)])
+                                            }}><DownOutlined /></Button>
+                                    </div>
+                                    <div>
+                                        <p>{rule.id}</p>
+                                        <div className="form-like">
+                                            <span>目标：</span>
+                                            <DropdownButtonSelect
+                                                value={rule.inputs.mode}
+                                                width={120}
+                                                options={['row', 'col', 'cell'].map(v => ({ label: v, value: v }))}
+                                                onChange={v => setRules(alt.set(rules, `${i}.inputs.mode`, v))}
+                                            />
+                                            {bottomInputs}
+                                            <span>---</span>
+                                            <span>---</span>
+                                            <span>
+                                                <CheckboxButton value={rule.inputs.cellColor[0]}
+                                                    onChange={v => setRules(alt.set(rules, `${i}.inputs.cellColor.0`, v))}
+                                                >表格背景：</CheckboxButton>
+                                            </span>
+                                            <div stlye={{ width: 40 }}>
+                                                <ColorPickerButton
+                                                    value={rule.inputs.cellColor[1]}
+                                                    onChange={v => setRules(alt.set(rules, `${i}.inputs.cellColor.1`, v))}
+                                                />
+                                            </div>
+                                            <span>
+                                                <CheckboxButton value={rule.inputs.style[0]}
+                                                    onChange={v => setRules(alt.set(rules, `${i}.inputs.style.0`, v))}
+                                                >文本样式：</CheckboxButton>
+                                            </span>
+                                            <div>
+                                                <Button onClick={_ => {
+                                                    setLeafStlyeDialogVisible(true);
+                                                    setLeafStlyeDialogOnApply([(_, v) => setRules(alt.set(rules, `${i}.inputs.style.1`, v.style))]);
+                                                }}>
+                                                    <Leaf leaf={{ ...rule.inputs.style[1], fontSize: undefined }}>T</Leaf>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </aside>
+                <div className="sample-container slate-normalize">
+                    <DropdownButtonSelect
+                        value={tableRows}
+                        width={80}
+                        dropdownWidth={80}
+                        options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
+                        onChange={setTableRows}
+                    />
+                    <DropdownButtonSelect
+                        value={tableCols}
+                        width={80}
+                        dropdownWidth={80}
+                        options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
+                        onChange={setTableCols}
+                    />
+                    <table>
+                        <tbody>
+                            {
+                                Array(tableRows).fill(0).map((_, r) => (
+                                    <tr key={r}>
+                                        {Array(tableCols).fill(0).map((_, c) => {
+                                            const cc = computedTableStyle(r + 1, c + 1);
+                                            const [cellColor, style] = cc;
+                                            console.log(cc);
+                                            return (
+                                                <td key={c} style={{ background: cellColor }}>
+                                                    <Leaf leaf={style}>单元</Leaf>
+                                                </td>
+                                            )
+                                        })}
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <StylePickerDialog
+                    visible={leafStlyeDialogVisible}
+                    setVisible={setLeafStlyeDialogVisible}
+                    onApply={leafStlyeDialogOnApply[0]}
+                />
+            </div>
+        </Dialog>
+    )
+}
 
 const ColorPickerButton = ({ disabled, value, onChange }) => {
     const [pickerActive, setPickerActive] = useState(false);
@@ -285,7 +516,9 @@ const ColorPickerButton = ({ disabled, value, onChange }) => {
     )
 }
 
-const _DialogHistory = ({ visible, setVisible, setSlateValue, history, dispatch }) => {
+const HistoryDialog = connect(state => ({
+    history: state.workbenchAside.memory
+}))(({ visible, setVisible, setSlateValue, history, dispatch }) => {
     const [value, setValue] = useState([{ children: [{ text: '' }] }]);
     const [index, setIndex] = useState(-1);
 
@@ -321,7 +554,7 @@ const _DialogHistory = ({ visible, setVisible, setSlateValue, history, dispatch 
                         active={index === i}
                         key={h.time.toString()}
                         onClick={_ => setIndex(i)}>
-                        {h.time.toTimeString().slice(0,8)}
+                        {h.time.toTimeString().slice(0, 8)}
                     </Button>
                 )).reverse()}
             </div>
@@ -347,43 +580,48 @@ const _DialogHistory = ({ visible, setVisible, setSlateValue, history, dispatch 
             </div>
         </Dialog>
     )
-};
-
-const mapStateToProps = state => ({
-    history: state.workbenchAside.memory
 });
 
-const DialogHistory = connect(mapStateToProps)(_DialogHistory);
-
 const ExtraToolbar = ({ readOnly, setSlateValue }) => {
-    const [visibleDialogNewLeafStyle, setVisibleDialogNewLeafStyle] = useState();
-    const [visibleDialogHistory, setVisibleDialogHistory] = useState();
+    const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState();
+    const [tableStyleDialogVisible, setTableStyleDialogVisible] = useState();
+    const [historyDialogVisible, setHistoryDialogVisible] = useState();
 
     return (
         <>
             <div className={`editor-toolbar${readOnly ? ' editor-toolbar-disabled' : ''}`}>
                 <Button className="editor-button" onMouseDown={e => {
                     e.preventDefault();
-                    setVisibleDialogNewLeafStyle(true);
+                    setLeafStlyeDialogVisible(true);
+                }}>
+                    <AppstoreAddOutlined />
+                </Button>
+                <Button className="editor-button" onMouseDown={e => {
+                    e.preventDefault();
+                    setTableStyleDialogVisible(true);
                 }}>
                     <AppstoreAddOutlined />
                 </Button>
                 <Button className="editor-button" onMouseDown={e => {
                     // NOTE: SELECTION
                     window.getSelection().removeAllRanges();
-                    setVisibleDialogHistory(true);
+                    setHistoryDialogVisible(true);
                 }}>
                     <HistoryOutlined />
                 </Button>
             </div>
-            <DialogNewLeafStyle
+            <LeafStlyeDialog
                 onApply={
                     (title, group, style) => mockedCustomStyles.push({ title, group, style })
                 }
-                visible={visibleDialogNewLeafStyle}
-                setVisible={setVisibleDialogNewLeafStyle}
+                visible={leafStlyeDialogVisible}
+                setVisible={setLeafStlyeDialogVisible}
             />
-            <DialogHistory setSlateValue={setSlateValue} visible={visibleDialogHistory} setVisible={setVisibleDialogHistory} />
+            <TableStyleDialog
+                visible={tableStyleDialogVisible}
+                setVisible={setTableStyleDialogVisible}
+            />
+            <HistoryDialog setSlateValue={setSlateValue} visible={historyDialogVisible} setVisible={setHistoryDialogVisible} />
         </>
     );
 };

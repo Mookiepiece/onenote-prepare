@@ -96,14 +96,14 @@
 
   pre,
   table,
-  ul,
-  ol {
+  li {
     --tab-base: 0in;
     --tabs: 0in;
     margin-left: calc(var(--tabs) + var(--tab-base));
   }
   ul,
   ol {
+    padding-left:0;
     --tab-base: 0.375in;
   }
   .bling-placeholder {

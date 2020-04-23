@@ -32,6 +32,8 @@ const higherOrderKeydownHandler = (editor) => {
                 return;
             }
         }
+
+        // tab
         if (isHotkey('shift+tab', event)) {
             event.preventDefault();
 

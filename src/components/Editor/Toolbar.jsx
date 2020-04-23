@@ -80,6 +80,7 @@ const Toolbar = ({ readOnly }) => {
                     format="bgColor"
                     icon={BgColorsOutlined}
                 />
+                <TableColorButton />
             </div>
             <div className="toolbar-group">
                 <ActionButton />
@@ -145,8 +146,6 @@ const TableButton = () => {
 }
 
 const getInsertRowHandlers = (editor, match) => {
-    if (!match) return [];
-
     const [tableNode, tablePath] = match;
 
     const rows = [...Editor.nodes(editor, {
@@ -342,54 +341,6 @@ const TableButtonGroup = () => {
     )
 }
 
-const TableStyleButton = () => {
-    const editor = useSlate();
-    const matches = [...Editor.nodes(editor, {
-        match: n => n.type === 'table'
-    })];
-
-    const disabled = matches.length === 0;
-    const match = matches[matches.length - 1];
-
-    return (
-        <>
-            <Button
-                className="editor-button"
-                onMouseDown={
-                    event => {
-                        event.preventDefault();
-
-                    }
-                }
-            >
-                <TableOutlined />
-            </Button>
-            <Dialog full unmountOnExit>
-
-            </Dialog>
-        </>
-    )
-}
-
-const FontStyleButton = () => {
-    const editor = useSlate();
-
-    return (
-        <Button
-            className="editor-button"
-            onMouseDown={
-                event => {
-                    event.preventDefault();
-
-
-                }
-            }
-        >
-            <TableOutlined />
-        </Button>
-    );
-}
-
 const ActionButton = () => {
     const editor = useSlate();
     return (
@@ -435,14 +386,6 @@ const ColorButton = ({ format, icon }) => {
 
     const Icon = icon;
 
-    const setActiveForDropdown = v => {
-        setPickerActive(v);
-        if (v === false) {
-            getSelection(editor);
-            toggleMark(editor, format, color);
-        }
-    };
-
     return (
         <>
             <Button
@@ -460,12 +403,121 @@ const ColorButton = ({ format, icon }) => {
             <DropdownButton
                 trigger='mousedown'
                 active={pickerActive}
-                setActive={setActiveForDropdown}
+                setActive={v => {
+                    setPickerActive(v);
+                    if (v === false) {
+                        getSelection(editor);
+                        toggleMark(editor, format, color);
+                    }
+                }}
 
                 renderButton={
                     (buttonRef) => {
                         return (
                             <Button
+                                className={`editor-button editor-button-color-r ${pickerActive ? "__dropdown" : ""}`}
+                                active={pickerActive}
+                                onMouseDown={event => {
+                                    event.preventDefault();
+                                    if (!pickerActive) {
+                                        putSelection(editor);
+                                    }
+                                    setPickerActive(!pickerActive);
+                                }}
+                                ref={buttonRef}
+                            >
+                                <SwapRightOutlined />
+                            </Button>
+                        )
+                    }
+                }
+
+                renderDropdown={
+                    (setPickerActive) => {
+                        return (
+                            <div>
+                                <SketchPicker
+                                    color={color}
+                                    onChange={({ hex }) => setColor(hex)}
+                                />
+                            </div>
+                        )
+                    }
+                }
+            />
+        </>
+    )
+}
+
+const TableColorButton = () => {
+    const editor = useSlate();
+    const [pickerActive, setPickerActive] = useState(false);
+    const [color, setColor] = useState('#f90');
+
+    const matches = [...Editor.nodes(editor, {
+        match: n => n.type === 'table-cell'
+    })];
+
+    const disabled = matches.length === 0;
+    // const match = matches[matches.length - 1];
+
+    const toggleMark = _ => {
+
+        if (isMarkActive()) {
+            Transforms.setNodes(editor, {
+                cellColor: undefined
+            }, {
+                match: n => n.type === 'table-cell'
+            });
+        }
+        else {
+            Transforms.setNodes(editor, {
+                cellColor: color
+            }, {
+                match: n => n.type === 'table-cell'
+            });
+        }
+    }
+
+    const isMarkActive = _ => {
+        const [match] = Editor.nodes(editor, {
+            match: n => n.type === 'table-cell' && n.cellColor === color,
+            mode: 'all',
+        });
+        return !!match;
+    }
+
+    return (
+        <>
+            <Button
+                disabled={disabled}
+                className="editor-button editor-button-color"
+                active={isMarkActive()}
+                onMouseDown={event => {
+                    event.preventDefault();
+                    toggleMark();
+                    setPickerActive(false);
+                }}>
+                <div style={{ background: color }}></div>
+                <TableOutlined />
+            </Button>
+
+            <DropdownButton
+                trigger='mousedown'
+                active={pickerActive}
+                setActive={v => {
+                    setPickerActive(v);
+                    if (v === false) {
+                        getSelection(editor);
+                        toggleMark();
+                    }
+                }}
+
+                renderButton={
+                    (buttonRef) => {
+                        return (
+                            <Button
+                                disabled={disabled}
                                 className={`editor-button editor-button-color-r ${pickerActive ? "__dropdown" : ""}`}
                                 active={pickerActive}
                                 onMouseDown={event => {

@@ -12,8 +12,8 @@ import Dialog from '@/components/Dialog';
 import { SlateEditor } from '@/components/Editor';
 import { Switch } from '@/components/Switch';
 
-import { mockedCustomStyles } from '@/utils/userSettings';
 import { alt } from '@/utils';
+import StylePickerDialog from './StylePickerDialog';
 
 const ResultPanel = ({ result, onResultChange }) => {
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -57,16 +57,13 @@ const ResultPanel = ({ result, onResultChange }) => {
 }
 
 const Aside = ({ result, onResultChange }) => {
-    // const [switchValue, setSwitchValue] = useState(false);
-    const editor = useSlate();
-
     const [stylePickerDialogVisible, setStylePickerDialogVisible] = useState();
 
-    const [path, setPath] = useState(null);
+    const [m, sm] = useState([_ => _]);
 
-    const showStyleDialog = ([node, path]) => {
+    const showStyleDialog = (cb) => {
         setStylePickerDialogVisible(true);
-        setPath(path);
+        sm([cb]);
     };
 
     useEffect(_ => {
@@ -80,19 +77,7 @@ const Aside = ({ result, onResultChange }) => {
             {/* <span>输入多行</span><Switch value={switchValue} onChange={setSwitchValue} /> */}
             <span>完全覆盖原样式</span><Switch value={result.options.overrideStyle} onChange={v => onResultChange(alt.merge(result, `options`, { overrideStyle: v }))} />
             <StylePickerDialog
-                onApply={
-                    index => {
-                        Transforms.setNodes(editor, {
-                            meta: {
-                                style: mockedCustomStyles[index].style,
-                                mirror: 'ORIGIN'
-                            }
-                        }, {
-                            at: path
-                        });
-                        setStylePickerDialogVisible(false);
-                    }
-                }
+                onApply={m[0]}
                 visible={stylePickerDialogVisible}
                 setVisible={setStylePickerDialogVisible}
             />
@@ -119,25 +104,6 @@ const ExtraToolbar = () => {
 
 const insertTransformPlaceholder = (editor) => {
     Transforms.insertNodes(editor, { type: 'transform-placeholder', meta: { mirror: 'ORIGIN' }, children: [{ text: '' }] });
-};
-
-const StylePickerDialog = ({ visible, setVisible, onApply }) => {
-
-    return (
-        <Dialog full visible={visible} setVisible={setVisible}>
-            <div className="dialog-style-picker">
-                {
-                    mockedCustomStyles.map((leafStyle, i) => (
-                        <div className="leaf-style-card" onClick={_ => onApply(i)} key={i} >
-                            <div></div>
-                            <h6>{leafStyle.title}</h6>
-                            <p>{leafStyle.group}</p>
-                        </div>
-                    ))
-                }
-            </div>
-        </Dialog>
-    )
 };
 
 export default ResultPanel;

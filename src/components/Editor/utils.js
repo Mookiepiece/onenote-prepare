@@ -81,12 +81,12 @@ export const getMarkActiveSet = (editor, value) => {
     const set = Editor.nodes(editor, {
         match: n => n.text !== undefined,
     });
-    // set 剔重
+    // no repeat
     return [...new Set([...set].map(v => v[0][value] === undefined ? '' : v[0][value]))];
 }
 
-//https://github.com/ianstormtaylor/slate/issues/3412
-//失去焦点的解决方案
+// https://github.com/ianstormtaylor/slate/issues/3412
+// no lose focus
 let selection;
 export const putSelection = editor => {
     selection = editor.selection;

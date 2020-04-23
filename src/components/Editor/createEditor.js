@@ -146,7 +146,16 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
         if (value === 'CLOSE') {
             Transforms.removeNodes(editor, { at: path });
         } else {
-            TinyEmitter.emit(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_CLICK, [node, path]);
+            TinyEmitter.emit(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_CLICK, function callback(i, v) {
+                Transforms.setNodes(editor, {
+                    meta: {
+                        style: v.style,
+                        mirror: 'ORIGIN'
+                    }
+                }, {
+                    at: path
+                });
+            });
         }
     };
 
@@ -276,6 +285,7 @@ const Element = (props) => {
         case 'table-row':
             return <tr {...attributes}>{children}</tr>
         case 'table-cell':
+            attributes.style = { ...attributes.style, background: element.cellColor };
             return <td {...attributes}>{children}</td>
 
         //placeholder

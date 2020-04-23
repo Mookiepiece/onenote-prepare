@@ -12,8 +12,6 @@ const Workbench = ({ state, dispatch }) => {
     const [value, setValue] = useState(initialValue);
     const [value1, setValue1] = useState(initialValue);
 
-
-
     let shouldDelete = !!(state.v && state.v.shouldDelete)
     useEffect(_ => {
         if (shouldDelete) {
@@ -36,7 +34,7 @@ const Workbench = ({ state, dispatch }) => {
     return (
         <div className="workbench">
             <SlateEditor showToolbar readOnly={readOnly} value={readOnly ? value1 : value} setValue={readOnly ? setValue1 : setValue}>
-                <Aside readOnly={readOnly} setSlateValue={setValue} />
+                <Aside readOnly={readOnly} setSlateValue={readOnly ? setValue1 : setValue} />
             </SlateEditor>
         </div>
     );

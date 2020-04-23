@@ -149,13 +149,6 @@
     position: absolute;
     top: 0;
   }
-
-  .add-match-button {
-  }
-  .close-button {
-  }
-  .apply-transform-button {
-  }
 }
 
 .history-list {
@@ -214,7 +207,7 @@
 
         > button {
           position: absolute;
-          top:0;
+          top: 0;
           right: 0;
         }
 
@@ -223,7 +216,7 @@
           width: 40px;
           button {
             height: 60px;
-            &.disabled{
+            &.disabled {
               opacity: 0;
             }
           }
@@ -236,9 +229,11 @@
   }
 
   > .sample-container {
-    float: left;
-    margin-left: 24px;
+    margin-left: 424px;
     min-width: 200px;
+
+    overflow: scroll;
+    white-space: nowrap;
   }
 }
 
