@@ -2,8 +2,6 @@ import { Editor, Transforms, Range, Path } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { useState } from 'react';
 
-// const LIST_TYPES = ;
-
 const DEFAULT_KEY_MAP = new Map([
     ['align', 'left'],
 ]);
@@ -16,7 +14,6 @@ const isParagraph = (node) => {
 export const toggleBlock = (editor, key, value) => {
     if (key === "type") { // types are just <pre> or <li>
         const isActive = isBlockActive(editor, key, value);
-        // const isList = LIST_TYPES.includes(value);
 
         // unwrap the ol/ul first
         Transforms.unwrapNodes(editor, {
