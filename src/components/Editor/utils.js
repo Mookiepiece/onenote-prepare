@@ -1,37 +1,62 @@
-import { Editor, Transforms } from 'slate';
+import { Editor, Transforms, Range, Path } from 'slate';
 import { ReactEditor } from 'slate-react';
 import { useState } from 'react';
 
-const LIST_TYPES = ['numbered-list', 'bulleted-list'];
+// const LIST_TYPES = ;
 
 const DEFAULT_KEY_MAP = new Map([
     ['align', 'left'],
 ]);
 
+const isParagraph = (node) => {
+    // root node could be an editor object with much properties, dont know why
+    return ((node.text === undefined && (node.type === undefined)) || node.type === 'paragraph') && node.operations === undefined
+}
+
 export const toggleBlock = (editor, key, value) => {
     if (key === "type") { // types are just <pre> or <li>
         const isActive = isBlockActive(editor, key, value);
-        const isList = LIST_TYPES.includes(value);
+        // const isList = LIST_TYPES.includes(value);
 
         // unwrap the ol/ul first
         Transforms.unwrapNodes(editor, {
-            match: n => LIST_TYPES.includes(n.type),
+            match: n => ['numbered-list', 'bulleted-list'].includes(n.type),
             split: true,
         });
-
-        // switch to p or li
-        Transforms.setNodes(editor, {
-            type: isActive ? 'paragraph' : isList ? 'list-item' : value,
-            match: ({ type }) => type === 'list-item' || type === 'paragraph'
+        Transforms.unwrapNodes(editor, {
+            match: ({ type }) => type === 'list-item',
+            split: true
         });
 
-        // wrap li with ol/ul
-        if (!isActive && isList) {
+        if (!isActive) {
+            let { anchor: { path: p0 }, focus: { path: p1 } } = editor.selection;
+            if (p0.length > p1.length) [p0, p1] = [p1, p0];
+
+            // the first index of anchorPath & focusPath become different
+            // which represents the nearest Path that contains the whole selection
+            let index = 0;
+            for (; index < p1.length; index++) {
+                if (p1[index] !== p0[index]) {
+                    break;
+                }
+            }
+            if (index === p1.length) index = p1.length - 1;
             const listBlock = { type: value, children: [] };
+            let matches = [...Editor.nodes(editor, { at: editor.selection, match: n => n.type === 'table' || isParagraph(n) })];
+            matches = matches.filter(([n, { length }]) => length >= index); // filter nodes which outside our selection
+
+            if (matches[0]) {
+                let m = matches.reduce((prev, [n, { length }]) => length < prev ? length : prev, Number.MAX_SAFE_INTEGER);
+                matches = matches.filter(([n, { length }]) => length === m); // only save those nearest nodes inside our selection
+            }
+
 
             // NOTE: Transforms.wrapNodes will always wrap the biggest user selection even if match:type==='li' is settled
             // that way in tables, we will get td/tr wrapped by ul/ol and cause error
-            for (let [_, path] of Editor.nodes(editor, { at: editor.selection, match: ({ type }) => type === 'list-item' })) {
+            // TODO: BUT in this way, every li is in a indivisual ol/ul, which is bad
+            for (let [node, path] of matches) {
+                console.log(node, path);
+                Transforms.wrapNodes(editor, { type: 'list-item', children: [] }, { at: path });
                 Transforms.wrapNodes(editor, listBlock, { at: path });
             }
         }

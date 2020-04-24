@@ -36,7 +36,6 @@ import {
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
 
 import { fontSizeOptions, fontFamilyOptions, SLATE_DEFAULTS } from '@/utils/userSettings';
-import Dialog from '../Dialog';
 
 const Toolbar = ({ readOnly }) => {
 
@@ -341,6 +340,8 @@ const TableButtonGroup = () => {
     )
 }
 
+// NOTE: Editor.nodes(editor,{at}), the 'at' option means all nodes lays on the way from outer to that 'at' path and all nodes inside 'at'
+
 const ActionButton = () => {
     const editor = useSlate();
     return (
@@ -349,7 +350,7 @@ const ActionButton = () => {
             onMouseDown={
                 event => {
                     event.preventDefault();
-                    getSelection(editor);
+                    // getSelection(editor);
                 }
             }
         >
