@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Transforms } from 'slate';
+import { Transforms, Editor } from 'slate';
 import { useSlate } from 'slate-react';
 import {
     ApiOutlined,
@@ -91,7 +91,8 @@ const ExtraToolbar = () => {
     return (
         <>
             <div className="editor-toolbar">
-                <Button className="editor-button" onMouseDown={e => {
+                <Button className="editor-button" 
+                onMouseDown={e => {
                     e.preventDefault();
                     insertTransformPlaceholder(editor);
                 }}>

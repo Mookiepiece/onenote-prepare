@@ -171,7 +171,7 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
             {...attributes}
         >
             <DropdownButtonSelect
-                value="原文"
+                value="原内容"
                 active={active}
                 setActive={setActive}
                 options={[
@@ -190,7 +190,7 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
                         }}
 
                     >
-                        <span style={style} className={className}> {"HAPPY"} </span>
+                        <span style={style} className={className}> {"原内容"} </span>
                     </Button>
                 )}
             />

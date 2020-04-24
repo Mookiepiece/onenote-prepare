@@ -53,22 +53,22 @@ export const mockedCustomStyles = [
     }
 ]
 
-export const mockedCustomTableBackground = [
+export const mockedCustomTableStyle = [
     [
         {
-            target: [2, 1],
-            type: 'row',
-            style: '#ddffcc',
+            target: ['row',2, 1],
+            cellColor:'#ddd',
+            style: {},
         },
         {
-            target: [2, 0],
-            type: 'row',
-            style: '#dd99ff',
+            target: ['row',2, 0],
+            cellColor:'#ddd',
+            style: {},
         },
         {
-            target: [0, 0],
-            type: 'row',
-            style: '#99ddff',
+            target: ['row',0, 0],
+            cellColor:'#ddd',
+            style: {},
         },
     ],
 ]
