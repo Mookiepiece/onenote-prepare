@@ -34,7 +34,6 @@ const useDropdown = (panelActive, setPanelActive, eventName = 'click', position 
 
     if (panelActive) {
         const rect = buttonRef.current.getBoundingClientRect();
-        console.log(rect);
 
         switch (position) {
             case '↘':

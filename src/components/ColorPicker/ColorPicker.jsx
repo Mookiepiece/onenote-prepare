@@ -36,8 +36,6 @@ const ColorPicker = ({ value, onChange }) => {
         }
     });
 
-    console.log(mousePosition)
-
     let gradientBackgroundRef = useRef();
 
     return (

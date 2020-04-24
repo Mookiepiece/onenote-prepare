@@ -222,6 +222,8 @@ const SaveLeafStyleDialog = ({ visible, setVisible, onApply }) => {
 
     return (
         <Dialog visible={visible} setVisible={setVisible}>
+            <p>新建样式</p>
+            <hr />
             <div className="form-like">
                 <span>标题 *</span>
                 <div>
@@ -249,6 +251,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
 
     const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState(false);
     const [leafStlyeDialogOnApply, setLeafStlyeDialogOnApply] = useState([_ => _]);
+    console.log('we are table selector');
 
     const computedTableStyle = (r, c) => {
         for (let rule of rules) {
@@ -465,9 +468,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                 Array(tableRows).fill(0).map((_, r) => (
                                     <tr key={r}>
                                         {Array(tableCols).fill(0).map((_, c) => {
-                                            const cc = computedTableStyle(r + 1, c + 1);
-                                            const [cellColor, style] = cc;
-                                            console.log(cc);
+                                            const [cellColor, style] = computedTableStyle(r + 1, c + 1);
                                             return (
                                                 <td key={c} style={{ background: cellColor }}>
                                                     <Leaf leaf={style}>单元</Leaf>
