@@ -9,12 +9,13 @@
 }
 
 .form-like {
+  --grid-template-columns: 100px auto;
   display: grid;
-  grid-template-columns: 100px auto;
+  grid-template-columns: var(--grid-template-columns);
   align-items: center;
   margin: 8px 0;
 
-  > span:nth-child(odd) {
+  > span {
     display: inline-block;
     margin-right: 12px;
     line-height: 40px;

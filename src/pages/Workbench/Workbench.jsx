@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './style.scss';
 
 import Aside from './components/Aside';
-import { SlateEditor, ReadOnlySlateEditor } from '@/components/Editor';
+import { SlateEditor } from '@/components/Editor';
 import ActionTypes from '@/redux/actions';
 import { deepCopy } from '@/utils';
 

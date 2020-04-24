@@ -21,7 +21,7 @@ import {
 } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { useSlate } from 'slate-react';
-import { ReadOnlySlateEditor, SlateEditor } from '@/components/Editor';
+import { ReadOnlySlateEditor } from '@/components/Editor';
 
 import Dialog from "@/components/Dialog";
 import Button from "@/components/MkButton";
@@ -51,10 +51,6 @@ const leafStylesO = [
 
 const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
     const editor = useSlate();
-
-    const [title, setTitle] = useState('');
-    const [group, setGroup] = useState('');
-    const [visibleDialogSave, setVisibleDialogSave] = useState(false);
 
     const [sampleText, setSampleText] = useState('文字样式示例');
     const [sampleTextEditable, setSampleTextEditable] = useState(false);
@@ -192,9 +188,9 @@ const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
                             />
                         </div>
 
-                        <br />
+                        <hr />
                         <div>
-                            <Button onClick={_ => setVisibleDialogSave(true)} full>下一步</Button>
+                            <Button onClick={_ => onApply(computedLeafStyle)} full>提交</Button>
                         </div>
                     </aside>
                     <div className="sample-container slate-normalize">
@@ -216,28 +212,35 @@ const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
                     </div>
                 </div>
             </Dialog>
-            <Dialog visible={visibleDialogSave} setVisible={setVisibleDialogSave}>
-                <div className="form-like">
-                    <span>标题 *</span>
-                    <div>
-                        <Input full value={title} onChange={setTitle} />
-                    </div>
-                    <span>分组 *</span>
-                    <div>
-                        <Input full value={group} onChange={setGroup} />
-                    </div>
-                </div>
-                <Button disabled={!title.trim() || !group.trim()} onClick={_ => {
-                    setVisibleDialogSave(false);
-                    setVisible(false);
-                    setTitle('');
-                    setGroup('');
-                    onApply(title, group, computedLeafStyle)
-                }} full>保存</Button>
-            </Dialog>
         </>
     )
 };
+
+const SaveLeafStyleDialog = ({ visible, setVisible, onApply }) => {
+    const [title, setTitle] = useState('');
+    const [group, setGroup] = useState('');
+
+    return (
+        <Dialog visible={visible} setVisible={setVisible}>
+            <div className="form-like">
+                <span>标题 *</span>
+                <div>
+                    <Input full value={title} onChange={setTitle} />
+                </div>
+                <span>分组 *</span>
+                <div>
+                    <Input full value={group} onChange={setGroup} />
+                </div>
+            </div>
+            <Button disabled={!title.trim() || !group.trim()} onClick={_ => {
+                setVisible(false);
+                setTitle('');
+                setGroup('');
+                onApply(title, group)
+            }} full>保存</Button>
+        </Dialog>
+    )
+}
 
 const TableStyleDialog = ({ visible, setVisible }) => {
     const [rules, setRules] = useState([]);
@@ -259,20 +262,28 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                     if (rule.inputs.inputs1 === 1) {
                         if (rule.inputs.inputs0 % 2 === r % 2)
                             return result;
-                    } else if (rule.inputs.inputs0 === r) {
+                    } else if (rule.inputs.inputs1 === 0) {
                         return result;
+                    } else {
+                        if (rule.inputs.inputs0 === r) {
+                            return result;
+                        }
                     }
                     break;
                 case 'col':
                     if (rule.inputs.inputs1 === 1) {
                         if (rule.inputs.inputs0 % 2 === c % 2)
                             return result;
-                    } else if (rule.inputs.inputs0 === c) {
+                    } else if (rule.inputs.inputs1 === 0) {
                         return result;
+                    } else {
+                        if (rule.inputs.inputs0 === c) {
+                            return result;
+                        }
                     }
                     break;
                 case 'cell':
-                    if (rule.inputs.inputs1 === c && rule.inputs.inputs0 === c) return result;
+                    if (rule.inputs.inputs1 === c && rule.inputs.inputs0 === r) return result;
                     break;
             }
         };
@@ -286,7 +297,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                     <Button
                         disabled={rules.length === 10}
                         onClick={
-                            _ => setRules([...rules, {
+                            _ => setRules([{
                                 id: uuid(),
                                 inputs: {
                                     inputs0: 1,
@@ -296,7 +307,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                     style: [false, {}]
                                 },
                                 bg: '#ccf'
-                            }])
+                            }, ...rules])
                         }><PlusOutlined /></Button>
                     <div className="table-style-list">
                         {rules.map((rule, i, rules) => {
@@ -308,7 +319,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                         <>
                                             <span>目标-第：</span>
                                             <CachedInput
-                                                width={120}
+                                                width={80}
                                                 rule={v => {
                                                     let vv = Number.parseInt(v);
                                                     if (vv === Number.NaN || !Number.isFinite(vv) || vv <= 0) {
@@ -318,17 +329,22 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                                 value={rule.inputs.inputs0}
                                                 onChange={v => setRules(alt.set(rules, `${i}.inputs.inputs0`, v))}
                                             />
-                                            <span>目标-斑马纹：</span>
-                                            <Switch value={!!rule.inputs.inputs1} onChange={v => setRules(alt.set(rules, `${i}.inputs.inputs1`, v ? 1 : 0))}></Switch>
+                                            <span>目标-重复：</span>
+                                            <DropdownButtonSelect
+                                                width={80}
+                                                value={rule.inputs.inputs1}
+                                                options={[0, 1, 2].map(v => ({ label: v, value: v }))}
+                                                onChange={v => setRules(alt.set(rules, `${i}.inputs.inputs1`, v))}
+                                            />
                                         </>
                                     )
                                     break;
                                 case 'cell':
                                     bottomInputs = (
                                         <>
-                                            <span>目标-X：</span>
+                                            <span>目标-行：</span>
                                             <CachedInput
-                                                width={120}
+                                                width={80}
                                                 rule={v => {
                                                     let vv = Number.parseInt(v);
                                                     if (vv === Number.NaN || !Number.isFinite(vv) || vv <= 0) {
@@ -338,9 +354,9 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                                 value={rule.inputs.inputs0}
                                                 onChange={v => setRules(alt.set(rules, `${i}.inputs.inputs0`, v))}
                                             />
-                                            <span>目标-Y：</span>
+                                            <span>目标-列：</span>
                                             <CachedInput
-                                                width={120}
+                                                width={80}
                                                 rule={v => {
                                                     let vv = Number.parseInt(v);
                                                     if (vv === Number.NaN || !Number.isFinite(vv) || vv <= 0) {
@@ -380,34 +396,42 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                             <span>目标：</span>
                                             <DropdownButtonSelect
                                                 value={rule.inputs.mode}
-                                                width={120}
+                                                width={80}
                                                 options={['row', 'col', 'cell'].map(v => ({ label: v, value: v }))}
                                                 onChange={v => setRules(alt.set(rules, `${i}.inputs.mode`, v))}
                                             />
                                             {bottomInputs}
-                                            <span>---</span>
-                                            <span>---</span>
-                                            <span>
-                                                <CheckboxButton value={rule.inputs.cellColor[0]}
+                                        </div>
+                                        <hr />
+                                        <div className="form-like" style={{ '--grid-template-columns': '100px 40px 40px' }}>
+                                            <span>表格背景：</span>
+                                            <div>
+                                                <CheckboxButton
+                                                    value={rule.inputs.cellColor[0]}
                                                     onChange={v => setRules(alt.set(rules, `${i}.inputs.cellColor.0`, v))}
-                                                >表格背景：</CheckboxButton>
-                                            </span>
-                                            <div stlye={{ width: 40 }}>
+                                                ></CheckboxButton>
+                                            </div>
+                                            <div>
                                                 <ColorPickerButton
+                                                    disabled={!rule.inputs.cellColor[0]}
                                                     value={rule.inputs.cellColor[1]}
                                                     onChange={v => setRules(alt.set(rules, `${i}.inputs.cellColor.1`, v))}
                                                 />
                                             </div>
-                                            <span>
-                                                <CheckboxButton value={rule.inputs.style[0]}
-                                                    onChange={v => setRules(alt.set(rules, `${i}.inputs.style.0`, v))}
-                                                >文本样式：</CheckboxButton>
-                                            </span>
+                                            <span>文本样式：</span>
                                             <div>
-                                                <Button onClick={_ => {
-                                                    setLeafStlyeDialogVisible(true);
-                                                    setLeafStlyeDialogOnApply([(_, v) => setRules(alt.set(rules, `${i}.inputs.style.1`, v.style))]);
-                                                }}>
+                                                <CheckboxButton
+                                                    value={rule.inputs.style[0]}
+                                                    onChange={v => setRules(alt.set(rules, `${i}.inputs.style.0`, v))}
+                                                ></CheckboxButton>
+                                            </div>
+                                            <div>
+                                                <Button
+                                                    disabled={!rule.inputs.style[0]}
+                                                    onClick={_ => {
+                                                        setLeafStlyeDialogVisible(true);
+                                                        setLeafStlyeDialogOnApply([(_, v) => setRules(alt.set(rules, `${i}.inputs.style.1`, v.style))]);
+                                                    }}>
                                                     <Leaf leaf={{ ...rule.inputs.style[1], fontSize: undefined }}>T</Leaf>
                                                 </Button>
                                             </div>
@@ -419,6 +443,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                     </div>
                 </aside>
                 <div className="sample-container slate-normalize">
+                    <span>预览行：</span>
                     <DropdownButtonSelect
                         value={tableRows}
                         width={80}
@@ -426,6 +451,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                         options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
                         onChange={setTableRows}
                     />
+                    <span>预览列：</span>
                     <DropdownButtonSelect
                         value={tableCols}
                         width={80}
@@ -584,8 +610,11 @@ const HistoryDialog = connect(state => ({
 
 const ExtraToolbar = ({ readOnly, setSlateValue }) => {
     const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState();
+    const [saveLeafStlyeDialogVisible, setSaveLeafStlyeDialogVisible] = useState();
     const [tableStyleDialogVisible, setTableStyleDialogVisible] = useState();
     const [historyDialogVisible, setHistoryDialogVisible] = useState();
+
+    const [leafStyleCache, setLeafStyleCache] = useState();
 
     return (
         <>
@@ -611,11 +640,20 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
                 </Button>
             </div>
             <LeafStlyeDialog
-                onApply={
-                    (title, group, style) => mockedCustomStyles.push({ title, group, style })
-                }
                 visible={leafStlyeDialogVisible}
                 setVisible={setLeafStlyeDialogVisible}
+                onApply={leafStyle => {
+                    setLeafStyleCache(leafStyle);
+                    setSaveLeafStlyeDialogVisible(true);
+                }}
+            />
+            <SaveLeafStyleDialog
+                visible={saveLeafStlyeDialogVisible}
+                setVisible={setSaveLeafStlyeDialogVisible}
+                onApply={(title, group) => {
+                    mockedCustomStyles.push({ title, group, style: leafStyleCache });
+                    setLeafStlyeDialogVisible(false);
+                }}
             />
             <TableStyleDialog
                 visible={tableStyleDialogVisible}

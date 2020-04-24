@@ -5,13 +5,15 @@ import Toolbar from './Toolbar';
 import { createEditor, renderElement, renderLeaf, createNoHistoryEditor } from './createEditor.js';
 import higherOrderKeydownHandler from './hotkeys';
 import Dialog from '../Dialog';
+import Button from '../MkButton';
+import { QuestionOutlined } from '@ant-design/icons';
 
-export const SlateEditor = ({ value, setValue,readOnly,showToolbar, children }) => {
+export const SlateEditor = ({ value, setValue, readOnly, showToolbar, children }) => {
     const editor = useMemo(createEditor, []);
 
     const [debug, setDebug] = useState(false);
 
-    const handleKeydown = event => higherOrderKeydownHandler(editor)(event);
+    const handleKeydown = readOnly ? undefined : event => higherOrderKeydownHandler(editor)(event);
 
     const toolbar = readOnly ? (showToolbar ? <Toolbar readOnly /> : null) : <Toolbar />
 
@@ -26,7 +28,9 @@ export const SlateEditor = ({ value, setValue,readOnly,showToolbar, children }) 
                     placeholder="Enter some rich text…"
                     onKeyDown={handleKeydown}
                 />
-                <input type="checkbox" value={debug} onChange={_ => setDebug(true)} />
+                <Button onClick={_ => setDebug(true)} style={{alignSelf:'start'}} >
+                    <QuestionOutlined />
+                </Button>
                 <Dialog visible={debug} setVisible={setDebug}>
                     <div style={{ whiteSpace: 'pre-wrap' }}>
                         {JSON.stringify(value, null, 4)}
@@ -52,7 +56,9 @@ export const ReadOnlySlateEditor = ({ value, setValue, showToolbar = false, chil
                     renderElement={renderElement}
                     renderLeaf={renderLeaf}
                 />
-                <input type="checkbox" value={debug} onChange={_ => setDebug(true)} />
+                <Button onClick={_ => setDebug(true)} style={{alignSelf:'start'}} >
+                    <QuestionOutlined />
+                </Button>
                 <Dialog visible={debug} setVisible={setDebug}>
                     <div style={{ whiteSpace: 'pre-wrap' }}>
                         {JSON.stringify(value, null, 4)}

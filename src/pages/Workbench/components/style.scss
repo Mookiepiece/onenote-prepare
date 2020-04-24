@@ -33,12 +33,13 @@
 
   #{$item-name} {
     display: inline-block;
+    position: relative;
     flex-basis: 200px;
     flex-grow: 0;
     border: 2px solid transparent;
 
     > div {
-      background-color: aliceblue;
+      background-color: #fff;
       width: 200px;
       height: 200px;
     }
@@ -69,6 +70,22 @@
 
 .dialog-style-picker {
   @include pick-one-dialog(".leaf-style-card");
+
+  .leaf-style-card {
+    > div:first-child {
+      > span:first-child {
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      > span:last-child {
+        float: right;
+        margin-right: 12px;
+        line-height: 32px;
+      }
+    }
+  }
 }
 
 .transform-card {

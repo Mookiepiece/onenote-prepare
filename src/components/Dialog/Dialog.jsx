@@ -12,7 +12,7 @@ const Dialog = ({
     setVisible,
     children,
     full,
-    unmountOnExit = false,
+    keepAlive = false,
     ...others
 }) => {
 
@@ -26,6 +26,7 @@ const Dialog = ({
         }
     }, [visible]);
 
+    const unmountOnExit = !keepAlive;
     return (
         <Portal>
             <div className='dialog-container' style={{ 'zIndex': zIndex }}>
