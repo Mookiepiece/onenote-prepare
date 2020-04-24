@@ -85,13 +85,13 @@
   }
   td {
     border: 1px solid;
-    padding:2px 4px;
+    padding: 2px 4px;
     min-width: 25px;
   }
 
-  pre{
-    margin-top:1px;
-    margin-bottom:1px;
+  pre {
+    margin-top: 1px;
+    margin-bottom: 1px;
     white-space: pre-wrap;
   }
 
@@ -104,8 +104,9 @@
   }
   ul,
   ol {
-    padding-left:0;
+    padding-left: 0;
     --tab-base: 0.375in;
+    margin-left: calc(var(--tabs) + var(--tab-base));
   }
   .bling-placeholder {
     width: 0.1ex;

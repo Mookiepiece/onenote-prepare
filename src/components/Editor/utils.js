@@ -9,27 +9,33 @@ const DEFAULT_KEY_MAP = new Map([
 ]);
 
 export const toggleBlock = (editor, key, value) => {
-    if (key === "type") {
+    if (key === "type") { // types are just <pre> or <li>
         const isActive = isBlockActive(editor, key, value);
         const isList = LIST_TYPES.includes(value);
 
-        // 无论什么情况，取消列表包装
+        // unwrap the ol/ul first
         Transforms.unwrapNodes(editor, {
             match: n => LIST_TYPES.includes(n.type),
             split: true,
         });
 
-        // 列表的情况更复杂：如果是列表，设置为li并用该列表（ol ul）包住（下一句）
-        // 否则是简单的换成p或者该value
+        // switch to p or li
         Transforms.setNodes(editor, {
             type: isActive ? 'paragraph' : isList ? 'list-item' : value,
+            match: ({ type }) => type === 'list-item' || type === 'paragraph'
         });
 
+        // wrap li with ol/ul
         if (!isActive && isList) {
-            const block = { type: value, children: [] };
-            Transforms.wrapNodes(editor, block);
+            const listBlock = { type: value, children: [] };
+
+            // NOTE: Transforms.wrapNodes will always wrap the biggest user selection even if match:type==='li' is settled
+            // that way in tables, we will get td/tr wrapped by ul/ol and cause error
+            for (let [_, path] of Editor.nodes(editor, { at: editor.selection, match: ({ type }) => type === 'list-item' })) {
+                Transforms.wrapNodes(editor, listBlock, { at: path });
+            }
         }
-    } else {
+    } else { // tabs, align, 
         const isActive = isBlockActive(editor, key, value);
         Transforms.setNodes(editor, {
             [key]: isActive ? DEFAULT_KEY_MAP.get(key) : value
