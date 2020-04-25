@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey';
-import { toggleBlock, toggleMark, getElement } from './utils';
+import { toggleBlock, toggleMark, getElement, toggleTabs } from './utils';
 
 const HOTKEYS_MARK = {
     'mod+b': 'bold',
@@ -36,20 +36,11 @@ const higherOrderKeydownHandler = (editor) => {
         // tab
         if (isHotkey('shift+tab', event)) {
             event.preventDefault();
-
-            const el = getElement(editor);
-            if (el) {
-                const { tabs } = el;
-                toggleBlock(editor, 'tabs', tabs ? tabs - 1 : 0);
-            }
+            toggleTabs(editor,-1);
         }
         if (isHotkey('tab', event)) {
             event.preventDefault();
-            const el = getElement(editor);
-            if (el) {
-                const { tabs } = el;
-                toggleBlock(editor, 'tabs', tabs ? tabs + 1 : 1);
-            }
+            toggleTabs(editor,1);
         }
     }
 }

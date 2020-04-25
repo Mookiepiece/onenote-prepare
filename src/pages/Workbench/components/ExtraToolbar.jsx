@@ -251,7 +251,6 @@ const TableStyleDialog = ({ visible, setVisible }) => {
 
     const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState(false);
     const [leafStlyeDialogOnApply, setLeafStlyeDialogOnApply] = useState([_ => _]);
-    console.log('we are table selector');
 
     const computedTableStyle = (r, c) => {
         for (let rule of rules) {

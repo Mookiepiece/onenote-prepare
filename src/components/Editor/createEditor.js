@@ -7,11 +7,13 @@ import { TinyEmitter, EVENTS } from '@/utils/index';
 import { DropdownButtonSelect } from '@/components/DropdownButton';
 import Button from '@/components/MkButton';
 
-export const createEditor = () => withPlaceholders(withTables(withHistory(withReact(_createEditor()))));
-export const createNoHistoryEditor = () => withPlaceholders(withTables(withReact(_createEditor())));
+export const createEditor = () => withPlaceholders(withTablesLists(withHistory(withReact(_createEditor()))));
+export const createNoHistoryEditor = () => withPlaceholders(withTablesLists(withReact(_createEditor())));
 
-const withTables = editor => {
+const withTablesLists = editor => {
     const { deleteBackward, deleteForward, insertBreak, normalizeNode } = editor;
+
+    // editor.insertBreak = 
 
     editor.deleteBackward = unit => {
         const { selection } = editor;
@@ -278,8 +280,8 @@ const Element = (props) => {
         //table
         case 'table':
             return (
-                <table>
-                    <tbody {...attributes}>{children}</tbody>
+                <table style={attributes.style}>
+                    <tbody {...{ ...attributes, style: undefined }}>{children}</tbody>
                 </table>
             )
         case 'table-row':
