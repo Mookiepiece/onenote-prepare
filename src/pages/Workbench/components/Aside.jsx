@@ -25,9 +25,9 @@ import ActionTypes from '@/redux/actions';
 
 import './style.scss';
 
-const applyChange = (editor, state) => {
+const applyChange = (editor, state, setSlateValue) => {
     applyMatcher(editor, state)
-    applyRender(editor, state.v.result);
+    applyRender(editor, state.v.result, setSlateValue);
     return state;
 };
 
@@ -49,7 +49,7 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
         ...arg,
         callback: {
             match: state => applyMatcher(editor, state),
-            change: state => applyChange(editor, state),
+            change: state => applyChange(editor, state, setSlateValue),
             clear: _ => clearUp(editor),
             children: _ => editor.children,
             slate: value => setSlateValue(value),

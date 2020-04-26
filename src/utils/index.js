@@ -23,11 +23,6 @@ export const setArrayItem = (array, index, item) => {
 }
 
 export const alt = {
-    nearleaf(object, path) {
-        if (path.length === 0)
-            throw new Error('[alt] param $path not valid');
-        return path.slice(0, path.length - 1).reduce((obj, p) => obj[p], object);
-    },
     set: immutable.set,
     merge: immutable.merge,
     insert: immutable.insert,
