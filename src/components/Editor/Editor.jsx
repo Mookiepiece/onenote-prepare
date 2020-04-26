@@ -22,13 +22,14 @@ export const SlateEditor = ({ value, setValue, readOnly, showToolbar, children }
             <div className="slate">
                 {toolbar}
                 <Editable
+                    readOnly={readOnly}
                     className="slate-editable"
                     renderElement={renderElement}
                     renderLeaf={renderLeaf}
                     placeholder="Enter some rich text…"
                     onKeyDown={handleKeydown}
                 />
-                <Button onClick={_ => setDebug(true)} style={{alignSelf:'start'}} >
+                <Button onClick={_ => setDebug(true)} style={{ alignSelf: 'start' }} >
                     <QuestionOutlined />
                 </Button>
                 <Dialog visible={debug} setVisible={setDebug}>
@@ -56,7 +57,7 @@ export const ReadOnlySlateEditor = ({ value, setValue, showToolbar = false, chil
                     renderElement={renderElement}
                     renderLeaf={renderLeaf}
                 />
-                <Button onClick={_ => setDebug(true)} style={{alignSelf:'start'}} >
+                <Button onClick={_ => setDebug(true)} style={{ alignSelf: 'start' }} >
                     <QuestionOutlined />
                 </Button>
                 <Dialog visible={debug} setVisible={setDebug}>

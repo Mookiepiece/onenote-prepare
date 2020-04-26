@@ -10,6 +10,7 @@ export function matchType(...args) {
     const p = args.includes('paragraph');
     if (p) {
         // root node could be an editor object with much properties like 'operations' etc, dont know why
+        // leaf text==='' when inline-block at the edge of an line
         return n => args.includes(n.type) || (n.text === undefined && n.type === undefined && n.operations === undefined)
     } else {
         return n => args.includes(n.type)
