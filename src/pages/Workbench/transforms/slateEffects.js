@@ -3,6 +3,7 @@ import { Transforms, Editor, Text, Range, Node, Path } from 'slate';
 import { setArrayItem } from '@/utils';
 import { interator } from './utils';
 import { alt } from '@/utils';
+import { matchType } from '@/components/Editor/utils';
 
 // useless info:
 // 根据slate，如果将inline node插入到第一个，前面会又出现一个text:''并不带任何样式，行尾同理
@@ -72,72 +73,59 @@ export const clearUp = (editor) => {
     });
 };
 
-export const applyRender = (editor, result) => { //TODO support node result and optional keep style
+export const applyRender = (editor, result) => { // TODO support node result and optional keep style
     const children = editor.children;
 
-    let swapArray = []; //[0:style, 1:at, 2:original-nodes]
+    let swapArray = []; // [0:original style, 1:at, 2:original-nodes]
 
     children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
-        if (el.text === undefined && (!el.type || el.type === 'paragraph')) { //NOTE:强制undefined是因为加入inline Node在行首尾时，会因为normalize而会出现text''的Leaf强制在首尾
-            let lastLeafActive = -1;
-            el.children.forEach((leafOrPlaceholder, index) => {
-                let thisLeafActive = leafOrPlaceholder.bling;
-
-                if (thisLeafActive) {
-                    if (!lastLeafActive || lastLeafActive !== thisLeafActive) {//防止两个range粘在一起而误判
-                        //get leaf range
-                        const at = Editor.edges(editor, [...path, index]).reduce((anchor, focus) => ({ anchor, focus }));
-
-                        //keep node style and swap text
-                        const [[node]] = Editor.nodes(editor, { at, match: Text.isText });
+        if (matchType('paragraph')(el)) {
+            for (let index = 0; index < el.children.length;) {
+                const node = el.children[index];
+                const { bling, text } = node;
+                if (bling) {
+                    let focusOffset = text.length; // make sure bling means it's a leaf and has 'text' attr
+                    let start = index;
+                    for (index++; index < el.children.length; index++) {
+                        const another = el.children[index];
+                        if (another.bling === bling) {
+                            focusOffset = another.text.length;
+                        } else {
+                            break;
+                        }
+                    }
+                    _: {
                         const { bling, text, ...style } = node;
-                        swapArray.push([style, at, [node]]);
-
-                    } else {
-                        const at = Editor.edges(editor, [...path, index]).reduce((anchor, focus) => ({ anchor, focus }));
-                        const [[node]] = Editor.nodes(editor, { at, match: Text.isText });
-
-                        swapArray = setArrayItem(swapArray, -1, [
-                            swapArray[swapArray.length - 1][0],
+                        swapArray.push([
+                            style,
                             {
-                                anchor: swapArray[swapArray.length - 1][1].anchor,
-                                focus: at.focus
+                                anchor: { path: [...path, start], offset: 0 },
+                                focus: { path: [...path, index - 1], offset: focusOffset }
                             },
-                            [...swapArray[swapArray.length - 1][2], node],
+                            el.children.slice(start, index)
                         ]);
                     }
-                }
+                } else if (node.type === 'bling-placeholder') {
+                    let style = {};
+                    const prevLeaf = el.children[index - 1]; // must exit even if it's a {text:''}, must not another placeholder
 
-                lastLeafActive = thisLeafActive;
-            });
-            return true;
-        } else if (el.type === 'bling-placeholder') {
-            //get placeholder range
+                    // styles will be borrow from slibing nodes
+                    if (prevLeaf.text.length > 0) { 
+                        let { bling, text, ..._style } = prevLeaf;
+                        style = _style;
+                    } else {
+                        const nextLeaf = el.children[index + 1];
+                        if (nextLeaf.text.length > 0) {
+                            let { bling, text, ..._style } = nextLeaf;
+                            style = _style;
+                        }
+                    }
 
-            // get style from sibling leaf,既然placeholder被slate认为是inline元素，左右两边必然各有leaf，虽然有可能是text''
-            let style = null;
-            //试探前面那个leaf，如果没文字说明它被插入在行首，应该继承后面那个leaf的style
-            let [[beforeLeaf]] = Editor.nodes(editor, {
-                at: [...path.slice(0, path.length - 1), path[path.length - 1] - 1],
-                match: Text.isText
-            });
-
-            let isFirst = !beforeLeaf.text.length;
-
-            if (!isFirst) {
-                let { bling, text, ..._style } = beforeLeaf;
-                style = _style;
-            } else {
-                let [[afterLeaf]] = Editor.nodes(editor, {
-                    at: [...path.slice(0, path.length - 1), path[path.length - 1] + 1],
-                    match: Text.isText
-                });
-                let { bling, text, ..._style } = afterLeaf;
-                style = _style;
+                    swapArray.push([style, [...path, index], []]);
+                    index ++;
+                } else index++;
             }
-
-            //keep node style and swap text
-            swapArray.push([style, path, []]);
+            return true;
         } else {
             return true;
         }
@@ -145,11 +133,8 @@ export const applyRender = (editor, result) => { //TODO support node result and 
 
     const swapResultFunc = getSwapResultCallback(result);
 
-    //反向insert to avoid path changes
+    // 反向insert to avoid path changes
     [...swapArray].reverse().forEach(([_style, at, origin], index) => {
-        // TODO if(result.options.mutiline)
-        // TODO if(result.nodes)
-        // TODO if (result.type = 'withStyle') {
         let nodes = swapResultFunc(origin, index);
 
         Transforms.insertNodes(editor, nodes, { at });
@@ -204,15 +189,9 @@ const getSwapResultCallback = (result) => {
                 }),
                 ...preElemChildren.slice(placeholderIndex + 1, preElemChildren.length)
             ];
-            // const preElemChildrenAfterSwap=origin;
 
             newNodes = preElemChildrenAfterSwap;
             console.log(phElem, objectPath, newNodes);
-
-            // if (el.meta.mirror === "ORIGIN" || true) { //WARNING: true
-            //     newNodes = alt.set(newNodes, objectPath.slice(0, objectPath.length - 1), preElemChildrenAfterSwap);
-            // }
-
         });
 
         return newNodes;
