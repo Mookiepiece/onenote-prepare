@@ -54,21 +54,25 @@ export const mockedCustomStyles = [
 ]
 
 export const mockedCustomTableStyle = [
-    [
-        {
-            target: ['row',2, 1],
-            cellColor:'#ddd',
-            style: {},
-        },
-        {
-            target: ['row',2, 0],
-            cellColor:'#ddd',
-            style: {},
-        },
-        {
-            target: ['row',0, 0],
-            cellColor:'#ddd',
-            style: {},
-        },
-    ],
+    {
+        title:'nb',
+        group:'sasdasd',
+        rules:[
+            {
+                target: ['row',2, 1],
+                cellColor:'#ddd',
+                style: {},
+            },
+            {
+                target: ['row',2, 0],
+                cellColor:'#ddd',
+                style: {},
+            },
+            {
+                target: ['row',0, 0],
+                cellColor:'#ddd',
+                style: {},
+            },
+        ]
+    },
 ]

@@ -7,7 +7,6 @@ const MkButton = React.forwardRef(({
     unfocusable,
     full,
     children,
-    size = "small",
     round,
     disabled = false,
     onClick,
@@ -28,7 +27,6 @@ const MkButton = React.forwardRef(({
         className += ' ' + "mk-button-round";
     }
 
-
     className += ' ' + (_ => {
         switch (type) {
             case 'plain':
@@ -39,15 +37,6 @@ const MkButton = React.forwardRef(({
                 return 'mk-button-floating';
             default:
                 return "mk-button-default";
-        }
-    })();
-
-    className += ' ' + (_ => {
-        switch (size) {
-            case 'l':
-                return 'mk-button-large';
-            default:
-                return "";
         }
     })();
 

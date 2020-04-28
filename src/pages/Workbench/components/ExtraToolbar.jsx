@@ -17,7 +17,8 @@ import {
     PlusOutlined,
     UpOutlined,
     DownOutlined,
-    CloseOutlined
+    CloseOutlined,
+    FormOutlined
 } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { useSlate } from 'slate-react';
@@ -35,7 +36,7 @@ import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { setArrayItem } from '@/utils';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, mockedCustomStyles } from '@/utils/userSettings';
+import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, mockedCustomStyles, mockedCustomTableStyle } from '@/utils/userSettings';
 import { Editor } from 'slate';
 import ActionTypes from '@/redux/actions';
 import { v4 as uuid } from 'uuid';
@@ -49,22 +50,34 @@ const leafStylesO = [
     ['strike', StrikethroughOutlined, '删除', { textDecoration: 'line-through' }],
 ];
 
-const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
+const leafStyles = [
+    ['bold', true],
+    ['italic', true],
+    ['underline', true],
+    ['strike', true],
+    ['fontFamily', SLATE_DEFAULTS.FONT_FAMILY],
+    ['fontSize', SLATE_DEFAULTS.FONT_SIZE],
+    ['fontColor', '#fff'],
+    ['bgColor', '#000']
+];
+
+const fromStyle = (style) => {
+    let result = {};
+    leafStyles.forEach(([key, defaultValue]) => {
+        if (style[key] === undefined) {
+            result[key] = [false, defaultValue];
+        } else {
+            result[key] = [true, style[key]];
+        }
+    }, style);
+    return result;
+}
+
+const LeafStlyeDialog = ({ visible, setVisible, onApply, customLeafStyle, setCustomLeafStyle }) => {
     const editor = useSlate();
 
     const [sampleText, setSampleText] = useState('文字样式示例');
     const [sampleTextEditable, setSampleTextEditable] = useState(false);
-
-    const [customLeafStyle, setcustomLeafStyle] = useState({
-        bold: [false, true],
-        italic: [false, true],
-        underline: [false, true],
-        strike: [false, true],
-        fontFamily: [false, SLATE_DEFAULTS.FONT_FAMILY],
-        fontSize: [false, SLATE_DEFAULTS.FONT_SIZE],
-        fontColor: [false, '#000'],
-        bgColor: [false, '#fff'],
-    });
 
     useEffect(_ => {
         if (visible) {
@@ -83,7 +96,7 @@ const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
                     },
                     customLeafStyle
                 )
-                setcustomLeafStyle(tt);
+                setCustomLeafStyle(tt);
             }
         }
     }, [visible]);
@@ -104,11 +117,11 @@ const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
                                     <div key={name} className={`style-item`}>
                                         <CheckboxButton
                                             value={customLeafStyle[name][0]}
-                                            onChange={v => setcustomLeafStyle({ ...customLeafStyle, [name]: setArrayItem(customLeafStyle[name], 0, v) })}
+                                            onChange={v => setCustomLeafStyle({ ...customLeafStyle, [name]: setArrayItem(customLeafStyle[name], 0, v) })}
                                         ><span style={{ ...style, fontSize: 12 }}><Icon />{text}</span></CheckboxButton>
                                         <Switch
                                             value={customLeafStyle[name][1]}
-                                            onChange={v => setcustomLeafStyle({ ...customLeafStyle, [name]: setArrayItem(customLeafStyle[name], 1, v) })}
+                                            onChange={v => setCustomLeafStyle({ ...customLeafStyle, [name]: setArrayItem(customLeafStyle[name], 1, v) })}
                                             disabled={!customLeafStyle[name][0]}
                                             inactiveColor={'var(--purple-5)'}
                                         />
@@ -119,7 +132,7 @@ const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
                         <div className={`style-item`}>
                             <CheckboxButton
                                 value={customLeafStyle.fontFamily[0]}
-                                onChange={v => setcustomLeafStyle({ ...customLeafStyle, fontFamily: setArrayItem(customLeafStyle.fontFamily, 0, v) })}
+                                onChange={v => setCustomLeafStyle({ ...customLeafStyle, fontFamily: setArrayItem(customLeafStyle.fontFamily, 0, v) })}
                             ><span style={{ fontFamily: '宋体', fontSize: 12 }}><FieldStringOutlined />{'字族'}</span></CheckboxButton>
                             <DropdownButtonSelect
                                 disabled={!customLeafStyle.fontFamily[0]}
@@ -135,14 +148,14 @@ const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
                                     })
                                 }
                                 onChange={
-                                    v => setcustomLeafStyle({ ...customLeafStyle, fontFamily: setArrayItem(customLeafStyle.fontFamily, 1, v) })
+                                    v => setCustomLeafStyle({ ...customLeafStyle, fontFamily: setArrayItem(customLeafStyle.fontFamily, 1, v) })
                                 }
                             />
                         </div>
                         <div className={`style-item`}>
                             <CheckboxButton
                                 value={customLeafStyle.fontSize[0]}
-                                onChange={v => setcustomLeafStyle({ ...customLeafStyle, fontSize: setArrayItem(customLeafStyle.fontSize, 0, v) })}
+                                onChange={v => setCustomLeafStyle({ ...customLeafStyle, fontSize: setArrayItem(customLeafStyle.fontSize, 0, v) })}
                             ><span style={{ fontSize: 10 }}><FontSizeOutlined />{'字号'}</span></CheckboxButton>
                             <DropdownButtonSelect
                                 disabled={!customLeafStyle.fontSize[0]}
@@ -157,40 +170,40 @@ const LeafStlyeDialog = ({ visible, setVisible, onApply }) => {
                                     })
                                 }
                                 onChange={
-                                    v => setcustomLeafStyle({ ...customLeafStyle, fontSize: setArrayItem(customLeafStyle.fontSize, 1, v) })
+                                    v => setCustomLeafStyle({ ...customLeafStyle, fontSize: setArrayItem(customLeafStyle.fontSize, 1, v) })
                                 }
                             />
                         </div>
                         <div className={`style-item`}>
                             <CheckboxButton
                                 value={customLeafStyle.fontColor[0]}
-                                onChange={v => setcustomLeafStyle({ ...customLeafStyle, fontColor: setArrayItem(customLeafStyle.fontColor, 0, v) })}
+                                onChange={v => setCustomLeafStyle({ ...customLeafStyle, fontColor: setArrayItem(customLeafStyle.fontColor, 0, v) })}
                             ><span style={{ fontSize: 12, color: 'var(--blue-5)' }}><FontColorsOutlined />{'前景'}</span></CheckboxButton>
                             <ColorPickerButton
                                 disabled={!customLeafStyle.fontColor[0]}
                                 value={customLeafStyle.fontColor[1]}
                                 onChange={
-                                    v => setcustomLeafStyle({ ...customLeafStyle, fontColor: setArrayItem(customLeafStyle.fontColor, 1, v) })
+                                    v => setCustomLeafStyle({ ...customLeafStyle, fontColor: setArrayItem(customLeafStyle.fontColor, 1, v) })
                                 }
                             />
                         </div>
                         <div className={`style-item`}>
                             <CheckboxButton
                                 value={customLeafStyle.bgColor[0]}
-                                onChange={v => setcustomLeafStyle({ ...customLeafStyle, bgColor: setArrayItem(customLeafStyle.bgColor, 0, v) })}
+                                onChange={v => setCustomLeafStyle({ ...customLeafStyle, bgColor: setArrayItem(customLeafStyle.bgColor, 0, v) })}
                             ><span style={{ fontSize: 12, backgroundColor: 'var(--blue-3)' }}><FontColorsOutlined />{'背景'}</span></CheckboxButton>
                             <ColorPickerButton
                                 disabled={!customLeafStyle.bgColor[0]}
                                 value={customLeafStyle.bgColor[1]}
                                 onChange={
-                                    v => setcustomLeafStyle({ ...customLeafStyle, bgColor: setArrayItem(customLeafStyle.bgColor, 1, v) })
+                                    v => setCustomLeafStyle({ ...customLeafStyle, bgColor: setArrayItem(customLeafStyle.bgColor, 1, v) })
                                 }
                             />
                         </div>
 
                         <hr />
                         <div>
-                            <Button onClick={_ => onApply(computedLeafStyle)} full>提交</Button>
+                            <Button onClick={_ => { setVisible(false); onApply(computedLeafStyle) }} full>提交</Button>
                         </div>
                     </aside>
                     <div className="sample-container slate-normalize">
@@ -238,7 +251,37 @@ const SaveLeafStyleDialog = ({ visible, setVisible, onApply }) => {
                 setVisible(false);
                 setTitle('');
                 setGroup('');
-                onApply(title, group)
+                onApply(title, group);
+                setVisible(false);
+            }} full>保存</Button>
+        </Dialog>
+    )
+}
+
+const SaveTableStyleDialog = ({ visible, setVisible, onApply }) => {
+    const [title, setTitle] = useState('');
+    const [group, setGroup] = useState('');
+
+    return (
+        <Dialog visible={visible} setVisible={setVisible}>
+            <p>新建表格样式</p>
+            <hr />
+            <div className="form-like">
+                <span>标题 *</span>
+                <div>
+                    <Input full value={title} onChange={setTitle} />
+                </div>
+                <span>分组 *</span>
+                <div>
+                    <Input full value={group} onChange={setGroup} />
+                </div>
+            </div>
+            <Button disabled={!title.trim() || !group.trim()} onClick={_ => {
+                setVisible(false);
+                setTitle('');
+                setGroup('');
+                onApply(title, group);
+                setVisible(false);
             }} full>保存</Button>
         </Dialog>
     )
@@ -250,9 +293,20 @@ const TableStyleDialog = ({ visible, setVisible }) => {
     const [tableCols, setTableCols] = useState(5);
 
     const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState(false);
-    const [leafStlyeDialogOnApply, setLeafStlyeDialogOnApply] = useState([_ => _]);
+    const [stylePickerDialogVisible, setStylePickerDialogVisible] = useState(false);
+    const [leafStlyeDialogValue, setLeafStlyeDialogValue] = useState(fromStyle({}));
+
+    const [leafStlyeDialogOnApplyIndex, setLeafStlyeDialogOnApplyIndex] = useState([_ => _]);
+    const [saveTableStyleDialogVisible, setSaveTableStyleDialogVisible] = useState(false);
 
     const computedTableStyle = (r, c) => {
+        let cellColor = null, style = {};
+
+        function celli(result) {
+            if (cellColor === null) cellColor = result[0];
+            if (Object.keys(style).length === 0) style = result[1];
+        }
+
         for (let rule of rules) {
             const result = [
                 rule.inputs.cellColor[0] ? rule.inputs.cellColor[1] : null,
@@ -263,33 +317,35 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                 case 'row':
                     if (rule.inputs.inputs1 === 1) {
                         if (rule.inputs.inputs0 % 2 === r % 2)
-                            return result;
+                            celli(result);
                     } else if (rule.inputs.inputs1 === 0) {
-                        return result;
+                        celli(result);
                     } else {
                         if (rule.inputs.inputs0 === r) {
-                            return result;
+                            celli(result);
                         }
                     }
                     break;
                 case 'col':
                     if (rule.inputs.inputs1 === 1) {
                         if (rule.inputs.inputs0 % 2 === c % 2)
-                            return result;
+                            celli(result);
                     } else if (rule.inputs.inputs1 === 0) {
-                        return result;
+                        celli(result);
                     } else {
                         if (rule.inputs.inputs0 === c) {
-                            return result;
+                            celli(result);
                         }
                     }
                     break;
                 case 'cell':
-                    if (rule.inputs.inputs1 === c && rule.inputs.inputs0 === r) return result;
+                    if (rule.inputs.inputs1 === c && rule.inputs.inputs0 === r) {
+                        celli(result);
+                    }
                     break;
             }
         };
-        return [null, {}];
+        return [cellColor, style];
     };
 
     return (
@@ -307,8 +363,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                     mode: 'row',
                                     cellColor: [false, '#ddd'],
                                     style: [false, {}]
-                                },
-                                bg: '#ccf'
+                                }
                             }, ...rules])
                         }><PlusOutlined /></Button>
                     <div className="table-style-list">
@@ -405,7 +460,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                             {bottomInputs}
                                         </div>
                                         <hr />
-                                        <div className="form-like" style={{ '--grid-template-columns': '100px 40px 40px' }}>
+                                        <div className="form-like" style={{ '--grid-template-columns': '100px 40px 100px' }}>
                                             <span>表格背景：</span>
                                             <div>
                                                 <CheckboxButton
@@ -431,10 +486,18 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                                 <Button
                                                     disabled={!rule.inputs.style[0]}
                                                     onClick={_ => {
-                                                        setLeafStlyeDialogVisible(true);
-                                                        setLeafStlyeDialogOnApply([(_, v) => setRules(alt.set(rules, `${i}.inputs.style.1`, v.style))]);
+                                                        setStylePickerDialogVisible(true);
+                                                        setLeafStlyeDialogOnApplyIndex(i);
                                                     }}>
                                                     <Leaf leaf={{ ...rule.inputs.style[1], fontSize: undefined }}>T</Leaf>
+                                                </Button>
+                                                <Button
+                                                    disabled={!rule.inputs.style[0]}
+                                                    onClick={_ => {
+                                                        setLeafStlyeDialogVisible(true);
+                                                        setLeafStlyeDialogOnApplyIndex(i);
+                                                    }}>
+                                                    <FormOutlined />
                                                 </Button>
                                             </div>
                                         </div>
@@ -481,11 +544,43 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                     </table>
                 </div>
                 <StylePickerDialog
+                    visible={stylePickerDialogVisible}
+                    setVisible={setStylePickerDialogVisible}
+                    onApply={(i, v) => { setLeafStlyeDialogValue(fromStyle(v.style)); setLeafStlyeDialogVisible(true) }}
+                />
+                <LeafStlyeDialog
                     visible={leafStlyeDialogVisible}
                     setVisible={setLeafStlyeDialogVisible}
-                    onApply={leafStlyeDialogOnApply[0]}
+                    onApply={(v) => setRules(alt.set(rules, `${leafStlyeDialogOnApplyIndex}.inputs.style.1`, v))}
+
+                    customLeafStyle={leafStlyeDialogValue}
+                    setCustomLeafStyle={setLeafStlyeDialogValue}
                 />
             </div>
+            <div style={{ inlineSize: '160px' }}>
+                <Button
+                    disabled={!rules.length}
+                    full
+                    onClick={_ => setSaveTableStyleDialogVisible(true)}
+                    type="primary"
+                >保存</Button>
+            </div>
+            <SaveTableStyleDialog
+                visible={saveTableStyleDialogVisible}
+                setVisible={setSaveTableStyleDialogVisible}
+                onApply={(title, group) => {
+                    mockedCustomTableStyle.push({
+                        title, group, rules: rules.map(({ inputs, bg }) => {
+                            return {
+                                target: [inputs.mode, inputs.inputs0, inputs.inputs1],
+                                cellColor: inputs.cellColor[0] ? inputs.cellColor[1] : null,
+                                style: inputs.style[0] ? inputs.style[1] : null
+                            }
+                        })
+                    });
+                    setVisible(false);
+                }}
+            />
         </Dialog>
     )
 }
@@ -566,30 +661,32 @@ const HistoryDialog = connect(state => ({
     }, [index]);
 
     return (
-        <Dialog visible={visible} setVisible={setVisible} style={{ paddingBottom: 48 }}>
-            <div className="history-list">
-                <Button
-                    full
-                    active={index === -1}
-                    key='👻'
-                    onClick={_ => setIndex(-1)}
-                >目前</Button>
-                {history.map((h, i) => (
+        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'} full>
+            <div className="history-container">
+                <div className="history-list">
                     <Button
                         full
-                        active={index === i}
-                        key={h.time.toString()}
-                        onClick={_ => setIndex(i)}>
-                        {h.time.toTimeString().slice(0, 8)}
-                    </Button>
-                )).reverse()}
+                        active={index === -1}
+                        key='👻'
+                        onClick={_ => setIndex(-1)}
+                    >目前</Button>
+                    {history.map((h, i) => (
+                        <Button
+                            full
+                            active={index === i}
+                            key={h.time.toString()}
+                            onClick={_ => setIndex(i)}>
+                            {h.time.toTimeString().slice(0, 8)}
+                        </Button>
+                    )).reverse()}
+                </div>
+                <div className="history-preview">
+                    <ReadOnlySlateEditor value={value} setValue={setValue}>
+                        <div></div>
+                    </ReadOnlySlateEditor>
+                </div>
             </div>
-            <div className="history-preview">
-                <ReadOnlySlateEditor value={value} setValue={setValue}>
-                    <div></div>
-                </ReadOnlySlateEditor>
-            </div>
-            <div style={{ position: 'absolute', right: 24, bottom: 0, width: 100 }}>
+            <div style={{ inlineSize: '160px' }}>
                 <Button
                     disabled={index === -1}
                     full
@@ -610,6 +707,8 @@ const HistoryDialog = connect(state => ({
 
 const ExtraToolbar = ({ readOnly, setSlateValue }) => {
     const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState();
+    const [leafStlyeDialogValue, setLeafStlyeDialogValue] = useState(fromStyle({}));
+
     const [saveLeafStlyeDialogVisible, setSaveLeafStlyeDialogVisible] = useState();
     const [tableStyleDialogVisible, setTableStyleDialogVisible] = useState();
     const [historyDialogVisible, setHistoryDialogVisible] = useState();
@@ -646,13 +745,14 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
                     setLeafStyleCache(leafStyle);
                     setSaveLeafStlyeDialogVisible(true);
                 }}
+                customLeafStyle={leafStlyeDialogValue}
+                setCustomLeafStyle={setLeafStlyeDialogValue}
             />
             <SaveLeafStyleDialog
                 visible={saveLeafStlyeDialogVisible}
                 setVisible={setSaveLeafStlyeDialogVisible}
                 onApply={(title, group) => {
                     mockedCustomStyles.push({ title, group, style: leafStyleCache });
-                    setLeafStlyeDialogVisible(false);
                 }}
             />
             <TableStyleDialog

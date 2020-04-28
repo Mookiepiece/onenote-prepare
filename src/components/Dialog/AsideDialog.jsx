@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Portal, closest } from '@/components/util';
+import React from 'react';
+import { Portal } from '@/components/util';
 import { CSSTransition } from 'react-transition-group';
 
 import Button from '@/components/MkButton';

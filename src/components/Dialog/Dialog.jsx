@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Portal, closest } from '@/components/util';
+import React, { useEffect, useState } from 'react';
+import { Portal } from '@/components/util';
 import { CSSTransition } from 'react-transition-group';
 
 // every visible dialog will have z-index great than the prev visible one, reduce z-index when invisible
@@ -12,6 +12,7 @@ const Dialog = ({
     setVisible,
     children,
     full,
+    paddingBottom,
     keepAlive = false,
     ...others
 }) => {
@@ -62,7 +63,7 @@ const Dialog = ({
                     classNames='ani-dialog'
                     unmountOnExit={unmountOnExit}
                 >
-                    <div {...others} className={`dialog dialog-default${full ? ' full' : ''}${visible ? '' : ' hidden'}`}>
+                    <div {...others} className={`dialog dialog-default${full ? ' full' : ''}${visible ? '' : ' hidden'}`} >
                         {children}
                     </div>
                 </CSSTransition>
