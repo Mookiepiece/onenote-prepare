@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-    PlusCircleOutlined,
     BoldOutlined,
     ItalicOutlined,
     UnderlineOutlined,
     StrikethroughOutlined,
     FontColorsOutlined,
-    BgColorsOutlined,
     FieldStringOutlined,
     FontSizeOutlined,
-    SwapRightOutlined,
-    ApiOutlined,
     AppstoreAddOutlined,
     EditOutlined,
     HistoryOutlined,
@@ -661,7 +657,7 @@ const HistoryDialog = connect(state => ({
     }, [index]);
 
     return (
-        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'} full>
+        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'} style={{display:'flex',flexDirection:'column'}}>
             <div className="history-container">
                 <div className="history-list">
                     <Button

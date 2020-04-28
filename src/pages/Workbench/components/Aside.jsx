@@ -19,7 +19,6 @@ import ExtraToolbar from './ExtraToolbar';
 import MatchPickerDialog from './MatchPickerDialog';
 import ResultPanel from './ResultPanel';
 import { connect } from 'react-redux';
-let matchedRanges = [];
 
 import ActionTypes from '@/redux/actions';
 
@@ -27,13 +26,13 @@ import './style.scss';
 
 const applyChange = (editor, state, setSlateValue) => {
     applyMatcher(editor, state)
-    applyRender(editor, state.v.result, setSlateValue);
+    applyRender(editor, state.v.result, setSlateValue,state.v.matches[setSlateValue,state.v.matches.length - 1].outType);
     return state;
 };
 
 const applyMatcher = (editor, state) => {
     clearUp(editor);
-    const ranges = state.v.matches.reduce((prevRanges, v, i) => { return v.match(editor, matchedRanges, v.inputs) }, []);
+    const ranges = state.v.matches.reduce((prevRanges, v) => { return v.match(editor, prevRanges, v.inputs) }, []);
     applyMatch(editor, ranges);
     return state;
 };

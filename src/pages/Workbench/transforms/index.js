@@ -19,7 +19,7 @@ import AsideDialog from "@/components/Dialog/asideDialog";
 
 import './style.scss';
 
-import { interator } from './utils';
+import Children from './utils';
 import { alt } from '@/utils';
 
 export const MGet = (i) => {
@@ -42,7 +42,7 @@ export const M = [
 
             const ranges = [];
 
-            children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+            children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
                 if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                     //匹配过程中pre里面只能有一层span不会出现placeholder
                     const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
@@ -129,13 +129,12 @@ export const M = [
 
         inputs: _ => ({ value: '' }),
         match: (editor, prevRanges, { value }) => {
-            // if (!value) return; 0字符仍然匹配开头
             const children = editor.children;
 
             const ranges = [];
 
             if (value === '') {
-                children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+                children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
                     if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                         let anchor, focus;
                         anchor = focus = { path: [...path, 0], offset: 0 }
@@ -144,7 +143,7 @@ export const M = [
                     return true;
                 }));
             } else {
-                children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+                children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
                     if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                         const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
                         if (innerText.startsWith(value)) {
@@ -197,7 +196,7 @@ export const M = [
             const ranges = [];
 
             if (value === '') {
-                children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+                children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
                     if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                         let anchor, focus;
                         anchor = focus = Editor.end(editor, path);
@@ -206,7 +205,7 @@ export const M = [
                     return true;
                 }));
             } else {
-                children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+                children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
                     if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                         const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
                         if (innerText.endsWith(value)) {
@@ -268,7 +267,7 @@ export const M = [
             if (!(bold[0] || italic[0] || underline[0] || strike[0] || fontColor[0] || bgColor[0]))
                 return [];
 
-            children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+            children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
                 if (el.text !== undefined) {
                     if (bold[0]) {
                         if (!(el.bold === bold[1] || el.bold === undefined && !bold[1]))  //NOTE: undefined !== false and undefined !== true
@@ -356,13 +355,13 @@ export const M = [
         title: "空行匹配",
         desc: '筛选空行',
         inType: '',
-        outType: 'p',
+        outType: 'node',
         inputs: _ => { },
-        match: (editor, prevRanges, { bold, italic, underline, fontColor, bgColor }) => {
+        match: (editor, prevRanges, { }) => {
             const children = editor.children;
             const ranges = [];
 
-            children.forEach((el, index) => interator(el, [index], children, (el, path, children) => {
+            children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
                 if (el.type === 'paragraph' || (el.type === undefined && el.text === undefined)) {
                     if (el.children.length === 1 && el.children[0].text === '') {
                         ranges.push(path);

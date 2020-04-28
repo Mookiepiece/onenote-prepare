@@ -46,7 +46,7 @@ export const toggleBlock = (editor, key, value) => {
 
             // NOTE: Transforms.wrapNodes will always wrap the biggest user selection even if match:type==='li' is settled
             // that way in tables, we will get td/tr wrapped by ul/ol and cause error
-            // TODO: BUT in this way, every li is in a indivisual ol/ul, which is bad
+            // BUT in this way, every li is in a indivisual ol/ul, which is also not good
             for (let [node, path] of matches) {
                 Transforms.wrapNodes(editor, { type: 'list-item', children: [] }, { at: path });
                 Transforms.wrapNodes(editor, { type: value, children: [] }, { at: path });

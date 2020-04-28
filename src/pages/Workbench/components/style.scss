@@ -88,6 +88,10 @@
   }
 }
 
+.dialog-table-style-picker {
+  @include pick-one-dialog(".table-style-card");
+}
+
 .transform-card {
   position: relative;
 
@@ -168,14 +172,28 @@
   }
 }
 
+.history-container {
+  height: calc(100% - 64px);
+  margin-bottom: 24px;
+  overflow: hidden;
+  display: flex;
+}
+
 .history-list {
-  float: left;
-  width: 300px;
+  flex-basis: 150px;
+  flex-shrink: 0;
+  flex-grow: 2;
+  overflow-y: auto;
 }
 
 .history-preview {
+  flex-basis: 150px;
+  flex-shrink: 1;
+  flex-grow: 10;
+
   position: relative;
-  margin-left: 300px;
+  margin-left: 12px;
+  overflow-y: auto;
 }
 
 .leaf-style-editor {
@@ -208,12 +226,16 @@
 }
 
 .table-style-editor {
+  height: calc(100% - 64px);
+  margin-bottom: 24px;
+
   > aside {
     padding: 8px;
     float: left;
     overflow: auto;
     box-shadow: var(--gray-4) 0 0 4px 2px;
     width: 400px;
+    max-height: 100%;
 
     .table-style-list {
       > div {
