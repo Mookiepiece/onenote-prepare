@@ -5,7 +5,6 @@ import { SLATE_DEFAULTS, fontFamilyOptions, fontSizeOptions } from '@/utils/user
 import { DropdownButtonSelect } from '@/components/DropdownButton';
 
 const Settings = _ => {
-    const [v, s] = useState("#666");
 
     const [slateFontFamily, _setSlateFontFamily] = useState(SLATE_DEFAULTS.FONT_FAMILY);
     const setSlateFontFamily = v => { _setSlateFontFamily(v); SLATE_DEFAULTS.FONT_FAMILY = v; };
@@ -14,12 +13,6 @@ const Settings = _ => {
 
     return (
         <div>
-            <Input
-                value={v}
-                onChange={v => {
-                    s(v);
-                }}
-            />
             <div className="form-like">
                 <span>默认字体</span>
                 <div>

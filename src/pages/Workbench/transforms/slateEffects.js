@@ -139,15 +139,16 @@ export const applyRender = (editor, result, setSlateValue) => { // TODO support 
     // 反向insert to avoid path changes
     [...swapArray].reverse().forEach(([style, at, origin, el, elPath], index) => {
         const nodes = swapResultFunc([style, at, origin, el, elPath], index);
-
         const containerPath = elPath.slice(0, elPath.length - 1);
         const elIndex = elPath[elPath.length - 1];
 
         const containerEl = containerPath.reduce((el, index) => el.children[index], { children: nv });
         const slibings = containerEl.children;
+
+        const _ = containerPath.length ? `${containerPath.join('.children.')}.children` : ''; // root path is []
         nv = alt.set(
             nv,
-            `${containerPath.join('.children.')}.children`,
+            _,
             [
                 ...slibings.slice(0, elIndex),
                 ...nodes,
@@ -183,7 +184,6 @@ const getSwapResultCallback = (result) => {
         // replace entire pre element to (muti) pre element
         let newNodes = [...resultNodes];
 
-
         placeholders.forEach(([placeholder, path]) => {
             const placeholderContainerPath = path.slice(0, path.length - 1);
             const placeholderIndex = path[path.length - 1];
@@ -212,11 +212,23 @@ const getSwapResultCallback = (result) => {
                 ]);
         });
 
+        inject_original_style_to_frist_line: {
+            newNodes = alt.set(newNodes, `0.children`, newNodes[0].children.map(n => ({ ...n, ...style })));
+        }
+
         inject_prevLeaf_and_nextLeaf_slibing_bling: {
-            const prevLeaf = el.children.slice(0, at.anchor.path[at.anchor.path.length - 1]);
-            const nextLeaf = el.children.slice(at.focus.path[at.focus.path.length - 1] + 1, el.children.length);
+            // at could be path when bling placeholder
+            let prevLeaf, nextLeaf;
+            if (at.anchor) {
+                prevLeaf = el.children.slice(0, at.anchor.path[at.anchor.path.length - 1]);
+                nextLeaf = el.children.slice(at.focus.path[at.focus.path.length - 1] + 1, el.children.length);
+            } else {
+                prevLeaf = el.children.slice(0, at[at.length - 1]);
+                nextLeaf = el.children.slice(at[at.length - 1] + 1, el.children.length);
+            }
             newNodes = alt.set(newNodes, '0.children', [...prevLeaf, ...newNodes[0].children]);
             newNodes = alt.set(newNodes, `${newNodes.length - 1}.children`, [...newNodes[newNodes.length - 1].children, ...nextLeaf]);
+
         }
 
         return newNodes;
