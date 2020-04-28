@@ -269,19 +269,13 @@ const preprocessResultPlaceholders = (result) => {
     }
 }
 
-
-const resultPreprocessor = ([el, path]) => {
-
-
-
-}
-
 const getBlingArrayOfNodes = ({ children }) => {
     let swapArray = []; // [0:original style, 1:at, 2:original-nodes, 3: paragraph container, 4: paragraph container path]
 
     children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
         if (matchType('paragraph')(el)) {
             if (el.bling) {
+                let flag = false;
 
                 // lists cannot in a list, if we have a list parent node in bling paragraph, 
                 // (despe)-should disable all lists in result root, flat them by their direct children, paragraph or table
@@ -300,13 +294,14 @@ const getBlingArrayOfNodes = ({ children }) => {
                             path,
                             potentialListParent,
                             li.children.slice(0, lastPath),
-                            li.children.slice(lastPath + 1, li.children.length)]);
+                            li.children.slice(lastPath + 1, li.children.length)
+                        ]);
+                        flag = true;
                     }
-                } else {
-                    swapArray.push([el, path, null, [], []]);
                 }
+                !flag && swapArray.push([el, path, null, [], []]);
             }
-            return false;
+            return true;
         }
         return true;
     }));
