@@ -86,8 +86,8 @@
   td {
     vertical-align: top;
     border: 1px solid var(--gray-6);
-    padding: 2px 4px;
-    min-width: 25px;
+    padding: 4px 8px;
+    min-width: 50px;
   }
 
   pre {
@@ -107,12 +107,12 @@
   ol {
     --tab-base: 0.375in;
     margin-left: calc(var(--tabs) + var(--tab-base));
-    
+
     margin-top: 0;
     margin-bottom: 0;
     padding-left: 0;
   }
-  
+
   .bling-placeholder {
     width: 0.1ex;
     height: 1em;

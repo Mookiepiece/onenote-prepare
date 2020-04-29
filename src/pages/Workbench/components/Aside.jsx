@@ -183,7 +183,7 @@ const TransformCard = ({ v, onClose, onTogglePreview, onInput, onMatch, onOpenDi
                     })
                 }
             </TransitionGroup>
-            <Button className="add-match-button" onClick={onOpenDialog} disabled ><PlusCircleOutlined /></Button>
+            <Button onClick={onOpenDialog} disabled ><PlusCircleOutlined /></Button>
             {
                 v.matches.length ?
                     (

@@ -28,6 +28,15 @@ const Children = {
      */
     getEl(root, path) {
         return path.reduce((el, p) => el.children[p], { children: root });
+    },
+
+    slibings(root, elPath, count = 1) {
+        const containerPath = elPath.slice(0, -1);
+        const elIndex = elPath[elPath.length - 1];
+        const containerEl = Children.getEl(root, containerPath); // NOTE: will get {children:root} when path=[]
+        const slibings = containerEl.children;
+
+        return [slibings.slice(0, elIndex), slibings.slice(elIndex + count, slibings.length)];
     }
 }
 

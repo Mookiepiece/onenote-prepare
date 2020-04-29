@@ -3,7 +3,8 @@ import { Transforms, Editor } from 'slate';
 import { useSlate } from 'slate-react';
 import {
     ApiOutlined,
-    BookOutlined,
+    HighlightOutlined,
+    ClearOutlined
 } from '@ant-design/icons';
 
 import { TinyEmitter, EVENTS } from '@/utils/index';
@@ -38,12 +39,14 @@ const ResultPanel = ({ result, onResultChange }) => {
     return (
         <div className="content-result" >
             <span>替换结果:</span>
-            {/* {
-                typeof v.result === 'string' ?
-                    <Input value={v.result} onChange={onChange} />
-                    : null
-            } */}
-            <Button className="add-match-button" onClick={_ => setDialogVisible(true)} ><BookOutlined /></Button>
+            <Button
+                type={!result.options.clear ? 'primary' : undefined}
+                onClick={_ => { onResultChange(alt.merge(result, `options`, { clear: false })); setDialogVisible(true); }}
+            ><HighlightOutlined /></Button>
+            <Button
+                type={result.options.clear ? 'primary' : undefined}
+                onClick={_ => onResultChange(alt.merge(result, `options`, { clear: true }))}
+            ><ClearOutlined /></Button>
             <Dialog full visible={dialogVisible} setVisible={setDialogVisible} >
                 <div className="result-editor-dialog">
                     <SlateEditor value={value} setValue={setValue}>
@@ -74,8 +77,13 @@ const Aside = ({ result, onResultChange }) => {
     return (
         <aside>
             <ExtraToolbar />
-            {/* <span>输入多行</span><Switch value={switchValue} onChange={setSwitchValue} /> */}
-            <span>完全覆盖原样式</span><Switch value={result.options.overrideStyle} onChange={v => onResultChange(alt.merge(result, `options`, { overrideStyle: v }))} />
+            <div className="form-like">
+                <span>覆盖原文样式</span>
+                <Switch
+                    value={result.options.overrideStyle}
+                    onChange={v => onResultChange(alt.merge(result, `options`, { overrideStyle: v }))}
+                />
+            </div>
             <StylePickerDialog
                 onApply={m[0]}
                 visible={stylePickerDialogVisible}
@@ -91,11 +99,11 @@ const ExtraToolbar = () => {
     return (
         <>
             <div className="editor-toolbar">
-                <Button className="editor-button" 
-                onMouseDown={e => {
-                    e.preventDefault();
-                    insertTransformPlaceholder(editor);
-                }}>
+                <Button className="editor-button"
+                    onMouseDown={e => {
+                        e.preventDefault();
+                        insertTransformPlaceholder(editor);
+                    }}>
                     <ApiOutlined />
                 </Button>
             </div>

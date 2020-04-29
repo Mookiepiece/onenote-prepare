@@ -352,8 +352,8 @@ export const M = [
         }
     },
     {
-        title: "空行匹配",
-        desc: '筛选空行',
+        title: "空行（单独）",
+        desc: ' ',
         inType: '',
         outType: 'node',
         inputs: _ => { },

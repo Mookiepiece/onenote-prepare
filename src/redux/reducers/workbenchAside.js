@@ -32,6 +32,7 @@ const workbenchAside = (state = {
                     nodes: [],
                     options: {
                         overrideStyle: false,
+                        clear:false,
                     }
                 }, // nodes会在useEffect里通过INPUT事件传入
                 key: uuid()
