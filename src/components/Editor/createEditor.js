@@ -177,7 +177,7 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
                 active={active}
                 setActive={setActive}
                 options={[
-                    { label: '样式', value: 'STYLE' },
+                    { label: '样式(仅文字匹配)', value: 'STYLE' },
                     { label: '✘', value: 'CLOSE' },
                 ]}
                 onChange={handleChange}

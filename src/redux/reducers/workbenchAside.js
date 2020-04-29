@@ -70,7 +70,7 @@ const workbenchAside = (state = {
             if (state.v === null) throw new Error('[pre-onenote][store] .');
             if (state.v.isApplied) {
                 action.callback.slate(state.memory[state.memory.length - 1].value);
-                setTimeout(_ => action.callback.match(state), 0); //WARNING: bad practice, should open another memory to record those state
+                setTimeout(_ => action.callback.match(state), 0); // WARNING: bad practice, should open another memory to record those state
             } else {
                 state = action.callback.change(state);
             }

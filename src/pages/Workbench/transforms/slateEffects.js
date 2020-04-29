@@ -38,9 +38,9 @@ export const applyMatch = (editor, ranges) => {
         });
     } else {
         // match element
-        [...ranges].reverse().forEach((path, index) => {
+        [...ranges].reverse().forEach(([path, bling], index) => {
             Transforms.setNodes(editor, {
-                bling: index + 1,
+                bling,
             }, {
                 at: path,
             });

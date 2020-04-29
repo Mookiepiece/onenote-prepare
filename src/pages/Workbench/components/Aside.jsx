@@ -26,12 +26,14 @@ import './style.scss';
 
 const applyChange = (editor, state, setSlateValue) => {
     applyMatcher(editor, state)
-    applyRender(editor, state.v.result, setSlateValue,state.v.matches[setSlateValue,state.v.matches.length - 1].outType);
+    applyRender(editor, state.v.result, setSlateValue, state.v.matches[setSlateValue, state.v.matches.length - 1].outType);
     return state;
 };
 
 const applyMatcher = (editor, state) => {
     clearUp(editor);
+
+    // TODO: co matches
     const ranges = state.v.matches.reduce((prevRanges, v) => { return v.match(editor, prevRanges, v.inputs) }, []);
     applyMatch(editor, ranges);
     return state;

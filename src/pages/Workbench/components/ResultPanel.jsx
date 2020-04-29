@@ -45,7 +45,7 @@ const ResultPanel = ({ result, onResultChange }) => {
             ><HighlightOutlined /></Button>
             <Button
                 type={result.options.clear ? 'primary' : undefined}
-                onClick={_ => onResultChange(alt.merge(result, `options`, { clear: true }))}
+                onClick={_ => onResultChange(alt.merge(result, `options`, { clear: !result.options.clear }))}
             ><ClearOutlined /></Button>
             <Dialog full visible={dialogVisible} setVisible={setDialogVisible} >
                 <div className="result-editor-dialog">
@@ -78,7 +78,7 @@ const Aside = ({ result, onResultChange }) => {
         <aside>
             <ExtraToolbar />
             <div className="form-like">
-                <span>覆盖原文样式</span>
+                <span>覆盖原文样式（仅文字匹配）</span>
                 <Switch
                     value={result.options.overrideStyle}
                     onChange={v => onResultChange(alt.merge(result, `options`, { overrideStyle: v }))}

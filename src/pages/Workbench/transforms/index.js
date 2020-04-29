@@ -352,19 +352,20 @@ export const M = [
         }
     },
     {
-        title: "空行（单独）",
-        desc: ' ',
+        title: "空行",
+        desc: '-',
         inType: '',
         outType: 'node',
         inputs: _ => { },
         match: (editor, prevRanges, { }) => {
             const children = editor.children;
-            const ranges = [];
 
-            children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
+            let id = 0;
+            const ranges = [];
+            children.forEach((el, index) => Children.iterate(el, [index], children, (el, path) => {
                 if (el.type === 'paragraph' || (el.type === undefined && el.text === undefined)) {
                     if (el.children.length === 1 && el.children[0].text === '') {
-                        ranges.push(path);
+                        ranges.push([path, ++id]);
                     }
                 }
                 return true;
@@ -374,5 +375,52 @@ export const M = [
         render({ onInput }) {
             return (<p onClick={_ => onInput({}, true)}>hello</p>)
         }
+    },
+    {
+        title: "连续空行",
+        desc: '-',
+        inType: '',
+        outType: 'node',
+        inputs: _ => { },
+        match: (editor, prevRanges, { }) => {
+            const children = editor.children;
+            const badChildren = { children };
+
+            let id = 0;
+            const ranges = [];
+            Children.iterate(badChildren, [], badChildren, (el, path) => {
+                if (el.type === 'paragraph' || (el.type === undefined && el.text === undefined)) {
+                    if (el.children.length === 1 && el.children[0].text === '') {
+
+                        let lastRange = ranges[ranges.length - 1];
+                        lastRange && console.log(lastRange[0],path);
+                        if (lastRange && nextTo(lastRange[0], path)) {
+                            ranges.push([path, id]);
+                        } else {
+                            ranges.push([path, ++id]);
+                        }
+                    }
+                }
+                return true;
+            });
+            return ranges;
+        },
+        render({ onInput }) {
+            return (<p onClick={_ => onInput({}, true)}>hello</p>)
+        }
     }
 ]
+
+
+const nextTo = (p0, p1) => {
+    if (!p0.length || !p1.length)
+        return;
+
+    let _0 = p0.slice(0, -1), _1 = p1.slice(0, -1);
+    if (_0.length === _1.length && _0.every((v, i) => v === _1[i])) {
+        let $0 = p0[p0.length - 1], $1 = p1[p1.length - 1];
+        if ($0 === $1 - 1)
+            return true;
+    }
+    return false;
+}
