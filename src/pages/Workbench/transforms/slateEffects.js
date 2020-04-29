@@ -1,6 +1,6 @@
 
 import { Transforms, Editor, Text, Range, Node, Path } from 'slate';
-import { alt } from '@/utils';
+import { alt, deepCopy } from '@/utils';
 import Children from './utils';
 import { matchType } from '@/components/Editor/utils';
 
@@ -80,50 +80,83 @@ export const applyRender = (editor, resultInput, setSlateValue, outType) => { //
 
         // 反向insert to avoid path changes
         [...swapArray].reverse().forEach(([style, at, origin, elPath]) => {
-            const result = complieResultFunc([style, at, origin, elPath], newChildren);
 
-            const containerPath = elPath.slice(0, elPath.length - 1);
-            const elIndex = elPath[elPath.length - 1];
-            const containerEl = Children.getEl(newChildren, containerPath);
-            const slibings = containerEl.children;
+            let el = Children.getEl(newChildren, elPath);
+            const result = complieResultFunc([style, at, origin, elPath], el);
 
-            newChildren = alt.set(
-                newChildren,
-                Children.str(containerPath),
-                [
-                    ...slibings.slice(0, elIndex),
-                    ...result,
-                    ...slibings.slice(elIndex + 1, slibings.length)
-                ]);
+            newChildren = swapNode(newChildren, elPath, result);
         });
     } else if (outType === 'node') {
         const swapArray = getBlingArrayOfNodes(editor);
         const complieResultFunc = preprocessResultPlaceholdersOfNodes(resultInput);
-        [...swapArray].reverse().forEach(([el, elPath, listEl, prevSlibings, nextSlibings]) => {
-            const result = complieResultFunc([el, elPath, listEl, prevSlibings, nextSlibings]);
 
-            const containerPath = elPath.slice(0, elPath.length - 1);
-            const elIndex = elPath[elPath.length - 1];
-            const containerEl = Children.getEl(newChildren, containerPath);
-            const slibings = containerEl.children;
+        for (let i = swapArray.length - 1; i >= 0; i--) {
+            const [el, elPath, inList] = swapArray[i];
 
-            newChildren = alt.set(
-                newChildren,
-                Children.str(containerPath),
-                [
-                    ...slibings.slice(0, elIndex),
-                    ...prevSlibings,
-                    ...result,
-                    ...nextSlibings,
-                    ...slibings.slice(elIndex + 1, slibings.length)
-                ]);
-        });
+            if (inList) {
+                // if inList, combine all transforms in this temp variable li first, finally move then to replace the entire list
+                // this way we can merge muti matched paragraph in one li
+                // beacuse we will merge the slibing paragraph nodes to new result, which is changed once omplieResultFunc calls
+                let li = Children.getEl(newChildren, elPath.slice(0, -1));
 
+                let result = complieResultFunc([el, elPath], li);
+                li = { children: result };
+
+                for (i--; i >= 0; i--) {
+                    const [el2, elPath2, listPath2] = swapArray[i];
+
+                    if (listPath2 !== true) {
+                        break;
+                    }
+
+                    let _elPath2 = elPath2.slice(0, -1);
+                    let _elPath = elPath.slice(0, -1);
+                    let eq = _elPath.length === _elPath2.length && _elPath.every((v, i) => v === _elPath2[i]);
+                    if (!eq) {
+                        break;
+                    }
+
+                    result = complieResultFunc([el2, elPath2], li);
+                    li = { children: result };
+                }
+                i++;
+
+                newChildren = swapNode(newChildren, elPath.slice(0, -2), result); //replace ul/ol
+
+            } else {
+                let result = complieResultFunc([el, elPath]);
+
+                newChildren = swapNode(newChildren, elPath, result);
+            }
+        }
     }
 
-    setSlateValue(newChildren);
+    setSlateValue(deepCopy(newChildren));
 };
 
+/**
+ * swap origin placeholder to result nodes
+ * leaf and nodes are same, they both have an container with children:[] property
+ * @param {Array} root 
+ * @param {Array} elPath 
+ * @param {Array} result 
+ */
+const swapNode = (root, elPath, result) => {
+    const containerPath = elPath.slice(0, -1);
+    const elIndex = elPath[elPath.length - 1];
+    const containerEl = Children.getEl(root, containerPath); // NOTE: will get {children:root} when path=[]
+    const slibings = containerEl.children;
+    return alt.set(
+        root,
+        Children.str(containerPath),
+        [
+            ...slibings.slice(0, elIndex),
+            ...result,
+            ...slibings.slice(elIndex + 1, slibings.length)
+        ]
+    );
+}
+const swapLeaf = swapNode;
 
 const getBlingArray = ({ children }) => {
     let swapArray = []; // [0:original style, 1:at, 2:original-nodes, 3: paragraph container, 4: paragraph container path]
@@ -212,37 +245,28 @@ const preprocessResultPlaceholders = (result) => {
         }
     }
 
-    return ([style, at, origin, elPath], newResult) => {
+    return ([style, at, origin, elPath], el) => {
         // replace entire pre element to (muti) pre element
         let newNodes = [...resultNodes];
 
+        // swap placeholders by origin leafs
         placeholders.forEach(([placeholder, path]) => {
-            const placeholderContainerPath = path.slice(0, path.length - 1);
-            const placeholderIndex = path[path.length - 1];
-
             // pay caution on mutiline user input result case:
             // origin p:      [p > [      prevLeaf,               matched-leaf,        nextLeaf        ]
             // user-result         [ p > [leaf3],            p > [placeholder],   p > [leaf4]          ]
             // return :            [ p > [prevLeaf,leaf3],   p > [matched-leaf],  p > [leaf4,nextLeaf] ]
             // we need to combine leaf1 and leaf2 into user input result
 
-            const paragraphEl = Children.getEl(newNodes, placeholderContainerPath);
-            const placeholderSlibings = paragraphEl.children;
-            newNodes = alt.set(
-                newNodes,
-                Children.str(placeholderContainerPath),
-                [
-                    ...placeholderSlibings.slice(0, placeholderIndex),
-                    ...origin.map(originLeaf => {
-                        let v = originLeaf;
-                        if (overrideStyle) {
-                            v = { text: v.text };
-                        }
-                        return { ...v, ...placeholder.meta.style, bling: false }
-                    }),
-                    ...placeholderSlibings.slice(placeholderIndex + 1, placeholderSlibings.length)
-                ]
-            );
+            const replaced = origin.map(originLeaf => {
+                let v = originLeaf;
+                if (overrideStyle) {
+                    v = { text: v.text };
+                }
+                return { ...v, ...placeholder.meta.style, bling: false }
+            });
+
+            newNodes = swapLeaf(newNodes, path, replaced);
+
         });
 
         inject_original_leaf_style_to_results_frist_line: {
@@ -250,7 +274,6 @@ const preprocessResultPlaceholders = (result) => {
         }
 
         inject_original_paragraphs_prevLeaf_and_nextLeaf_slibing_of_matched_bling: {
-            let el = Children.getEl(newResult, elPath);
             // at could be path when bling placeholder
             let prevLeaf, nextLeaf;
             if (at.anchor) {
@@ -262,7 +285,6 @@ const preprocessResultPlaceholders = (result) => {
             }
             newNodes = alt.set(newNodes, '0.children', [...prevLeaf, ...newNodes[0].children]);
             newNodes = alt.set(newNodes, `${newNodes.length - 1}.children`, [...newNodes[newNodes.length - 1].children, ...nextLeaf]);
-
         }
 
         return newNodes;
@@ -286,20 +308,15 @@ const getBlingArrayOfNodes = ({ children }) => {
                     if (matchType('numbered-list', 'bulleted-list')(potentialListParent)) {
                         // yep, it's an list
 
-                        // TODO: through current we do not support shift+enter, still need to be careful, so we deliver sliblings
-                        const lastPath = path[path.length - 1];
-                        const li = Children.getEl(children, path.slice(0, -1));
                         swapArray.push([
                             el,
                             path,
-                            potentialListParent,
-                            li.children.slice(0, lastPath),
-                            li.children.slice(lastPath + 1, li.children.length)
+                            true,
                         ]);
                         flag = true;
                     }
                 }
-                !flag && swapArray.push([el, path, null, [], []]);
+                !flag && swapArray.push([el, path, false]);
             }
             return true;
         }
@@ -319,25 +336,24 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
 
     let { overrideStyle } = result.options; // TODO
 
-    return ([el, path, listEl, prevSlibings, nextSlibings], children) => {
+    return ([el, path], li) => {
         let newNodes = [...result.nodes];
+        const lastPath = path[path.length - 1];
 
+        // swap placeholders by origin leafs
         placeholders.forEach(([placeholder, path]) => {
-            const placeholderContainerPath = path.slice(0, path.length - 1);
-            const placeholderIndex = path[path.length - 1];
-            const paragraphEl = Children.getEl(newNodes, placeholderContainerPath);
-            const placeholderSlibings = paragraphEl.children;
-
-            newNodes = alt.set(
-                newNodes,
-                Children.str(placeholderContainerPath),
-                [
-                    ...placeholderSlibings.slice(0, placeholderIndex),
-                    ...el.children,
-                    ...placeholderSlibings.slice(placeholderIndex + 1, placeholderSlibings.length)
-                ]
-            );
+            newNodes = swapLeaf(newNodes, path, el.children);
         });
+
+        // in future case we'll got ul > li > [pre, pre] when user press shift+enter
+        // TODO: through current we do not support shift+enter, still need to be careful, we deliver sliblings
+        inject_original_paragraphs_prevElems_and_nextElems_when_in_list: {
+            if (li !== undefined) {
+                let prevElems = li.children.slice(0, lastPath);
+                let nextElems = li.children.slice(lastPath + 1, li.children.length);
+                newNodes = [...prevElems, ...newNodes, ...nextElems];
+            }
+        }
 
         return newNodes;
     }

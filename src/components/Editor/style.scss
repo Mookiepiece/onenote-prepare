@@ -84,6 +84,7 @@
     border-collapse: collapse;
   }
   td {
+    vertical-align: top;
     border: 1px solid var(--gray-6);
     padding: 2px 4px;
     min-width: 25px;

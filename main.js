@@ -23,7 +23,7 @@ function createMainWindow() {
 
   if (isDevelopment) {
     window.webContents.openDevTools({
-      mode: 'bottom'
+      mode: 'undocked'
     })
   }
 
