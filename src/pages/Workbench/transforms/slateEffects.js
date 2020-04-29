@@ -80,7 +80,6 @@ export const applyRender = (editor, resultInput, setSlateValue, outType) => { //
         const swapArray = getBlingArray(editor);
         const complieResultFunc = preprocessResultPlaceholders(resultInput);
 
-        // 反向insert to avoid path changes
         [...swapArray].reverse().forEach(([style, at, origin, elPath]) => {
 
             let el = Children.getEl(newChildren, elPath);
@@ -246,8 +245,7 @@ const preprocessResultPlaceholders = (result) => {
         return true;
     }));
 
-
-    let resultNodes = result.nodes; // do not mutate
+    let resultNodes = result.nodes;
 
     // we can transform leafs to muti paragraph with tables/list inside, not begin not end
     // so need avoid tables/lists at results first/last line
@@ -367,7 +365,7 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
 
     // split the paragraph where placeholders placed in, into three division: [ p>prevLeaf(optional), placeholder, p>nextLeaf(optional) ]
     // placeholders was inline but, anyway it will be replaced by origin nodes
-    [...placeholders0].reverse().forEach(([el, path]) => {
+    placeholders0.forEach(([el, path]) => {
         const [prevLeafSlibings, nextLeafSlibings] = Children.slibings(altedResult, path);
 
         let prevSlibings = prevLeafSlibings.length === 1 && prevLeafSlibings[0].text === '' ? [] : [{ type: 'paragraph', children: prevLeafSlibings }];
