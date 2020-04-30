@@ -30,7 +30,8 @@ import {
     DeleteColumnOutlined,
     DeleteRowOutlined,
     CreditCardOutlined,
-    StarOutlined
+    StarOutlined,
+    ClearOutlined
 } from '@ant-design/icons';
 
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
@@ -38,6 +39,8 @@ import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet,
 import { fontSizeOptions, fontFamilyOptions, SLATE_DEFAULTS } from '@/utils/userSettings';
 import StylePickerDialog from './StylePickerDialog';
 import TableStylePickerDialog from './TableStylePickerDialog';
+
+import Children from '@/pages/Workbench/transforms/utils';
 
 const Toolbar = ({ readOnly }) => {
 
@@ -488,14 +491,73 @@ const LeafStyleButton = () => {
     )
 }
 
+export const computeStyleTable = (computedRules, r, c) => {
+    const table = Array(r).fill(c).map(c => Array(c).fill(0).map(_ => ({ cellColor: null, style: null })));
+
+    function celli(cell, cellColor, style) {
+        if (cell.cellColor === null) cell.cellColor = cellColor;
+        if (cell.style === null) cell.style = style;
+    }
+    function all(cellColor, style) {
+        table.forEach(r => r.forEach(cell => celli(cell, cellColor, style)));
+    }
+
+    for (let { target, cellColor, style } of computedRules) {
+        switch (target[0]) {
+            case 'row':
+                if (target[2] === 0) {
+                    all(cellColor, style);
+                } else if (target[2] === 1) {
+                    let j = target[1] - 1;
+                    table.forEach((r, i) => {
+                        if (i % 2 === j % 2)
+                            r.forEach(cell => celli(cell, cellColor, style))
+                    });
+                } else {
+                    let j = target[1] - 1;
+                    table[j] && (table[j].forEach(cell => celli(cell, cellColor, style)));
+                }
+                break;
+            case 'col':
+                if (target[2] === 0) {
+                    all(cellColor, style);
+                } else if (target[2] === 1) {
+                    let j = target[1] - 1;
+                    table.forEach(r => r.forEach((cell, i) => {
+                        if (i % 2 === j % 2)
+                            celli(cell, cellColor, style);
+                    }));
+                } else {
+                    let j = target[1] - 1;
+                    table.forEach(r => r.forEach((cell, i) => i === j && celli(cell, cellColor, style)));
+                }
+                break;
+            case 'cell':
+                let i = target[1] - 1, j = target[2] - 1;
+                table[i] && table[i][j] && celli(table[i][j], cellColor, style);
+                break;
+        }
+    }
+
+    return table;
+}
+
 const TableStyleButton = () => {
     const editor = useSlate();
     const [stylePickerDialogVisible, setStylePickerDialogVisible] = useState(false);
+
+    const matches = [...Editor.nodes(editor, {
+        match: n => n.type === 'table',
+        mode: 'lowest'
+    })];
+
+    const disabled = matches.length === 0;
 
     return (
         <>
             <Button
                 className="editor-button"
+                disabled={disabled}
                 onMouseDown={event => {
                     event.preventDefault();
                     putSelection(editor);
@@ -505,15 +567,40 @@ const TableStyleButton = () => {
                 <CreditCardOutlined />
             </Button>
             <TableStylePickerDialog
-                onApply={(_, { style }) => {
+                onApply={(_, { rules }) => {
                     const selection = getSelection(editor);
-                    // if (Range.isCollapsed(selection)) {
-                    //     Transforms.setNodes(editor, style, { match: Text.isText })
-                    // } else {
-                    //     for (let key in style) {
-                    //         Editor.addMark(editor, key, style[key]);
-                    //     }
-                    // }
+                    const [table, tablePath] = matches[0];
+                    console.log(matches);
+                    let tableRows = table.children.length, tableCols = table.children[0].children.length;
+
+                    const computedStyleTable = computeStyleTable(rules, tableRows, tableCols);
+
+                    for (let i = 0; i < tableRows; i++) {
+                        for (let j = 0; j < tableCols; j++) {
+                            Transforms.setNodes(
+                                editor,
+                                { cellColor: computedStyleTable[i][j].cellColor },
+                                { at: [...tablePath, i, j], }
+                            )
+
+                            // TODO: can transform leaf styles so difficult???
+                            const cell = table.children[i].children[j];
+                            for (let p = 0; p < cell.children.length; p++) {
+                                const pre = cell.children[p];
+
+                                for (let l = 0; l < pre.children.length; l++) {
+                                    Transforms.setNodes(
+                                        editor,
+                                        computedStyleTable[i][j].style,
+                                        {
+                                            at: [...tablePath, i, j, p, l],
+                                        }
+                                    )
+                                }
+                            }
+
+                        }
+                    }
                 }}
                 visible={stylePickerDialogVisible}
                 setVisible={setStylePickerDialogVisible}
@@ -586,40 +673,36 @@ const TableColorButton = () => {
                     }
                 }}
 
-                renderButton={
-                    (buttonRef) => {
-                        return (
-                            <Button
-                                disabled={disabled}
-                                className={`editor-button editor-button-color-r ${pickerActive ? "__dropdown" : ""}`}
-                                active={pickerActive}
-                                onMouseDown={event => {
-                                    event.preventDefault();
-                                    if (!pickerActive) {
-                                        putSelection(editor);
-                                    }
-                                    setPickerActive(!pickerActive);
-                                }}
-                                ref={buttonRef}
-                            >
-                                <SwapRightOutlined />
-                            </Button>
-                        )
-                    }
-                }
+                renderButton={(buttonRef) => {
+                    return (
+                        <Button
+                            disabled={disabled}
+                            className={`editor-button editor-button-color-r ${pickerActive ? "__dropdown" : ""}`}
+                            active={pickerActive}
+                            onMouseDown={event => {
+                                event.preventDefault();
+                                if (!pickerActive) {
+                                    putSelection(editor);
+                                }
+                                setPickerActive(!pickerActive);
+                            }}
+                            ref={buttonRef}
+                        >
+                            <SwapRightOutlined />
+                        </Button>
+                    )
+                }}
 
-                renderDropdown={
-                    (setPickerActive) => {
-                        return (
-                            <div>
-                                <SketchPicker
-                                    color={color}
-                                    onChange={({ hex }) => setColor(hex)}
-                                />
-                            </div>
-                        )
-                    }
-                }
+                renderDropdown={(setPickerActive) => {
+                    return (
+                        <div>
+                            <SketchPicker
+                                color={color}
+                                onChange={({ hex }) => setColor(hex)}
+                            />
+                        </div>
+                    )
+                }}
             />
         </>
     )
@@ -710,6 +793,5 @@ const FontSizeComponent = ({
         />
     )
 }
-
 
 export default Toolbar;

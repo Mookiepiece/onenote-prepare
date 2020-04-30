@@ -39,6 +39,7 @@ import ActionTypes from '@/redux/actions';
 import { v4 as uuid } from 'uuid';
 import CachedInput from '@/components/Input/cachedInput';
 import StylePickerDialog from '@/components/Editor/StylePickerDialog';
+import { computeStyleTable } from '@/components/Editor/Toolbar';
 
 const leafStylesO = [
     ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],
@@ -253,57 +254,6 @@ const SaveLeafStyleDialog = ({ visible, setVisible, onApply }) => {
             }} full>保存</Button>
         </Dialog>
     )
-}
-
-const computeStyleTable = (computedRules, r, c) => {
-    const table = Array(r).fill(c).map(c => Array(c).fill(0).map(_ => ({ cellColor: null, style: null })));
-
-    function celli(cell, cellColor, style) {
-        if (cell.cellColor === null) cell.cellColor = cellColor;
-        if (cell.style === null) cell.style = style;
-    }
-    function all(cellColor, style) {
-        table.forEach(r => r.forEach(cell => celli(cell, cellColor, style)));
-    }
-
-    for (let { target, cellColor, style } of computedRules) {
-        switch (target[0]) {
-            case 'row':
-                if (target[2] === 0) {
-                    all(cellColor, style);
-                } else if (target[2] === 1) {
-                    let j = target[1] - 1;
-                    table.forEach((r, i) => {
-                        if (i % 2 === j % 2)
-                            r.forEach(cell => celli(cell, cellColor, style))
-                    });
-                } else {
-                    let j = target[1] - 1;
-                    table[j] && (table[j].forEach(cell => celli(cell, cellColor, style)));
-                }
-                break;
-            case 'col':
-                if (target[2] === 0) {
-                    all(cellColor, style);
-                } else if (target[2] === 1) {
-                    let j = target[1] - 1;
-                    table.forEach(r => r.forEach((cell, i) => {
-                        if (i % 2 === j % 2)
-                            celli(cell, cellColor, style);
-                    }));
-                } else {
-                    let j = target[1] - 1;
-                    table.forEach(r => r.forEach((cell, i) => i === j && celli(cell, cellColor, style)));
-                }
-                break;
-            case 'cell':
-                let i = target[1] - 1, j = target[2] - 1;
-                table[i] && table[i][j] && celli(table[i][j], cellColor, style);
-                break;
-        }
-    }
-
-    return table;
 }
 
 const TableStylePreview = ({ rules }) => {

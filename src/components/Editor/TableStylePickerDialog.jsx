@@ -14,18 +14,13 @@ const TableStylePickerDialog = ({ visible, setVisible, onApply }) => {
                             setVisible(false);
                         }} key={i} >
                             <div>
-                                <span>
-                                    <img src={tableStyle.image} />
-                                </span>
+                                <img src={tableStyle.image} />
                             </div>
                             <h6>{tableStyle.title}</h6>
                             <p>{tableStyle.group}</p>
                         </div>
                     ))
                 }
-            </div>
-            <div>
-
             </div>
         </Dialog>
     )

@@ -62,17 +62,10 @@ export const mockedCustomTableStyle = [
             {
                 target: ['row', 2, 1],
                 cellColor: '#ddd',
-                style: {},
-            },
-            {
-                target: ['row', 2, 0],
-                cellColor: '#ddd',
-                style: {},
-            },
-            {
-                target: ['row', 0, 0],
-                cellColor: '#ddd',
-                style: {},
+                style: {
+                    bold:true,
+                    fontColor:'#fff'
+                },
             },
         ]
     },
