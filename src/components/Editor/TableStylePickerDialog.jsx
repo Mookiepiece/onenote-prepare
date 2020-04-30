@@ -1,0 +1,34 @@
+import React from 'react';
+import Dialog from '@/components/Dialog';
+
+import { mockedCustomTableStyle } from '@/utils/userSettings';
+
+const TableStylePickerDialog = ({ visible, setVisible, onApply }) => {
+    return (
+        <Dialog full visible={visible} setVisible={setVisible}>
+            <div className="dialog-table-style-picker">
+                {
+                    mockedCustomTableStyle.map((tableStyle, i) => (
+                        <div className="table-style-card" onClick={_ => {
+                            onApply(i, mockedCustomTableStyle[i]);
+                            setVisible(false);
+                        }} key={i} >
+                            <div>
+                                <span>
+                                    <img src={tableStyle.image} />
+                                </span>
+                            </div>
+                            <h6>{tableStyle.title}</h6>
+                            <p>{tableStyle.group}</p>
+                        </div>
+                    ))
+                }
+            </div>
+            <div>
+
+            </div>
+        </Dialog>
+    )
+};
+
+export default TableStylePickerDialog;

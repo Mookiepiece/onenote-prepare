@@ -14,7 +14,7 @@ import { SlateEditor } from '@/components/Editor';
 import { Switch } from '@/components/Switch';
 
 import { alt } from '@/utils';
-import StylePickerDialog from './StylePickerDialog';
+import StylePickerDialog from '@/components/Editor/StylePickerDialog';
 
 const ResultPanel = ({ result, onResultChange }) => {
     const [dialogVisible, setDialogVisible] = useState(false);

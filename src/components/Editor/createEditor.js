@@ -161,12 +161,6 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
         }
     };
 
-    let style = {}, className = '';
-
-    if (element.meta.style) {
-        [style, className] = computeLeafStyleAndClassName(element.meta.style);
-    }
-
     return (
         <div
             className={`transform-placeholder ${selected && focused ? 'focused' : ''}`}
@@ -192,7 +186,7 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
                         }}
 
                     >
-                        <span style={style} className={className}> {"原内容"} </span>
+                        <Leaf leaf={element.meta.style || {}}>原内容</Leaf>
                     </Button>
                 )}
             />

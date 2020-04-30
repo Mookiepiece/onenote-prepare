@@ -155,9 +155,8 @@ export const getSelection = editor => {
     if (selection !== null) {
         ReactEditor.focus(editor);
         Transforms.select(editor, selection); //NOTE:setSelection不能即时生效，不明白setSelection和select的区别
-        return true;
     }
-    return false;
+    return selection;
 }
 
 export const useSlateSelection = (editor) => {

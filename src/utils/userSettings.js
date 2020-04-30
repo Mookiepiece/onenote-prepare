@@ -57,6 +57,7 @@ export const mockedCustomTableStyle = [
     {
         title: 'nb',
         group: 'sasdasd',
+        image:'',
         rules: [
             {
                 target: ['row', 2, 1],

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     BoldOutlined,
     ItalicOutlined,
@@ -14,7 +14,8 @@ import {
     UpOutlined,
     DownOutlined,
     CloseOutlined,
-    FormOutlined
+    FormOutlined,
+    FolderOpenOutlined
 } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { useSlate } from 'slate-react';
@@ -30,14 +31,14 @@ import { connect } from 'react-redux';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 import { Switch, CheckboxButton } from '@/components/Switch';
-import { setArrayItem } from '@/utils';
+import { setArrayItem, drawImageScaled } from '@/utils';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
 import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, mockedCustomStyles, mockedCustomTableStyle } from '@/utils/userSettings';
 import { Editor } from 'slate';
 import ActionTypes from '@/redux/actions';
 import { v4 as uuid } from 'uuid';
 import CachedInput from '@/components/Input/cachedInput';
-import StylePickerDialog from './StylePickerDialog';
+import StylePickerDialog from '@/components/Editor/StylePickerDialog';
 
 const leafStylesO = [
     ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],
@@ -254,39 +255,105 @@ const SaveLeafStyleDialog = ({ visible, setVisible, onApply }) => {
     )
 }
 
-const SaveTableStyleDialog = ({ visible, setVisible, onApply }) => {
-    const [title, setTitle] = useState('');
-    const [group, setGroup] = useState('');
+const computeStyleTable = (computedRules, r, c) => {
+    const table = Array(r).fill(c).map(c => Array(c).fill(0).map(_ => ({ cellColor: null, style: null })));
+
+    function celli(cell, cellColor, style) {
+        if (cell.cellColor === null) cell.cellColor = cellColor;
+        if (cell.style === null) cell.style = style;
+    }
+    function all(cellColor, style) {
+        table.forEach(r => r.forEach(cell => celli(cell, cellColor, style)));
+    }
+
+    for (let { target, cellColor, style } of computedRules) {
+        switch (target[0]) {
+            case 'row':
+                if (target[2] === 0) {
+                    all(cellColor, style);
+                } else if (target[2] === 1) {
+                    let j = target[1] - 1;
+                    table.forEach((r, i) => {
+                        if (i % 2 === j % 2)
+                            r.forEach(cell => celli(cell, cellColor, style))
+                    });
+                } else {
+                    let j = target[1] - 1;
+                    table[j] && (table[j].forEach(cell => celli(cell, cellColor, style)));
+                }
+                break;
+            case 'col':
+                if (target[2] === 0) {
+                    all(cellColor, style);
+                } else if (target[2] === 1) {
+                    let j = target[1] - 1;
+                    table.forEach(r => r.forEach((cell, i) => {
+                        if (i % 2 === j % 2)
+                            celli(cell, cellColor, style);
+                    }));
+                } else {
+                    let j = target[1] - 1;
+                    table.forEach(r => r.forEach((cell, i) => i === j && celli(cell, cellColor, style)));
+                }
+                break;
+            case 'cell':
+                let i = target[1] - 1, j = target[2] - 1;
+                table[i] && table[i][j] && celli(table[i][j], cellColor, style);
+                break;
+        }
+    }
+
+    return table;
+}
+
+const TableStylePreview = ({ rules }) => {
+    const [tableRows, setTableRows] = useState(5);
+    const [tableCols, setTableCols] = useState(5);
+
+    const computedStyleTable = computeStyleTable(rules, tableRows, tableCols);
 
     return (
-        <Dialog visible={visible} setVisible={setVisible}>
-            <p>新建表格样式</p>
-            <hr />
-            <div className="form-like">
-                <span>标题 *</span>
-                <div>
-                    <Input full value={title} onChange={setTitle} />
-                </div>
-                <span>分组 *</span>
-                <div>
-                    <Input full value={group} onChange={setGroup} />
-                </div>
-            </div>
-            <Button disabled={!title.trim() || !group.trim()} onClick={_ => {
-                setVisible(false);
-                setTitle('');
-                setGroup('');
-                onApply(title, group);
-                setVisible(false);
-            }} full>保存</Button>
-        </Dialog>
+        <div className="sample-container slate-normalize">
+            <span>预览行：</span>
+            <DropdownButtonSelect
+                value={tableRows}
+                width={80}
+                dropdownWidth={80}
+                options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
+                onChange={setTableRows}
+            />
+            <span>预览列：</span>
+            <DropdownButtonSelect
+                value={tableCols}
+                width={80}
+                dropdownWidth={80}
+                options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
+                onChange={setTableCols}
+            />
+            <table>
+                <tbody>
+                    {
+                        Array(tableRows).fill(0).map((_, r) => (
+                            <tr key={r}>
+                                {Array(tableCols).fill(0).map((_, c) => {
+                                    const { cellColor, style } = computedStyleTable[r][c];
+                                    return (
+                                        <td key={c} style={{ background: cellColor }}>
+                                            <Leaf leaf={style ? style : {}}>单元</Leaf>
+                                        </td>
+                                    )
+                                })}
+                            </tr>
+                        ))
+                    }
+                </tbody>
+            </table>
+        </div>
     )
 }
 
 const TableStyleDialog = ({ visible, setVisible }) => {
     const [rules, setRules] = useState([]);
-    const [tableRows, setTableRows] = useState(5);
-    const [tableCols, setTableCols] = useState(5);
 
     const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState(false);
     const [stylePickerDialogVisible, setStylePickerDialogVisible] = useState(false);
@@ -295,54 +362,11 @@ const TableStyleDialog = ({ visible, setVisible }) => {
     const [leafStlyeDialogOnApplyIndex, setLeafStlyeDialogOnApplyIndex] = useState([_ => _]);
     const [saveTableStyleDialogVisible, setSaveTableStyleDialogVisible] = useState(false);
 
-    const computedTableStyle = (r, c) => {
-        let cellColor = null, style = {};
-
-        function celli(result) {
-            if (cellColor === null) cellColor = result[0];
-            if (Object.keys(style).length === 0) style = result[1];
-        }
-
-        for (let rule of rules) {
-            const result = [
-                rule.inputs.cellColor[0] ? rule.inputs.cellColor[1] : null,
-                rule.inputs.style[0] ? rule.inputs.style[1] : {}
-            ];
-
-            switch (rule.inputs.mode) {
-                case 'row':
-                    if (rule.inputs.inputs1 === 1) {
-                        if (rule.inputs.inputs0 % 2 === r % 2)
-                            celli(result);
-                    } else if (rule.inputs.inputs1 === 0) {
-                        celli(result);
-                    } else {
-                        if (rule.inputs.inputs0 === r) {
-                            celli(result);
-                        }
-                    }
-                    break;
-                case 'col':
-                    if (rule.inputs.inputs1 === 1) {
-                        if (rule.inputs.inputs0 % 2 === c % 2)
-                            celli(result);
-                    } else if (rule.inputs.inputs1 === 0) {
-                        celli(result);
-                    } else {
-                        if (rule.inputs.inputs0 === c) {
-                            celli(result);
-                        }
-                    }
-                    break;
-                case 'cell':
-                    if (rule.inputs.inputs1 === c && rule.inputs.inputs0 === r) {
-                        celli(result);
-                    }
-                    break;
-            }
-        };
-        return [cellColor, style];
-    };
+    const computedRules = rules.map(({ inputs, bg }) => ({
+        target: [inputs.mode, inputs.inputs0, inputs.inputs1],
+        cellColor: inputs.cellColor[0] ? inputs.cellColor[1] : null,
+        style: inputs.style[0] ? inputs.style[1] : null
+    }));
 
     return (
         <Dialog full visible={visible} setVisible={setVisible}>
@@ -503,42 +527,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                         })}
                     </div>
                 </aside>
-                <div className="sample-container slate-normalize">
-                    <span>预览行：</span>
-                    <DropdownButtonSelect
-                        value={tableRows}
-                        width={80}
-                        dropdownWidth={80}
-                        options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
-                        onChange={setTableRows}
-                    />
-                    <span>预览列：</span>
-                    <DropdownButtonSelect
-                        value={tableCols}
-                        width={80}
-                        dropdownWidth={80}
-                        options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
-                        onChange={setTableCols}
-                    />
-                    <table>
-                        <tbody>
-                            {
-                                Array(tableRows).fill(0).map((_, r) => (
-                                    <tr key={r}>
-                                        {Array(tableCols).fill(0).map((_, c) => {
-                                            const [cellColor, style] = computedTableStyle(r + 1, c + 1);
-                                            return (
-                                                <td key={c} style={{ background: cellColor }}>
-                                                    <Leaf leaf={style}>单元</Leaf>
-                                                </td>
-                                            )
-                                        })}
-                                    </tr>
-                                ))
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                <TableStylePreview rules={computedRules} />
                 <StylePickerDialog
                     visible={stylePickerDialogVisible}
                     setVisible={setStylePickerDialogVisible}
@@ -564,19 +553,144 @@ const TableStyleDialog = ({ visible, setVisible }) => {
             <SaveTableStyleDialog
                 visible={saveTableStyleDialogVisible}
                 setVisible={setSaveTableStyleDialogVisible}
-                onApply={(title, group) => {
+                onApply={(title, group, image) => {
                     mockedCustomTableStyle.push({
-                        title, group, rules: rules.map(({ inputs, bg }) => {
-                            return {
-                                target: [inputs.mode, inputs.inputs0, inputs.inputs1],
-                                cellColor: inputs.cellColor[0] ? inputs.cellColor[1] : null,
-                                style: inputs.style[0] ? inputs.style[1] : null
-                            }
-                        })
+                        title,
+                        group,
+                        image,
+                        rules: computedRules
                     });
                     setVisible(false);
                 }}
             />
+        </Dialog>
+    )
+}
+
+const BLANK = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII='
+
+const imagineThis = (src, canvas, callback) => {
+    let img = new Image();
+    img.src = URL.createObjectURL(src);
+    img.onload = _ => {
+        drawImageScaled(img, canvas.current.getContext('2d'));
+        callback(canvas.current.toDataURL('image/png', .5));
+        URL.revokeObjectURL(src);
+    };
+}
+
+const ImageInput = ({ emit }) => {
+    const [cleard, setCleard] = useState(true);
+    const [file, setFile] = useState(null);
+    const canvas = useRef();
+    const button = useRef();
+
+    useEffect(_ => {
+        if (file) {
+            imagineThis(file, canvas, emit);
+            setCleard(false);
+        }
+    }, [file]);
+
+    return (
+        <div className="image-input" style={{ position: 'relative' }}>
+            <div
+                role="button"
+                ref={button}
+                className="image-input-button"
+                tabIndex="0"
+                onPaste={e => {
+                    const src = e.clipboardData.files[0];
+                    if (!src || !src.type.startsWith('image'))
+                        return;
+
+                    imagineThis(src, canvas, emit);
+                    setCleard(false);
+                }}
+                onClick={_ => {
+                    if (!cleard) {
+                        canvas.current.getContext('2d').clearRect(0, 0, 200, 200);
+                        setCleard(true);
+                    } else {
+                        button.current.focus();
+                        document.execCommand('paste');
+                    }
+                }}
+            ></div>
+
+            <div><PlusOutlined /></div>
+            <canvas
+                tabIndex="0"
+                width="200"
+                height="200"
+                style={{ width: 200, height: 200 }}
+                ref={canvas}
+            > NOTE: 👴の surface 200% scaled</canvas>
+            {
+                cleard ? <FileInput type="file" onChange={setFile} /> : null
+            }
+            <span>{cleard ? '点击粘贴剪贴板图片' : '点击清除图片'}</span>
+        </div>
+    )
+}
+
+// https://medium.com/trabe/controlled-file-input-components-in-react-3f0d42f901b8
+const FileInput = ({ value, onChange = _ => _, ...rest }) => {
+    const input = useRef();
+    return (
+        <div className="file-input">
+            <div>
+                {value ? `已选文件: ${value.name}` : '来自文件'}
+            </div>
+            <label>
+                <Button onClick={_ => input.current.click()}><FolderOpenOutlined /></Button>
+                <input
+                    ref={input}
+                    {...rest}
+                    style={{ display: "none" }}
+                    type="file"
+                    multiple={false}
+                    accept='image/*'
+                    onChange={e => {
+                        onChange(e.target.files[0]);
+                    }}
+                />
+            </label>
+        </div>
+    )
+}
+
+const SaveTableStyleDialog = ({ visible, setVisible, rules, onApply }) => {
+    const [title, setTitle] = useState('');
+    const [group, setGroup] = useState('');
+    const [image, setImage] = useState(BLANK);
+
+    return (
+        <Dialog visible={visible} setVisible={setVisible}>
+            <p>新建表格样式</p>
+            <hr />
+            <div className="form-like">
+                <span>标题 *</span>
+                <div>
+                    <Input full value={title} onChange={setTitle} />
+                </div>
+                <span>分组 *</span>
+                <div>
+                    <Input full value={group} onChange={setGroup} />
+                </div>
+                <span>图片</span>
+                <div>
+                    <ImageInput emit={setImage} />
+                </div>
+            </div>
+            <Button disabled={!title.trim() || !group.trim()} onClick={_ => {
+                setVisible(false);
+                setTitle('');
+                setGroup('');
+                setImage(BLANK);
+                onApply(title, group, image);
+                setVisible(false);
+            }} full>保存</Button>
         </Dialog>
     )
 }
@@ -657,7 +771,7 @@ const HistoryDialog = connect(state => ({
     }, [index]);
 
     return (
-        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'} style={{display:'flex',flexDirection:'column'}}>
+        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'} style={{ display: 'flex', flexDirection: 'column' }}>
             <div className="history-container">
                 <div className="history-list">
                     <Button

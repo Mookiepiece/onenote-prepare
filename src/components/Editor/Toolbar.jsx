@@ -36,6 +36,8 @@ import {
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
 
 import { fontSizeOptions, fontFamilyOptions, SLATE_DEFAULTS } from '@/utils/userSettings';
+import StylePickerDialog from './StylePickerDialog';
+import TableStylePickerDialog from './TableStylePickerDialog';
 
 const Toolbar = ({ readOnly }) => {
 
@@ -82,6 +84,8 @@ const Toolbar = ({ readOnly }) => {
                 <TableColorButton />
             </div>
             <div className="toolbar-group">
+                <LeafStyleButton />
+                <TableStyleButton />
                 <ActionButton />
                 <ActionButtonX />
             </div>
@@ -445,6 +449,74 @@ const ColorButton = ({ format, icon }) => {
                         )
                     }
                 }
+            />
+        </>
+    )
+}
+
+const LeafStyleButton = () => {
+    const editor = useSlate();
+    const [stylePickerDialogVisible, setStylePickerDialogVisible] = useState(false);
+
+    return (
+        <>
+            <Button
+                className="editor-button"
+                onMouseDown={event => {
+                    event.preventDefault();
+                    putSelection(editor);
+                    setStylePickerDialogVisible(true);
+                }}
+            >
+                <FontColorsOutlined />
+            </Button>
+            <StylePickerDialog
+                onApply={(_, { style }) => {
+                    const selection = getSelection(editor);
+                    if (Range.isCollapsed(selection)) {
+                        Transforms.setNodes(editor, style, { match: Text.isText })
+                    } else {
+                        for (let key in style) {
+                            Editor.addMark(editor, key, style[key]);
+                        }
+                    }
+                }}
+                visible={stylePickerDialogVisible}
+                setVisible={setStylePickerDialogVisible}
+            />
+        </>
+    )
+}
+
+const TableStyleButton = () => {
+    const editor = useSlate();
+    const [stylePickerDialogVisible, setStylePickerDialogVisible] = useState(false);
+
+    return (
+        <>
+            <Button
+                className="editor-button"
+                onMouseDown={event => {
+                    event.preventDefault();
+                    putSelection(editor);
+                    setStylePickerDialogVisible(true);
+                }}
+            >
+                <CreditCardOutlined />
+            </Button>
+            <TableStylePickerDialog
+                onApply={(_, { style }) => {
+                    const selection = getSelection(editor);
+                    // if (Range.isCollapsed(selection)) {
+                    //     Transforms.setNodes(editor, style, { match: Text.isText })
+                    // } else {
+                    //     for (let key in style) {
+                    //         Editor.addMark(editor, key, style[key]);
+                    //     }
+                    // }
+                }}
+                visible={stylePickerDialogVisible}
+                setVisible={setStylePickerDialogVisible}
             />
         </>
     )
