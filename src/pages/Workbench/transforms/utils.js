@@ -13,6 +13,13 @@ const Children = {
         }
     },
     /**
+     * No roots
+     * @param {Array} arr 
+     */
+    iterateArray(arr, callback) {
+        arr.forEach((el, i) => this.iterate(el, [i], arr, callback));
+    },
+    /**
      * path to string for alt.set
      * @param {Array} path 
      */

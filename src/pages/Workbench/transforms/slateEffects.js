@@ -173,8 +173,7 @@ const swapNode = (root, elPath, result) => {
 
 const getBlingArray = ({ children }) => {
     let swapArray = []; // [0:original style, 1:at, 2:original-nodes, 3: paragraph container path]
-
-    children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
+    Children.iterateArray(children, (el, path, children) => {
         if (matchType('paragraph')(el)) {
             for (let index = 0; index < el.children.length; index++) {
                 const node = el.children[index];
@@ -225,7 +224,7 @@ const getBlingArray = ({ children }) => {
         } else {
             return true;
         }
-    }));
+    });
     return swapArray;
 }
 
@@ -238,12 +237,12 @@ const preprocessResultPlaceholders = (result) => {
 
     let placeholders = [];
 
-    result.nodes.forEach((el, index) => Children.iterate(el, [index], result.nodes, (el, path, children) => {
+    Children.iterateArray(result.nodes, (el, path, children) => {
         if (el.type === "transform-placeholder") {
             placeholders.unshift([el, path]);
         }
         return true;
-    }));
+    });
 
     let resultNodes = result.nodes;
 
@@ -325,8 +324,7 @@ const getBlingArrayOfNodes = ({ children }) => {
             bling
         ]);
     }
-
-    children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
+    Children.iterateArray(children, (el, path, children) => {
         if (matchType('paragraph')(el)) {
             if (el.bling) {
                 let inList = false;
@@ -346,7 +344,7 @@ const getBlingArrayOfNodes = ({ children }) => {
             return true;
         }
         return true;
-    }));
+    });
     return swapArray;
 }
 
@@ -354,12 +352,12 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
     let { overrideStyle } = result.options; // TODO
 
     let placeholders0 = [], placeholders = [];
-    result.nodes.forEach((el, index) => Children.iterate(el, [index], result.nodes, (el, path, children) => {
+    Children.iterateArray(result.nodes, (el, path, children) => {
         if (el.type === "transform-placeholder") {
             placeholders0.unshift([el, path]);
         }
         return true;
-    }));
+    });
 
     let altedResult = [...result.nodes];
 

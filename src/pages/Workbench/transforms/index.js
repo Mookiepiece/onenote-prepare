@@ -21,6 +21,7 @@ import './style.scss';
 
 import Children from './utils';
 import { alt } from '@/utils';
+import { matchType } from '@/components/Editor/utils';
 
 export const MGet = (i) => {
     let { inputs, ...staticAttrs } = M[i];
@@ -42,8 +43,8 @@ export const M = [
 
             const ranges = [];
 
-            children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
-                if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
+            Children.iterateArray(children, (el, path, children) => {
+                if (matchType('paragraph')) {
                     //匹配过程中pre里面只能有一层span不会出现placeholder
                     const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
 
@@ -102,12 +103,12 @@ export const M = [
                 } else {
                     return true; //text或非paragraph继续循环，p停止？
                 }
-            }));
+            });
             return ranges;
         },
 
         render({ inputs, onInput, onMatch }) {
-            const { value, matchAll } = inputs;
+            const { value } = inputs;
 
             return (
                 <div className="match-rule-grid" >
@@ -134,16 +135,16 @@ export const M = [
             const ranges = [];
 
             if (value === '') {
-                children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
+                Children.iterateArray(children, (el, path, children) => {
                     if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                         let anchor, focus;
                         anchor = focus = { path: [...path, 0], offset: 0 }
                         ranges.push({ anchor, focus });
                     }
                     return true;
-                }));
+                });
             } else {
-                children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
+                Children.iterateArray(children, (el, path, children) => {
                     if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
                         const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
                         if (innerText.startsWith(value)) {
@@ -167,7 +168,7 @@ export const M = [
                         }
                     }
                     return true;
-                }));
+                });
             }
             return ranges;
         },
@@ -196,17 +197,17 @@ export const M = [
             const ranges = [];
 
             if (value === '') {
-                children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
-                    if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
+                Children.iterateArray(children, (el, path, children) => {
+                    if (matchType('paragraph')) {
                         let anchor, focus;
                         anchor = focus = Editor.end(editor, path);
                         ranges.push({ anchor, focus });
                     }
                     return true;
-                }));
+                });
             } else {
-                children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
-                    if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
+                Children.iterateArray(children, (el, path, children) => {
+                    if (matchType('paragraph')) {
                         const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
                         if (innerText.endsWith(value)) {
                             let anchor, focus = Editor.end(editor, path);
@@ -229,7 +230,7 @@ export const M = [
                         }
                     }
                     return true;
-                }));
+                });
             }
             return ranges;
         },
@@ -267,8 +268,8 @@ export const M = [
             if (!(bold[0] || italic[0] || underline[0] || strike[0] || fontColor[0] || bgColor[0]))
                 return [];
 
-            children.forEach((el, index) => Children.iterate(el, [index], children, (el, path, children) => {
-                if (el.text !== undefined) {
+            Children.iterateArray(children, (el, path, children) => {
+                if (Text.isText(el)) {
                     if (bold[0]) {
                         if (!(el.bold === bold[1] || el.bold === undefined && !bold[1]))  //NOTE: undefined !== false and undefined !== true
                             return false; //NOTE:return 仅仅是表示能不能继续向下循环 //不过这里防止push了
@@ -294,14 +295,13 @@ export const M = [
                             return false;
                     }
 
-
                     ranges.push({
                         anchor: { path, offset: 0 },
                         focus: Editor.end(editor, path)
                     });
                 }
                 return true;
-            }));
+            });
 
             return ranges;
         },
@@ -362,39 +362,35 @@ export const M = [
 
             let id = 0;
             const ranges = [];
-            children.forEach((el, index) => Children.iterate(el, [index], children, (el, path) => {
-                if (el.type === 'paragraph' || (el.type === undefined && el.text === undefined)) {
+            Children.iterateArray(children, (el, path) => {
+                if (matchType('paragraph')(el)) {
                     if (el.children.length === 1 && el.children[0].text === '') {
                         ranges.push([path, ++id]);
                     }
                 }
                 return true;
-            }));
+            });
             return ranges;
         },
         render({ onInput }) {
-            return (<p onClick={_ => onInput({}, true)}>hello</p>)
+            return (<p onClick={_ => onInput({}, true)}>{'//////////'}</p>)
         }
     },
     {
-        title: "连续空行",
+        title: "空行（粘连）",
         desc: '-',
         inType: '',
         outType: 'node',
         inputs: _ => { },
         match: (editor, prevRanges, { }) => {
             const children = editor.children;
-            const badChildren = { children };
 
             let id = 0;
             const ranges = [];
-            Children.iterate(badChildren, [], badChildren, (el, path) => {
-                if (el.type === 'paragraph' || (el.type === undefined && el.text === undefined)) {
+            Children.iterateArray(children, (el, path) => {
+                if (matchType('paragraph')(el)) {
                     if (el.children.length === 1 && el.children[0].text === '') {
-
-                        let lastRange = ranges[ranges.length - 1];
-                        lastRange && console.log(lastRange[0],path);
-                        if (lastRange && nextTo(lastRange[0], path)) {
+                        if (sticky(ranges, path)) {
                             ranges.push([path, id]);
                         } else {
                             ranges.push([path, ++id]);
@@ -406,11 +402,65 @@ export const M = [
             return ranges;
         },
         render({ onInput }) {
-            return (<p onClick={_ => onInput({}, true)}>hello</p>)
+            return (<p onClick={_ => onInput({}, true)}>{'//////////'}</p>)
+        }
+    },
+    {
+        title: "全部行",
+        desc: '-',
+        inType: '',
+        outType: 'node',
+        inputs: _ => { },
+        match: (editor, prevRanges, { }) => {
+            const iChildren = { children: editor.children };
+
+            let id = 0;
+            const ranges = [];
+            Children.iterate(iChildren, [], iChildren, (el, path) => {
+                if (matchType('paragraph')(el)) {
+                    ranges.push([path, ++id]);
+                }
+                return true;
+            });
+            return ranges;
+        },
+        render({ onInput }) {
+            return (<p onClick={_ => onInput({}, true)}>{'//////////'}</p>)
+        }
+    },
+    {
+        title: "全部行（粘连）",
+        desc: '-',
+        inType: '',
+        outType: 'node',
+        inputs: _ => { },
+        match: (editor, prevRanges, { }) => {
+            const iChildren = { children: editor.children };
+
+            let id = 0;
+            const ranges = [];
+            Children.iterate(iChildren, [], iChildren, (el, path) => {
+                if (matchType('paragraph')(el)) {
+                    if (sticky(ranges, path)) {
+                        ranges.push([path, id]);
+                    } else {
+                        ranges.push([path, ++id]);
+                    }
+                }
+                return true;
+            });
+            return ranges;
+        },
+        render({ onInput }) {
+            return (<p onClick={_ => onInput({}, true)}>{'//////////'}</p>)
         }
     }
 ]
 
+const sticky = (ranges, path) => {
+    let lastRange = ranges[ranges.length - 1];
+    return lastRange && nextTo(lastRange[0], path);
+}
 
 const nextTo = (p0, p1) => {
     if (!p0.length || !p1.length)

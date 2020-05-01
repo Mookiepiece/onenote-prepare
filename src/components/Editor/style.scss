@@ -123,12 +123,13 @@
   .bling-placeholder {
     position: relative;
 
-    border-radius: 0.2em;
-    animation: bling-after 0.75s cubic-bezier(0.1, 1, 0.5, 1) forwards, bling-shining 2s ease-in-out 0.75s infinite;
+    border-radius: 1px;
+    animation: bling-after 0.75s cubic-bezier(0.1, 1, 0.5, 1) forwards,;
 
     background-color: rgba(75, 175, 214, 0.1);
     &.odd {
-      background-color: rgba(214, 75, 168, 0.1);
+      // background-color: rgba(214, 75, 163, 0.1);
+      // TODO: colors
     }
   }
 
@@ -144,23 +145,22 @@
     }
   }
 
-  @keyframes bling-shining {
-    0% {
-      box-shadow: rgba(0, 170, 255, 1) 0 0 0 2px;
-    }
-    50% {
-      box-shadow: rgba(0, 170, 255, 0.5) 0 0 0 2px;
-    }
-    100% {
-      box-shadow: rgba(0, 170, 255, 1) 0 0 0 2px;
-    }
-  }
+  // @keyframes bling-shining {
+  //   0% {
+  //     box-shadow: rgba(0, 170, 255, 1) 0 0 0 2px;
+  //   }
+  //   50% {
+  //     box-shadow: rgba(0, 170, 255, 0.5) 0 0 0 2px;
+  //   }
+  //   100% {
+  //     box-shadow: rgba(0, 170, 255, 1) 0 0 0 2px;
+  //   }
+  // }
 
   .transform-placeholder {
     position: relative;
     display: inline-block;
     min-width: 60px;
-    background-color: mix(pink, transparent, 20%);
     margin: 0 30px;
     vertical-align: bottom;
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     CSSTransition,
     TransitionGroup,
@@ -153,6 +153,10 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
 const TransformCard = ({ v, onClose, onTogglePreview, onInput, onMatch, onOpenDialog }) => {
     let color = v.isApplied ? 'applied' : 'unused';
     let className = `transform-card${' ' + color}`;
+
+    useEffect(_ => {
+        setTimeout(_ => onInput({}, true, 0), 0); // WARNING: settimeout hack
+    }, []);
 
     return (
         <div className={className}>
