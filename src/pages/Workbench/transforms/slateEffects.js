@@ -271,7 +271,8 @@ const preprocessResultPlaceholders = (result) => {
             // we need to combine leaf1 and leaf2 into user input result
 
             const replaced = origin.map(originLeaf => {
-                let v = overrideStyle ? { text: v.text } : originLeaf;
+                // let v = overrideStyle ? { text: v.text } : originLeaf;
+                let v = originLeaf;
                 return { ...v, ...placeholder.meta.style, bling: false }
             });
 
@@ -279,9 +280,8 @@ const preprocessResultPlaceholders = (result) => {
 
         });
 
-        // TODO: this is not overiiderStyle's job
         inject_original_leaf_style_to_results_frist_line: {
-            overrideStyle && (newNodes = alt.set(newNodes, `0.children`, newNodes[0].children.map(n => ({ ...n, ...style }))));
+            newNodes = alt.set(newNodes, `0.children`, newNodes[0].children.map(n => ({ ...n, ...style })));
         }
 
         inject_original_paragraphs_prevLeaf_and_nextLeaf_slibing_of_matched_bling: {
@@ -385,16 +385,29 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
         let newNodes = [...altedResult];
         const index = pathes[0][pathes[0].length - 1];
 
+
         els = els.map(({ bling, ...origin }) => origin);
 
         // swap placeholders by origin paragraph
         placeholders.forEach(([placeholder, path]) => {
+            let elsInner = els;
+
+            // inject placeholder's style
+            Children.iterateArray(elsInner, (el, path) => {
+                if (matchType('paragraph')(el)) {
+                    const replaced = el.children.map(originLeaf => {
+                        return { ...originLeaf, ...placeholder.meta.style, bling: false }
+                    });
+                    elsInner = swapNode(elsInner, path, replaced);
+                }
+                return true;
+            });
 
             if (dividers.length) { // should divide by tabs
                 let i = placeholder.meta.mirror;
 
                 if (i === 0) {
-                    newNodes = swapNode(newNodes, path, els); // 0 -> normal
+                    newNodes = swapNode(newNodes, path, elsInner); // 0 -> normal
                 } else if (i > dividers.length) { // not included -> clear/[]
                     newNodes = swapNode(newNodes, path, []);
                 } else { // in division
@@ -402,7 +415,7 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
                     // not eq to min
                     let min = dividers[i - 2] === undefined ? 0 : dividers[i - 2] + 1, max = dividers[i - 1];
 
-                    let filterdEls = els.filter(n => {
+                    let filterdEls = elsInner.filter(n => {
                         let { tabs = 0 } = n;
                         return tabs <= max && tabs >= min
                     }).map(({ tabs, ...others }) => ({ tabs: tabs - min, ...others })); // should reduce tabs by prev value
@@ -410,7 +423,7 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
                     newNodes = swapNode(newNodes, path, filterdEls);
                 }
             } else {
-                newNodes = swapNode(newNodes, path, els); // normal
+                newNodes = swapNode(newNodes, path, elsInner); // normal
             }
         });
 
