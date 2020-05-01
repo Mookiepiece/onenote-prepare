@@ -480,6 +480,32 @@ export const M = [
         render({ onInput }) {
             return (<p onClick={_ => onInput({}, true)}>{'//////////'}</p>)
         }
+    },
+    {
+        title: "最外层所有（粘连）",
+        desc: '-',
+        inType: '',
+        outType: 'node',
+        inputs: _ => { },
+        match: (editor, prevRanges, { }) => {
+
+            let id = 0;
+            const ranges = [];
+            editor.children.forEach((el, index) => {
+                const path = [index];
+                if (matchType('paragraph', 'numbered-list', 'bulleted-list', 'table')(el)) {
+                    if (sticky(ranges, path)) {
+                        ranges.push([path, id]);
+                    } else {
+                        ranges.push([path, ++id]);
+                    }
+                }
+            });
+            return ranges;
+        },
+        render({ onInput }) {
+            return (<p onClick={_ => onInput({}, true)}>{'//////////'}</p>)
+        }
     }
 ]
 

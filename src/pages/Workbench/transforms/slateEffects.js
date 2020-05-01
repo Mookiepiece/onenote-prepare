@@ -326,7 +326,7 @@ const getBlingArrayOfNodes = ({ children }) => {
         ]);
     }
     Children.iterateArray(children, (el, path, children) => {
-        if (matchType('paragraph')(el)) {
+        if (matchType('paragraph', 'numbered-list', 'bulleted-list', 'table')(el)) {
             if (el.bling) {
                 let inList = false;
 
@@ -385,12 +385,11 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
         let newNodes = [...altedResult];
         const index = pathes[0][pathes[0].length - 1];
 
-
         els = els.map(({ bling, ...origin }) => origin);
 
         // swap placeholders by origin paragraph
         placeholders.forEach(([placeholder, path]) => {
-            let elsInner = els;
+            let elsInner = [...els];
 
             // inject placeholder's style
             Children.iterateArray(elsInner, (el, path) => {
@@ -398,7 +397,7 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
                     const replaced = el.children.map(originLeaf => {
                         return { ...originLeaf, ...placeholder.meta.style, bling: false }
                     });
-                    elsInner = swapNode(elsInner, path, replaced);
+                    elsInner = swapNode(elsInner, path, [{ ...el, children: replaced }]);
                 }
                 return true;
             });
@@ -411,14 +410,12 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
                 } else if (i > dividers.length) { // not included -> clear/[]
                     newNodes = swapNode(newNodes, path, []);
                 } else { // in division
-
                     // not eq to min
                     let min = dividers[i - 2] === undefined ? 0 : dividers[i - 2] + 1, max = dividers[i - 1];
 
-                    let filterdEls = elsInner.filter(n => {
-                        let { tabs = 0 } = n;
-                        return tabs <= max && tabs >= min
-                    }).map(({ tabs, ...others }) => ({ tabs: tabs - min, ...others })); // should reduce tabs by prev value
+                    let filterdEls = elsInner.filter(
+                        ({ tabs = 0 }) => tabs <= max && tabs >= min
+                    ).map(({ tabs = 0, ...others }) => ({ tabs: tabs - min, ...others })); // should reduce tabs by prev value
 
                     newNodes = swapNode(newNodes, path, filterdEls);
                 }
