@@ -68,6 +68,7 @@ const Toolbar = ({ readOnly }) => {
             <div className="toolbar-group">
                 <TableButton />
                 <TableButtonGroup />
+                <TableBorderButton />
             </div>
             <div className="toolbar-group">
                 <MarkButton format="bold" icon={BoldOutlined} />
@@ -257,11 +258,12 @@ const TableButtonGroup = () => {
     const editor = useSlate();
 
     const matches = [...Editor.nodes(editor, {
-        match: n => n.type === 'table'
+        match: n => n.type === 'table',
+        mode: 'lowest'
     })];
 
     const disabled = matches.length === 0;
-    const match = matches[matches.length - 1];
+    const match = matches[0];
 
     return (
         <>
@@ -609,6 +611,36 @@ const TableStyleButton = () => {
     )
 }
 
+const TableBorderButton = () => {
+    const editor = useSlate();
+    const matches = [...Editor.nodes(editor, {
+        match: n => n.type === 'table',
+        mode: 'lowest'
+    })];
+
+    const disabled = matches.length === 0;
+    const [table, tablePath] = matches[0] || [];
+
+    return (
+        <>
+            <Button
+                disabled={disabled}
+                className="editor-button editor-button-color"
+                active={table && table.noBorder}
+                onMouseDown={event => {
+                    event.preventDefault();
+                    Transforms.setNodes(editor, {
+                        noBorder: !table.noBorder
+                    }, {
+                        at: tablePath
+                    });
+                }}>
+                <TableOutlined />
+            </Button>
+        </>
+    )
+}
+
 const TableColorButton = () => {
     const editor = useSlate();
     const [pickerActive, setPickerActive] = useState(false);
@@ -622,7 +654,6 @@ const TableColorButton = () => {
     // const match = matches[matches.length - 1];
 
     const toggleMark = _ => {
-
         if (isMarkActive()) {
             Transforms.setNodes(editor, {
                 cellColor: undefined

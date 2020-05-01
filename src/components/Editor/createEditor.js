@@ -296,9 +296,12 @@ const Element = (props) => {
             return <li {...attributes}>{children}</li>;
         //table
         case 'table':
+            if (element.noBorder) {
+                attributes.className += ' no-border';
+            }
             return (
-                <table style={attributes.style}>
-                    <tbody {...{ ...attributes, style: undefined }}>{children}</tbody>
+                <table {...attributes}>
+                    <tbody>{children}</tbody>
                 </table>
             )
         case 'table-row':
