@@ -658,7 +658,7 @@ const ColorPickerButton = ({ disabled, value, onChange }) => {
                     return (
                         <Button
                             disabled={disabled}
-                            className={`${pickerActive ? " __dropdown" : ""}`}
+                            className={`color-picker-button${pickerActive ? " __dropdown" : ""}`}
                             active={pickerActive}
                             onMouseDown={event => {
                                 event.preventDefault();
@@ -668,12 +668,7 @@ const ColorPickerButton = ({ disabled, value, onChange }) => {
                             }}
                             ref={buttonRef}
                         >
-                            <div style={{
-                                width: '100%',
-                                height: '100%',
-                                background: value,
-                            }}>
-                            </div>
+                            <div style={{background: value}}></div>
                         </Button>
                     )
                 }

@@ -6,7 +6,7 @@ import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 const StylePickerDialog = ({ visible, setVisible, onApply }) => {
     return (
-        <Dialog full visible={visible} setVisible={setVisible}>
+        <Dialog fullW visible={visible} setVisible={setVisible}>
             <div className="dialog-style-picker">
                 {
                     mockedCustomStyles.map((leafStyle, i) => (

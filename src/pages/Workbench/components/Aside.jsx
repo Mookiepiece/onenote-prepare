@@ -146,7 +146,7 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
                     style={{ marginBottom: 12, display: readOnly && state.v.result.nodes.length !== 0 ? null : 'none' }}
                 >应用规则</Button>
             </div>
-        </aside >
+        </aside>
     )
 }
 

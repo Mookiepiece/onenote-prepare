@@ -5,7 +5,7 @@ import { mockedCustomTableStyle } from '@/utils/userSettings';
 
 const TableStylePickerDialog = ({ visible, setVisible, onApply }) => {
     return (
-        <Dialog full visible={visible} setVisible={setVisible}>
+        <Dialog fullW visible={visible} setVisible={setVisible}>
             <div className="dialog-table-style-picker">
                 {
                     mockedCustomTableStyle.map((tableStyle, i) => (
