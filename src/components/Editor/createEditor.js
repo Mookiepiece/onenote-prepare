@@ -132,7 +132,8 @@ const withPlaceholders = editor => {
     return editor
 }
 
-//Transform Placeholder Element (TPE) only occurs in ✨result✨ editor
+// Transform Placeholder Element only occurs in ✨result✨ editor
+// WARNING: I am going to TRANSFORM ⚠
 const TransformPlaceholderElement = ({ attributes, children, element }) => {
     const editor = useSlate();
     const selected = useSelected();
@@ -145,19 +146,40 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
             match: n => n.type === "transform-placeholder",
             mode: 'all',
         });
-        if (value === 'CLOSE') {
-            Transforms.removeNodes(editor, { at: path });
-        } else {
-            TinyEmitter.emit(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_CLICK, function callback(i, v) {
-                Transforms.setNodes(editor, {
-                    meta: {
-                        style: v.style,
-                        mirror: 'ORIGIN'
-                    }
-                }, {
-                    at: path
+
+        const { meta } = node
+
+        switch (value) {
+            case 'CLOSE':
+                Transforms.removeNodes(editor, { at: path });
+                break;
+            case 'STYLE':
+                TinyEmitter.emit(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_STYLE, function callback(i, v) {
+                    Transforms.setNodes(editor, {
+                        meta: {
+                            ...meta,
+                            style: v.style,
+                        }
+                    }, {
+                        at: path
+                    });
                 });
-            });
+                break;
+            case 'MIRROR':
+                TinyEmitter.emit(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_MIRROR, function callback(i) {
+                    console.log(i)
+                    Transforms.setNodes(editor, {
+                        meta: {
+                            ...meta,
+                            mirror: i,
+                        }
+                    }, {
+                        at: path
+                    });
+                });
+                break;
+            default:
+                throw new Error('[Transform] nooo');
         }
     };
 
@@ -171,7 +193,8 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
                 active={active}
                 setActive={setActive}
                 options={[
-                    { label: '样式(仅文字匹配)', value: 'STYLE' },
+                    { label: '样式', value: 'STYLE' },
+                    { label: 'Tab切分', value: 'MIRROR' },
                     { label: '✘', value: 'CLOSE' },
                 ]}
                 onChange={handleChange}
@@ -186,7 +209,7 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
                         }}
 
                     >
-                        <Leaf leaf={element.meta.style || {}}>原内容</Leaf>
+                        <Leaf leaf={element.meta.style || {}}>{element.meta.mirror === 0 ? '原内容' : '切分内容-' + element.meta.mirror}</Leaf>
                     </Button>
                 )}
             />
@@ -235,7 +258,7 @@ export const computeLeafStyleAndClassName = (leaf) => {
         style = { ...style, fontSize: 'var(--slate-default-font-size)' };
     }
 
-    //matched text ✨
+    // matched text ✨
     if (leaf.bling) {
         className += ' bling';
         leaf.bling % 2 && (className += ' odd')

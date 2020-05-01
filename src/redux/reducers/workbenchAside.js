@@ -18,7 +18,6 @@ const workbenchAside = (state = {
             return state;
         case ActionTypes.DELETE:
             action.callback.slate(state.memory[state.memory.length - 1].value);
-            // state = alt.del(state, `memory`, state.memory.length - 1);
             state = alt.set(state, 'memory', state.memory.slice(0, state.memory.length - 1));
             state = alt.set(state, 'v.shouldDelete', true);
             return state;
@@ -32,7 +31,8 @@ const workbenchAside = (state = {
                     nodes: [],
                     options: {
                         overrideStyle: false,
-                        clear:false,
+                        clear: false,
+                        dividers: []
                     }
                 }, // nodes会在useEffect里通过INPUT事件传入
                 key: uuid()

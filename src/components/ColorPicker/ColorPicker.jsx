@@ -1,24 +1,44 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 const boundary = (v, min, max) => {
-    if (v < min) return min;
-    else if (v > max) return max;
-    return v;
+    return Math.min(Math.max(v, min), max);
 }
 
 const ColorPicker = ({ value, onChange }) => {
 
+    let [gradientBackgroundRef, mousePosition, handleMouseDown] = useMouseDrag(0,0,200,200);
+
+    return (
+        <div role="input" className="color-picker">
+            <div
+                className="gradient-background"
+                style={{
+                    '--circle-left': mousePosition[0] + 'px',
+                    '--circle-top': mousePosition[1] + 'px',
+                    '--circle-color': 'red'
+                }}
+                ref={gradientBackgroundRef}
+                onMouseDown={handleMouseDown}
+            ></div>
+            <div className="gradient-hue"></div>
+
+        </div>
+    )
+}
+
+export const useMouseDrag = (minX,minY,maxX,maxY) => {
     let [mousePosition, setMousePosition] = useState([0, 0]);
     let [mouseDown, setMouseDown] = useState(false);
+    let gradientBackgroundRef = useRef();
 
     const getMousePosition = (e) => {
         setMousePosition([
-            boundary(e.clientX - gradientBackgroundRef.current.getBoundingClientRect().left, 0, 200),
-            boundary(e.clientY - gradientBackgroundRef.current.getBoundingClientRect().top, 0, 200)
+            boundary(e.clientX - gradientBackgroundRef.current.getBoundingClientRect().left, minX, maxX),
+            boundary(e.clientY - gradientBackgroundRef.current.getBoundingClientRect().top, minY, maxY)
         ]);
     };
 
+    console.log(mousePosition);
     const removeListener = (e) => {
         document.removeEventListener('mousemove', getMousePosition);
         document.removeEventListener('mouseup', removeListener);
@@ -36,24 +56,7 @@ const ColorPicker = ({ value, onChange }) => {
         }
     });
 
-    let gradientBackgroundRef = useRef();
-
-    return (
-        <div role="input" className="color-picker">
-            <div
-                className="gradient-background"
-                style={{
-                    '--circle-left': mousePosition[0] + 'px',
-                    '--circle-top': mousePosition[1] + 'px',
-                    '--circle-color': 'red'
-                }}
-                ref={gradientBackgroundRef}
-                onMouseDown={e => { getMousePosition(e); setMouseDown(true) }}
-            ></div>
-            <div className="gradient-hue"></div>
-
-        </div>
-    )
+    return [gradientBackgroundRef, mousePosition, e => { getMousePosition(e); setMouseDown(true); },mouseDown];
 }
 
 export default ColorPicker;

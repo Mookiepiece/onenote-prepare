@@ -15,6 +15,8 @@ import { Switch } from '@/components/Switch';
 
 import { alt } from '@/utils';
 import StylePickerDialog from '@/components/Editor/StylePickerDialog';
+import { Divider } from '@/components/ColorPicker/Divider';
+import { DropdownButtonSelect } from '@/components/DropdownButton';
 
 const ResultPanel = ({ result, onResultChange }) => {
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -25,7 +27,7 @@ const ResultPanel = ({ result, onResultChange }) => {
                 { text: '' },
                 {
                     type: 'transform-placeholder',
-                    meta: { mirror: 'ORIGIN' },
+                    meta: { mirror: 0 },
                     children: [{ text: '' }]
                 },
                 { text: '' }
@@ -61,35 +63,97 @@ const ResultPanel = ({ result, onResultChange }) => {
 
 const Aside = ({ result, onResultChange }) => {
     const [stylePickerDialogVisible, setStylePickerDialogVisible] = useState();
+    const [tabDividerDialogVisible, setTabDividerDialogVisible] = useState();
+    const [tabPickerDialogVisible, setTabPickerDialogVisible] = useState();
 
-    const [m, sm] = useState([_ => _]);
+    const [callback, setCallback] = useState([_ => _]);
+    const [callback0, setCallback0] = useState([_ => _]);
 
     const showStyleDialog = (cb) => {
         setStylePickerDialogVisible(true);
-        sm([cb]);
+        setCallback([cb]);
+    };
+    const showTabPickerDialog = (cb) => {
+        setTabPickerDialogVisible(true);
+        setCallback0([cb]);
     };
 
     useEffect(_ => {
-        TinyEmitter.on(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_CLICK, showStyleDialog);
-        return _ => TinyEmitter.off(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_CLICK, showStyleDialog);
+        TinyEmitter.on(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_STYLE, showStyleDialog);
+        return _ => TinyEmitter.off(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_STYLE, showStyleDialog);
     }, []);
+
+    useEffect(_ => {
+        TinyEmitter.on(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_MIRROR, showTabPickerDialog);
+        return _ => TinyEmitter.off(EVENTS.TRANSFORM_PLACEHOLDER_ELEMENT_MIRROR, showTabPickerDialog);
+    }, []);
+
 
     return (
         <aside>
             <ExtraToolbar />
             <div className="form-like">
-                <span>覆盖原文样式（仅文字匹配）</span>
+                <span>样式覆盖</span>
                 <Switch
                     value={result.options.overrideStyle}
                     onChange={v => onResultChange(alt.merge(result, `options`, { overrideStyle: v }))}
                 />
+                <span>Tab切分</span>
+                <Button onClick={_ => setTabDividerDialogVisible(true)}>设置</Button>
             </div>
+            <TabDividerDialog
+                onApply={v => onResultChange(alt.merge(result, `options`, { dividers: v }))}
+                visible={tabDividerDialogVisible}
+                setVisible={setTabDividerDialogVisible}
+            />
+            <TabPickerDialog
+                onApply={callback0[0]}
+                visible={tabPickerDialogVisible}
+                setVisible={setTabPickerDialogVisible}
+            />
             <StylePickerDialog
-                onApply={m[0]}
+                onApply={callback[0]}
                 visible={stylePickerDialogVisible}
                 setVisible={setStylePickerDialogVisible}
             />
         </aside>
+    )
+}
+
+const TabDividerDialog = ({ visible, setVisible, onApply }) => {
+    const [value, setValue] = useState([]);
+
+    return (
+        <Dialog visible={visible} setVisible={setVisible}>
+            <Divider value={value} onChange={setValue} />
+            <Button
+                type='primary'
+                onClick={_ => {
+                    setVisible(false);
+                    onApply(value);
+                }}
+            >提交</Button>
+        </Dialog>
+    )
+}
+
+const TabPickerDialog = ({ visible, setVisible, onApply }) => {
+    const [value, setValue] = useState([]);
+
+    return (
+        <Dialog visible={visible} setVisible={setVisible}>
+            <DropdownButtonSelect
+                value={value}
+                width={80}
+                dropdownWidth={80}
+                options={Array(10).fill(0).map((_, v) => ({ label: v, value: v }))}
+                onChange={setValue}
+            />
+            <Button onClick={_ => {
+                setVisible(false);
+                onApply(value)
+            }}>提交</Button>
+        </Dialog>
     )
 }
 
@@ -112,7 +176,7 @@ const ExtraToolbar = () => {
 };
 
 const insertTransformPlaceholder = (editor) => {
-    Transforms.insertNodes(editor, { type: 'transform-placeholder', meta: { mirror: 'ORIGIN' }, children: [{ text: '' }] });
+    Transforms.insertNodes(editor, { type: 'transform-placeholder', meta: { mirror: 0 }, children: [{ text: '' }] });
 };
 
 export default ResultPanel;

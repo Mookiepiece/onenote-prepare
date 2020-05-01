@@ -99,7 +99,7 @@ export const applyRender = (editor, resultInput, setSlateValue, outType) => { //
             let ListInList = inList && resultInput.nodes.some(matchType('numbered-list', 'bulleted-list'));
 
             if (ListInList) {
-                // if inList, combine all transforms in this temp variable li first, finally move then to replace the entire list
+                // combine all transforms in this temp variable li first, finally move then to replace the entire list
                 // this way we can merge muti matched paragraph in one li
                 // beacuse we will merge the slibing paragraph nodes to new result, which is changed once omplieResultFunc calls
                 let li = Children.getEl(newChildren, elPathes[0].slice(0, -1));
@@ -134,7 +134,7 @@ export const applyRender = (editor, resultInput, setSlateValue, outType) => { //
         }
     }
 
-    setSlateValue(deepCopy(newChildren));
+    setSlateValue(deepCopy(newChildren)); // TODO: some object has same the same refer/key cause update error
 };
 
 /**
@@ -279,6 +279,7 @@ const preprocessResultPlaceholders = (result) => {
 
         });
 
+        // TODO: this is not overiiderStyle's job
         inject_original_leaf_style_to_results_frist_line: {
             overrideStyle && (newNodes = alt.set(newNodes, `0.children`, newNodes[0].children.map(n => ({ ...n, ...style }))));
         }
@@ -349,7 +350,7 @@ const getBlingArrayOfNodes = ({ children }) => {
 }
 
 const preprocessResultPlaceholdersOfNodes = (result) => {
-    let { overrideStyle } = result.options; // TODO
+    let { overrideStyle, dividers } = result.options; // TODO
 
     let placeholders0 = [], placeholders = [];
     Children.iterateArray(result.nodes, (el, path, children) => {
@@ -361,7 +362,7 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
 
     let altedResult = [...result.nodes];
 
-    // split the paragraph where placeholders placed in, into three division: [ p>prevLeaf(optional), placeholder, p>nextLeaf(optional) ]
+    // result: split the paragraph where placeholders placed in, into three division: [ p>prevLeaf(optional), placeholder, p>nextLeaf(optional) ]
     // placeholders was inline but, anyway it will be replaced by origin nodes
     placeholders0.forEach(([el, path]) => {
         const [prevLeafSlibings, nextLeafSlibings] = Children.slibings(altedResult, path);
@@ -384,9 +385,33 @@ const preprocessResultPlaceholdersOfNodes = (result) => {
         let newNodes = [...altedResult];
         const index = pathes[0][pathes[0].length - 1];
 
+        els = els.map(({ bling, ...origin }) => origin);
+
         // swap placeholders by origin paragraph
         placeholders.forEach(([placeholder, path]) => {
-            newNodes = swapNode(newNodes, path, els.map(({ bling, ...origin }) => origin));
+
+            if (dividers.length) { // should divide by tabs
+                let i = placeholder.meta.mirror;
+
+                if (i === 0) {
+                    newNodes = swapNode(newNodes, path, els); // 0 -> normal
+                } else if (i > dividers.length) { // not included -> clear/[]
+                    newNodes = swapNode(newNodes, path, []);
+                } else { // in division
+
+                    // not eq to min
+                    let min = dividers[i - 2] === undefined ? 0 : dividers[i - 2] + 1, max = dividers[i - 1];
+
+                    let filterdEls = els.filter(n => {
+                        let { tabs = 0 } = n;
+                        return tabs <= max && tabs >= min
+                    }).map(({ tabs, ...others }) => ({ tabs: tabs - min, ...others })); // should reduce tabs by prev value
+
+                    newNodes = swapNode(newNodes, path, filterdEls);
+                }
+            } else {
+                newNodes = swapNode(newNodes, path, els); // normal
+            }
         });
 
         // in future case we'll got ul > li > [pre, pre] when user press shift+enter
