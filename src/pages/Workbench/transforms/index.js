@@ -44,7 +44,7 @@ export const M = [
             const ranges = [];
 
             Children.iterateArray(children, (el, path, children) => {
-                if (matchType('paragraph')) {
+                if (matchType('paragraph')(el)) {
                     //匹配过程中pre里面只能有一层span不会出现placeholder
                     const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
 
@@ -136,7 +136,7 @@ export const M = [
 
             if (value === '') {
                 Children.iterateArray(children, (el, path, children) => {
-                    if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
+                    if (matchType('paragraph')(el)) {
                         let anchor, focus;
                         anchor = focus = { path: [...path, 0], offset: 0 }
                         ranges.push({ anchor, focus });
@@ -145,7 +145,7 @@ export const M = [
                 });
             } else {
                 Children.iterateArray(children, (el, path, children) => {
-                    if (el.text === undefined && (!el.type || el.type === 'paragraph')) {
+                    if (matchType('paragraph')(el)) {
                         const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
                         if (innerText.startsWith(value)) {
                             let anchor = { path: [...path, 0], offset: 0 }, focus;
@@ -198,7 +198,7 @@ export const M = [
 
             if (value === '') {
                 Children.iterateArray(children, (el, path, children) => {
-                    if (matchType('paragraph')) {
+                    if (matchType('paragraph')(el)) {
                         let anchor, focus;
                         anchor = focus = Editor.end(editor, path);
                         ranges.push({ anchor, focus });
@@ -207,7 +207,7 @@ export const M = [
                 });
             } else {
                 Children.iterateArray(children, (el, path, children) => {
-                    if (matchType('paragraph')) {
+                    if (matchType('paragraph')(el)) {
                         const innerText = el.children.reduce((result, leaf) => result + leaf.text, '');
                         if (innerText.endsWith(value)) {
                             let anchor, focus = Editor.end(editor, path);

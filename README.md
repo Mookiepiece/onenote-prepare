@@ -24,6 +24,9 @@ in developing...so slow
 <img src="https://github.com/Mookiepiece/pre-onenote/blob/master/docs/tableCraft.jpg" alt="use onenote tables to simulate background-color" width="50%">
 
 ## 开发随笔
+20-05-02
+我已经忘了...Office不支持Alpha通道的颜色
+
 20-04-29
 - ordered-list数字不统一现象，放在一边了。因为web的list贴过去，如果想建立子项，序号样式不会后移，剪贴板不支持的话那没有办法了
 

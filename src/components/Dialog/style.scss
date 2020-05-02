@@ -34,6 +34,7 @@
 //dialog: dialog-default & aside-dialog
 
 .dialog {
+  display: flex;
   position: relative;
   top: 64px;
 
@@ -45,8 +46,7 @@
 
   > .dialog-inner {
     width: 100%;
-    height: 100%;
-    overflow: auto;
+    overflow-y: auto;
     padding: 32px 24px 24px 24px;
   }
 }
