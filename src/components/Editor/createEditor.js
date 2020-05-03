@@ -139,7 +139,7 @@ const withPasteHTML = editor => {
         const html = data.getData('text/html')
 
         if (html) {
-            const parsed = new DOMParser().parseFromString(html, 'text/html')
+            const parsed = new DOMParser().parseFromString(html, 'text/html');
             const fragment = deserializeX(parsed.body).children;
             console.log(deserializeX(parsed.body).children);
             Transforms.insertNodes(editor, fragment)

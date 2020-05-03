@@ -1,4 +1,3 @@
-
 /**
  * wangEditor的实现是强行正则后直接插入，会导致很多不存在的标签如aside、artcle存在
  * 显然slatejs对数据结构是很严格的，而且必须转JSON
@@ -6,6 +5,12 @@
  * 
  * ON某种情况下会复制出ul嵌套ul的列表，解决方法暂时是只看li不看ul（歪打正着？）已计入README
  */
+
+import { Text } from "slate";
+import { matchType } from "./utils";
+
+// TODO: npm i -S css-color-keywords, rgb? hsl?  
+// TODO: not support text node with '\n' in web case, but ON has '\n' for blank node
 
 
 /** https://htmlreference.io/  */
@@ -81,11 +86,13 @@ function deserializeX(el) { // need element, not text
     }
 }
 
-function deserializeFragmentX(children) {
-    let ans = []
+function deserializeFragmentX(children, css) {
+    let ans = [];
 
     for (let i = 0; i < children.length; i++) {
-        if (judgeInline(children[i]) === 1) { // TEXT_NODEs, inline elements will be binded into a paragraph
+        const judgeResult = judgeInline(children[i]);
+
+        if (judgeResult === 1) { // TEXT_NODEs, inline elements will be binded into a anonymous paragraph
             let leaves = [children[i]];
 
             for (i++; i < children.length; i++) {
@@ -96,19 +103,24 @@ function deserializeFragmentX(children) {
             }
             i--;
 
-            ans.push({
+            // anonymous paragraph
+            ans.push(eatCSS({
                 type: 'paragraph',
-                children: deserializeLeaves(leaves)
-            });
-        } else if (judgeInline(children[i]) === 2) { // block-level element: table, list, div
+                children: deserializeLeaves(leaves, css)
+            }, css));
+        } else if (judgeResult === 2) { // block-level element: table, list, div
+
+            let css0 = elementStyle(children[i], css);
+
             if (children[i].nodeName === 'TABLE') {
-                ans.push(deserializeTableX(children[i]));
+                ans.push(deserializeTableX(children[i], css0));
             } else if (['LI', 'DT'].includes(children[i].nodeName)) {
-                ans.push(deserializeListX(children[i]));
+                ans.push(deserializeListX(children[i], css0));
             } else {
-                ans.push(deserializeFragmentX(HTML.childNodes(children[i]))); // DIV does not matters, we just deep into inline
+                ans.push(deserializeFragmentX(HTML.childNodes(children[i]), css0)); // DIV does not matters, we just deep into inline
             }
-        } else if (judgeInline(children[i]) === 0) {
+
+        } else if (judgeResult === 0) {
             // invalid node, do nothing, please refer to function judgeInline
         }
     }
@@ -116,11 +128,11 @@ function deserializeFragmentX(children) {
     return ans.flat();
 }
 
-function deserializeTableX(el) {
+function deserializeTableX(el, css) {
     let tfboys = HTML.childNodes(el);
     if (tfboys.every(n => ['TBODY', 'THEAD', 'TFOOT', 'CAPTION'].includes(n.nodeName))) {
 
-        let trNodes = tfboys.reduce((arr, tbodyNode) => {
+        let trNodesWithCss = tfboys.reduce((arr, tbodyNode) => {
             if (tbodyNode.nodeName === 'CAPTION') {
                 return [...arr, {
                     nodeType: Node.ELEMENT_NODE,
@@ -134,33 +146,40 @@ function deserializeTableX(el) {
                             childNodes: [tbodyNode]
                         }]
                     }]
-                }];
+                }, css];
             }
 
-            return [...arr, ...HTML.childNodes(tbodyNode)];
+            let tbodyCss = elementStyle(tbodyNode, css);
+            return [...arr, ...HTML.childNodes(tbodyNode).map(v => [v, elementStyle(tbodyNode, tbodyCss)])];
         }, []);
 
-        let tdValid = true;
+        let tdValid = true; // tr includes td/th not other elements
         let maxTdsLen = 0;
-        let trs = trNodes.map(trNode => { // no matter whether u are really tr, just do it √
+        let trs = trNodesWithCss.map(([trNode, trCss]) => { // no matter whether u are really tr, just do it √
             let tdNodes = HTML.childNodes(trNode);
 
             tdValid = tdValid && tdNodes.every(n => ['TH', 'TD'].includes(n.nodeName));
             maxTdsLen = Math.max(tdNodes.length, maxTdsLen);
 
+            // tr/tbody 's style, only backgroundColor for td (ah, we have backgound inherit approach!)
             return {
                 type: 'table-row',
-                children: tdNodes.map(tdNode => ({
-                    type: 'table-cell',
-                    children: deserializeFragmentX(HTML.childNodes(tdNode))
-                }))
+                children: tdNodes.map(tdNode => {
+                    // td style? does td's style matters?... cellColor
+                    let tdCss = elementStyle(tdNode, trCss);
+
+                    return eatCSS({
+                        type: 'table-cell',
+                        children: deserializeFragmentX(HTML.childNodes(tdNode), tdCss)
+                    }, tdCss);
+                })
             }
         });
 
         // anti-alias
         trs = trs.map(tr => {
             let tdLeft = Array(maxTdsLen - tr.children.length).fill(0).map(
-                _ => ({ type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: '' }] }] })
+                _ => eatCSS({ type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: '' }] }] }, css) // trCSS not accessable
             );
             return {
                 ...tr,
@@ -170,25 +189,25 @@ function deserializeTableX(el) {
 
         if (!tdValid) return defaulta(); // INVALID td / th
 
-        return {
+        return eatCSS({
             type: 'table',
             children: trs
-        }
+        }, css)
     } else {
         return defaulta(); // INVALID tbody
     }
 }
 
-function deserializeListX(el) {
-    return {
+function deserializeListX(el, css) {
+    return eatCSS({
         type: 'bulleted-list',
         children: [
             {
                 type: 'list-item',
-                children: deserializeFragmentX(HTML.childNodes(el))
+                children: deserializeFragmentX(HTML.childNodes(el), css)
             }
         ]
-    };
+    }, css);
 }
 
 /**
@@ -203,33 +222,35 @@ function deserializeListX(el) {
  * 
  * @param {NodeList|Array} childNodes 
  */
-function deserializeLeaves(childNodes) {
+function deserializeLeaves(childNodes, css) {
     if (!childNodes.length) return [{ text: '' }];
+
     return childNodes.map(leaf => { // note that if we pass [] to deserializeLeaves, map function will not excuted and return [] and it works well
         if (leaf.nodeType === Node.TEXT_NODE) {
-            return {
+            return eatCSS({
                 text: leaf.textContent
-            }
+            }, css);
         } else {
-            return deserializeLeaves(HTML.childNodes(leaf)); // not flatted *1, 
+            let css0 = elementStyle(leaf, css);
+            return deserializeLeaves(HTML.childNodes(leaf), css0); // not flatted *1, 
         }
     }).flat(); // flat *1
 }
 
-function judgeInline(el) {
-    if (el.nodeType === Node.TEXT_NODE && HTML.notBlank(el)) {
+function judgeInline(htmlEl) {
+    if (htmlEl.nodeType === Node.TEXT_NODE && HTML.notBlank(htmlEl)) {
         return 1;
-    } else if (el.nodeType !== Node.ELEMENT_NODE) { //unreconized node type
+    } else if (htmlEl.nodeType !== Node.ELEMENT_NODE) { // unreconized node type
         return 0;
     }
 
-    const style = el.style;
-    if (ELSM.has(el.nodeName)) { // block-level element
-        if (['inline'].includes(style.display)) { // inine block also inline
+    const style = htmlEl.style;
+    if (ELSM.has(htmlEl.nodeName)) { // block-level element
+        if (['inline'].includes(style.display)) { // inline block also inline
             return 1;
         }
         return 2;
-    } else if (LFSM.has(el.nodeName)) { // inline-level tags (UA default), no matter whether it is inline
+    } else if (LFSM.has(htmlEl.nodeName)) { // inline-level tags (UA default), no matter whether it is inline
         // TODO: will getComputedStyle cost CPUs?
         if (['block', 'inline-block', 'inline-flex', 'inline-grid'].includes(style.display)) { // inine block also inline
             return 2;
@@ -240,12 +261,179 @@ function judgeInline(el) {
 }
 
 const HTML = {
-    childNodes(el) {
-        return [...el.childNodes].filter(this.notBlank);
+    childNodes(htmlEl) {
+        return [...htmlEl.childNodes].filter(this.notBlank);
     },
     notBlank(n) {
         return !(n.nodeType === Node.TEXT_NODE && n.textContent.trim() === "" && n.textContent[0] === '\n');
     }
+}
+
+function elementStyle(htmlEl, inheritedStlye) {
+    let {
+        font, fontWeight, fontFamily, fontSize, fontStyle, color,
+        marginLeft, marginRight,
+        border, borderWidth, borderStyle, borderColor, textDecoration, textDecorationLine,
+        backgroundColor, background
+    } = htmlEl.style;
+
+    // UA style sheel
+    if (LFSM.has(htmlEl.nodeName)) {
+        inheritedStlye = { ...inheritedStlye, ...LFSM.get(htmlEl.nodeName) };
+    }
+
+    // border of table
+    if (
+        /** border-width */ Number.parseFloat(borderWidth) === 0 ||
+        /** border-style */ (borderStyle !== undefined && [undefined, 'unset', 'none'].includes(borderStyle.toLowerCase())) ||
+        /** border */['unset', 'none', '0in', '0px', '0pt', '0'].some(str => border.toLowerCase().split(' ').includes(str))
+    ) {
+        inheritedStlye = { ...inheritedStlye, noBorder: true };
+    } else {
+        inheritedStlye = { ...inheritedStlye, noBorder: false };
+    }
+
+    // tabs - margin-left
+    let tabs = inheritedStlye.tabs ? inheritedStlye.tabs : 0;
+    if (marginLeft && marginLeft !== marginRight) {
+        let float = Number.parseFloat(marginLeft);
+
+        if (marginLeft.toLowerCase().endsWith('px')) {
+            tabs += Math.round(float / 100);
+        } else if (marginLeft.toLowerCase().endsWith('in')) {
+            tabs += Math.round(float / .375);
+        }
+    }
+    inheritedStlye = { ...inheritedStlye, tabs };
+
+    // cellColor for table-cell & bgColor for leaves - background
+    const judgeResult = judgeInline(htmlEl);
+    if (judgeResult === 1) {
+        inheritedStlye = { ...inheritedStlye, bgColor: backgroundColor || background };
+    } else if (judgeResult === 2) {
+        inheritedStlye = { ...inheritedStlye, cellColor: backgroundColor || background, bgColor: undefined };
+    } else if (judgeResult === 0) {
+        // do nothing
+    }
+
+    // font
+    // TODO: font - the short word
+    if (fontStyle !== undefined) {
+        if (['oblique', 'italic'].includes(fontStyle)) {
+            inheritedStlye = { ...inheritedStlye, italic: true };
+        } else if (['normal', 'unset'].includes(fontStyle)) {
+            inheritedStlye = { ...inheritedStlye, italic: false };
+        }
+    }
+    if (fontWeight !== undefined) {
+        if (['500', '600', '700', '800', '900', 'bold', 'bolder'].includes(fontWeight)) {
+            inheritedStlye = { ...inheritedStlye, bold: true };
+        } else if (['normal', 'unset'].includes(fontWeight)) {
+            inheritedStlye = { ...inheritedStlye, bold: false };
+        }
+    }
+    // if (fontSize !== undefined) {
+    //     //TODO
+    //     inheritedStlye = { ...inheritedStlye, fontSize };
+    //     if (['unset'].includes(fontSize)) {
+    //         inheritedStlye = { ...inheritedStlye, fontSize: undefined };
+    //     }
+    // }
+    // if (fontFamily !== undefined) {
+    //     inheritedStlye = { ...inheritedStlye, fontFamily };
+    //     if (['unset'].includes(fontFamily)) {
+    //         inheritedStlye = { ...inheritedStlye, fontFamily: undefined };
+    //     }
+    // }
+    if (color !== undefined) {
+        inheritedStlye = { ...inheritedStlye, fontColor: color };
+        if (['unset'].includes(color)) {
+            inheritedStlye = { ...inheritedStlye, fontColor: undefined };
+        }
+    }
+
+    // no inherit
+    let textDecorationItems = [textDecorationLine.split(' ')] || textDecoration.split(' ');
+    if (textDecoration !== undefined) {
+        if (['underline'].includes(textDecorationItems)) {
+            inheritedStlye = { ...inheritedStlye, underline: true };
+        } else {
+            inheritedStlye = { ...inheritedStlye, underline: false };
+        }
+
+        if (['line-through'].includes(textDecorationItems)) {
+            inheritedStlye = { ...inheritedStlye, underline: true };
+        } else {
+            inheritedStlye = { ...inheritedStlye, underline: false };
+        }
+    }
+
+    return inheritedStlye;
+}
+
+function eatCSS(el, inheritedStlye, style) {
+    style = { ...inheritedStlye, ...style };
+    if (Text.isText(el)) {
+        return eatCSSLeaf(el, style);
+    } else {
+        if (matchType('table')(el)) {
+            return eatCSSTable(el, style);
+        } else if (matchType('paragraph', 'numbered-list', 'bulleted-list')) {
+            return eatCSSParagraph(el, style);
+        } else if (matchType('table-cell')(el)) {
+            return eatCSSTd(el, style);
+        } else {
+            return el;
+        }
+    }
+}
+
+function eatCSSLeaf(leaf, css) {
+    return {
+        ...leaf,
+        ...filterCSS([
+            'fontFamily',
+            'fontColor',
+            'fontSize',
+            'bgColor',
+            'bold',
+            'italic',
+            'underline',
+            'strike',
+        ], css)
+    };
+}
+
+function eatCSSParagraph(pre, css) {
+    return {
+        ...pre,
+        ...filterCSS([
+            'tabs',
+        ], css)
+    };
+}
+
+function eatCSSTable(table, css) {
+    return {
+        ...table,
+        ...filterCSS([
+            'tabs',
+            'noBorder'
+        ], css)
+    };
+}
+function eatCSSTd(td, css) {
+    return {
+        ...td,
+        ...filterCSS([
+            'tabs',
+            'cellColor'
+        ], css)
+    };
+}
+
+function filterCSS(keys, css) {
+    return Object.keys(css).filter(k => keys.includes(k)).reduce((style, k) => ({ ...style, [k]: css[k] }), {});
 }
 
 export default deserializeX;
