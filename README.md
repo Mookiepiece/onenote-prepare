@@ -24,8 +24,15 @@ in developing...so slow
 <img src="https://github.com/Mookiepiece/pre-onenote/blob/master/docs/tableCraft.jpg" alt="use onenote tables to simulate background-color" width="50%">
 
 ## 开发随笔
+20-05-03
+- ON也不支持colgroup给table设的样式，旗鼓相当的对手
+- 测试认为表格从网页粘贴到ON里，需要border-style:none;才会隐藏边框。那粘贴出来的xhtml为什么是border:0???
+
 20-05-02
-我已经忘了...Office不支持Alpha通道的颜色
+- 我已经忘了...Office不支持Alpha通道的颜色
+- ON按tab追加shift+tab，可以将tab继续缩小一层，复制出来的html是ul嵌套ul，(都xhtml了居然还有这种bug)，解决方法是只看li/dt，舍弃ul/ol/dl
+- list里能嵌table，但嵌了table的list不能有缩进
+- 给读者：看剪贴板的方法是document.body.contentEditable=!0;document.body.onpaste=e=>console.log(new DOMParser().parseFromString(e.clipboardData.getData('text/html'),'text/html')) //slate官网有这个paste-html示例
 
 20-04-29
 - ordered-list数字不统一现象，放在一边了。因为web的list贴过去，如果想建立子项，序号样式不会后移，剪贴板不支持的话那没有办法了

@@ -6,8 +6,9 @@ import { withHistory } from 'slate-history';
 import { TinyEmitter, EVENTS } from '@/utils/index';
 import { DropdownButtonSelect } from '@/components/DropdownButton';
 import Button from '@/components/MkButton';
+import deserializeX from './paste';
 
-export const createEditor = () => withPlaceholders(withTablesLists(withHistory(withReact(_createEditor()))));
+export const createEditor = () => withPasteHTML(withPlaceholders(withTablesLists(withHistory(withReact(_createEditor())))));
 export const createNoHistoryEditor = () => withPlaceholders(withTablesLists(withReact(_createEditor())));
 
 const withTablesLists = editor => {
@@ -130,6 +131,25 @@ const withPlaceholders = editor => {
     }
 
     return editor
+}
+
+const withPasteHTML = editor => {
+    const { insertData } = editor;
+    editor.insertData = data => {
+        const html = data.getData('text/html')
+
+        if (html) {
+            const parsed = new DOMParser().parseFromString(html, 'text/html')
+            const fragment = deserializeX(parsed.body).children;
+            console.log(deserializeX(parsed.body).children);
+            Transforms.insertNodes(editor, fragment)
+            return
+        }
+
+        insertData(data);
+    }
+
+    return editor;
 }
 
 // Transform Placeholder Element only occurs in ✨result✨ editor

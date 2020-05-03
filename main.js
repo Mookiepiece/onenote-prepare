@@ -19,7 +19,6 @@ function createMainWindow() {
       nodeIntegration: true
     }
   })
-  window.maximize();
 
   if (isDevelopment) {
     window.webContents.openDevTools({
