@@ -1,26 +1,58 @@
 import ActionTypes from '../actions';
 import { v4 as uuid } from 'uuid';
 import { alt, deepCopy } from '@/utils';
+import DB from '@/store/indexedDB';
+
+function altMemory(state, action) {
+    let { memory } = state;
+
+    switch (action.type) {
+        case ActionTypes.INIT_MEMORY:
+            memory = action.value;
+            break;
+        case ActionTypes.PUSH_MEMORY:
+        case ActionTypes.PUSH_MATCH_RULE:
+            memory = memory.concat({
+                time: new Date(),
+                value: deepCopy(action.callback.children())
+            });
+            if (memory.length > 10) {
+                memory = memory.slice(-10);
+            }
+            break;
+        case ActionTypes.DELETE:
+            memory = memory.slice(0, memory.length - 1);
+            break;
+        default:
+            throw new Error('[pre-onenote] redux');
+    }
+
+    DB.history(memory);
+    return memory;
+}
 
 const workbenchAside = (state = {
     v: null,
     memory: [],
 }, action) => {
     switch (action.type) {
-        case ActionTypes.PUSH_MEMORY:
-            state = alt.push(state, 'memory', {
-                time: new Date(),
-                value: deepCopy(action.callback.children())
-            });
-            if (state.memory.length > 10) {
-                state = alt.set(state, 'memory', state.memory.slice(-10));
+        case ActionTypes.INIT_MEMORY:
+            return {
+                ...state,
+                memory: altMemory(state, action)
             }
-            return state;
+        case ActionTypes.PUSH_MEMORY:
+            return {
+                ...state,
+                memory: altMemory(state, action)
+            };
         case ActionTypes.DELETE:
-            action.callback.slate(state.memory[state.memory.length - 1].value);
-            state = alt.set(state, 'memory', state.memory.slice(0, state.memory.length - 1));
+            action.callback.slate(state.memory[state.memory.length - 1].value); // reset
             state = alt.set(state, 'v.shouldDelete', true);
-            return state;
+            return {
+                ...state,
+                memory: altMemory(state, action)
+            };
         case ActionTypes.PUSH_MATCH_RULE: {
             state = alt.set(state, `v`, {
                 name: action.value.title,
@@ -45,15 +77,10 @@ const workbenchAside = (state = {
             });
 
             // better add memory here, because at this time we toggle our editor to an readOnly state
-            state = alt.push(state, 'memory', {
-                time: new Date(),
-                value: deepCopy(action.callback.children())
-            });
-            if (state.memory.length > 10) {
-                state = alt.set(state, 'memory', state.memory.slice(-10));
-            }
-
-            return state;
+            return {
+                ...state,
+                memory: altMemory(state, action)
+            };
         }
         case ActionTypes.INPUT: {
             let matchIndex = action.matchIndex; // -1 result >= 0 matches
@@ -67,9 +94,8 @@ const workbenchAside = (state = {
             return state;
         }
         case ActionTypes.TOGGLE_PREVIEW: {
-            if (state.v === null) throw new Error('[pre-onenote][store] .');
             if (state.v.isApplied) {
-                action.callback.slate(state.memory[state.memory.length - 1].value);
+                action.callback.slate(state.memory[state.memory.length - 1].value); // reset
                 setTimeout(_ => action.callback.match(state), 0); // WARNING: bad practice, should open another memory to record those state
             } else {
                 state = action.callback.change(state);

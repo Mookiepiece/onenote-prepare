@@ -281,7 +281,7 @@ const preprocessResultPlaceholders = (result) => {
         });
 
         inject_original_leaf_style_to_results_frist_line: {
-            newNodes = alt.set(newNodes, `0.children`, newNodes[0].children.map(n => ({ ...n, ...style })));
+            newNodes = alt.set(newNodes, `0.children`, newNodes[0].children.map(n => ({ ...style,...n }))); // NOTE: origin style will also overridered by user style
         }
 
         inject_original_paragraphs_prevLeaf_and_nextLeaf_slibing_of_matched_bling: {

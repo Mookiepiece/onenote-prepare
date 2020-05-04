@@ -6,7 +6,8 @@ const ActionTypes = {
     MATCH: 'MATCH',
     APPLY: 'APPLY',
     APPLY_FINISH: 'APPLY_FINISH',
-    PUSH_MEMORY: 'PUSH_MEMORY'
+    PUSH_MEMORY: 'PUSH_MEMORY',
+    INIT_MEMORY:'INIT_MEMORY'
 };
 
 export default ActionTypes;

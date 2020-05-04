@@ -262,6 +262,7 @@
   margin-bottom: 24px;
   overflow: hidden;
   display: flex;
+  min-width: 300px;
 }
 
 .history-list {
@@ -273,9 +274,8 @@
 
 .history-preview {
   flex-basis: 150px;
-  flex-shrink: 1;
+  flex-shrink: 0;
   flex-grow: 10;
-
   position: relative;
   margin-left: 12px;
   overflow-y: auto;
