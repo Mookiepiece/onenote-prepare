@@ -150,7 +150,7 @@ function deserializeTableX(el, css) {
             }
 
             let tbodyCss = elementStyle(tbodyNode, css);
-            return [...arr, ...HTML.childNodes(tbodyNode).map(v => [v, elementStyle(tbodyNode, tbodyCss)])];
+            return [...arr, ...HTML.childNodes(tbodyNode).map(trNode => [trNode, elementStyle(trNode, tbodyCss)])];
         }, []);
 
         let tdValid = true; // tr includes td/th not other elements
@@ -308,12 +308,14 @@ function elementStyle(htmlEl, inheritedStlye) {
 
     // cellColor for table-cell & bgColor for leaves - background
     const judgeResult = judgeInline(htmlEl);
-    if (judgeResult === 1) {
-        inheritedStlye = { ...inheritedStlye, bgColor: backgroundColor || background };
-    } else if (judgeResult === 2) {
-        inheritedStlye = { ...inheritedStlye, cellColor: backgroundColor || background, bgColor: undefined };
-    } else if (judgeResult === 0) {
-        // do nothing
+    if ((backgroundColor || background).trim()) {
+        if (judgeResult === 1) {
+            inheritedStlye = { ...inheritedStlye, bgColor: backgroundColor || background };
+        } else if (judgeResult === 2) {
+            inheritedStlye = { ...inheritedStlye, cellColor: backgroundColor || background, bgColor: undefined };
+        } else if (judgeResult === 0) {
+            // do nothing
+        }
     }
 
     // font
@@ -378,7 +380,7 @@ function eatCSS(el, inheritedStlye, style) {
     } else {
         if (matchType('table')(el)) {
             return eatCSSTable(el, style);
-        } else if (matchType('paragraph', 'numbered-list', 'bulleted-list')) {
+        } else if (matchType('paragraph', 'numbered-list', 'bulleted-list')(el)) {
             return eatCSSParagraph(el, style);
         } else if (matchType('table-cell')(el)) {
             return eatCSSTd(el, style);
@@ -426,7 +428,6 @@ function eatCSSTd(td, css) {
     return {
         ...td,
         ...filterCSS([
-            'tabs',
             'cellColor'
         ], css)
     };
