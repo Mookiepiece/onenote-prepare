@@ -13,11 +13,7 @@ const SC = _ => {
     const [trible, setTrible] = useState('#dddd66');
 
     return (
-        <div className="style-collection">
-            <br />
-            <br />
-            <br />
-            <br />
+        <div className="page-style-collection">
             <ColorPicker value={trible} onChange={setTrible} />
 
         </div>

@@ -716,7 +716,7 @@ const HistoryDialog = connect(state => ({
     }, [index]);
 
     return (
-        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'} style={{ display: 'flex', flexDirection: 'column' }}>
+        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'}>
             <div className="history-container">
                 <div className="history-list">
                     <Button

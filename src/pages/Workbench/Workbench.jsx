@@ -4,15 +4,30 @@ import './style.scss';
 import Aside from './components/Aside';
 import { SlateEditor } from '@/components/Editor';
 import ActionTypes from '@/redux/actions';
-import { deepCopy } from '@/utils';
+import { deepCopy, TinyEmitter, EVENTS } from '@/utils';
 
 import { connect } from 'react-redux';
 
 const Workbench = ({ state, dispatch }) => {
+    const readOnly = state.v !== null;
+    let shouldDelete = !!(state.v && state.v.shouldDelete)
+
     const [value, setValue] = useState(initialValue);
     const [value1, setValue1] = useState(initialValue);
 
-    let shouldDelete = !!(state.v && state.v.shouldDelete)
+    useEffect(_ => {
+        const callback = (table) => {
+            setValue(table);
+        }
+
+        TinyEmitter.on(EVENTS.TOOLBOX_APPLY, callback);
+
+        return _ => {
+            TinyEmitter.off(EVENTS.TOOLBOX_APPLY,callback);
+        }
+    }, []);
+
+    ///////// hack: $nextTick()
     useEffect(_ => {
         if (shouldDelete) {
             dispatch((dispatch, getState) => {
@@ -21,7 +36,6 @@ const Workbench = ({ state, dispatch }) => {
         }
     }, [shouldDelete]);
 
-    const readOnly = state.v !== null;
     useEffect(_ => {
         if (shouldDelete) return;
         if (readOnly) {
@@ -30,6 +44,7 @@ const Workbench = ({ state, dispatch }) => {
             setValue(deepCopy(value1));
         }
     }, [shouldDelete, readOnly]);
+    /////////
 
     return (
         <div className="workbench">

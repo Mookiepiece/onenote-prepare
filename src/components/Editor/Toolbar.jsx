@@ -30,6 +30,7 @@ import {
     DeleteColumnOutlined,
     DeleteRowOutlined,
     CreditCardOutlined,
+    BorderlessTableOutlined,
     StarOutlined,
     ClearOutlined
 } from '@ant-design/icons';
@@ -625,7 +626,7 @@ const TableBorderButton = () => {
         <>
             <Button
                 disabled={disabled}
-                className="editor-button editor-button-color"
+                className="editor-button"
                 active={table && table.noBorder}
                 onMouseDown={event => {
                     event.preventDefault();
@@ -635,7 +636,7 @@ const TableBorderButton = () => {
                         at: tablePath
                     });
                 }}>
-                <TableOutlined />
+                <BorderlessTableOutlined />
             </Button>
         </>
     )

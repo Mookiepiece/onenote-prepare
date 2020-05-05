@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.0.2",
+    "@wojtekmaj/react-daterange-picker": "^3.0.0",
+    "dateformat": "^3.0.3",
     "electron-store": "^5.1.1",
     "is-hotkey": "^0.1.6",
     "object-path-immutable": "^4.1.0",

@@ -30,6 +30,8 @@
   grid-gap: 6px;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 
+  overflow: auto;
+
   width: 100%;
 
   #{$item-name} {
