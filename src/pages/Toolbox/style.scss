@@ -1,7 +1,17 @@
 @import "@/styles/default.scss";
 
 .page-toolbox {
+    %indexFrame {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        overflow: hidden;
+    }
     .tools-index {
+        @extend %indexFrame;
+
         margin-top: $app-frame-height;
     }
     .tools-container {
@@ -19,14 +29,16 @@
     }
 
     .tools-frame {
+        @extend %indexFrame;
+
         height: 100%;
         display: flex;
         > nav {
             width: 64px;
             height: 100%;
+            border-right: 1px solid var(--gray-4);
             > button {
                 height: 100%;
-                border-right-color: var(--gray-4);
             }
         }
         > div {
@@ -55,5 +67,43 @@
         margin: 24px;
     }
 }
-@media (max-width: 1024px) {
+
+.ani-toolbox-index-enter {
+    z-index: 1;
+    transform: scale(0.1);
+    opacity: 0;
+}
+.ani-toolbox-index-enter-active {
+    z-index: 1;
+    transform: translate(0);
+    opacity: 1;
+    transition: transform 0.3s cubic-bezier(0.1, 1, 0.5, 1), opacity 0.3s;
+}
+.ani-toolbox-index-exit {
+    opacity: 1;
+    transition: transform 0.3s cubic-bezier(0.8, 0.1, 0.1, 0.8), opacity 0.3s;
+}
+.ani-toolbox-index-exit-active {
+    opacity: 0;
+}
+
+.ani-toolbox-frame-enter {
+    transform: translate(200px);
+    opacity: 0;
+    z-index: 10000;
+}
+.ani-toolbox-frame-enter-active {
+    z-index: 10000;
+    transform: translate(0);
+    opacity: 1;
+    transition: transform 0.3s cubic-bezier(0.1, 1, 0.5, 1), opacity 0.3s;
+}
+.ani-toolbox-frame-exit {
+    transform: translate(0);
+    opacity: 1;
+    transition: transform 0.3s cubic-bezier(0.8, 0.1, 0.1, 0.8), opacity 0.3s;
+}
+.ani-toolbox-frame-exit-active {
+    transform: scale(0.8);
+    opacity: 0;
 }

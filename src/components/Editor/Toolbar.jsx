@@ -32,7 +32,8 @@ import {
     CreditCardOutlined,
     BorderlessTableOutlined,
     StarOutlined,
-    ClearOutlined
+    ClearOutlined,
+    DeleteOutlined
 } from '@ant-design/icons';
 
 import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet, putSelection, getSelection } from './utils';
@@ -40,8 +41,6 @@ import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet,
 import { fontSizeOptions, fontFamilyOptions, SLATE_DEFAULTS } from '@/utils/userSettings';
 import StylePickerDialog from './StylePickerDialog';
 import TableStylePickerDialog from './TableStylePickerDialog';
-
-import Children from '@/pages/Workbench/transforms/utils';
 
 const Toolbar = ({ readOnly }) => {
 
@@ -93,10 +92,32 @@ const Toolbar = ({ readOnly }) => {
                 <TableStyleButton />
                 <ActionButton />
                 <ActionButtonX />
+                <DeleteButton />
             </div>
         </div>
     );
 };
+
+const DeleteButton = () => {
+    const editor = useSlate();
+    return (
+        <Button
+            className="editor-button"
+            onMouseDown={
+                event => {
+                    event.preventDefault();
+                    for (let i = editor.children.length - 1; i > 0; i--) {
+                        Transforms.delete(editor, { at: [i] });
+                    }
+                    Transforms.insertNodes(editor, { type: 'paragraph', children: [{ text: '' }] }, { at: [0] })
+                    Transforms.delete(editor, { at: [1] });
+                }
+            }
+        >
+            <DeleteOutlined />
+        </Button>
+    )
+}
 
 const BlockButton = ({ formatKey = "type", format, icon }) => {
     const editor = useSlate();

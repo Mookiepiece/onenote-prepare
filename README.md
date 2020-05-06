@@ -29,6 +29,7 @@ in developing...so slow
 - 这也不能怪office，估计微软是很讨厌web和浏览器了（狗头）
 - 样式覆盖问题本来是想开iframe就不会样式污染，顺便练习跨源通信，还是算了。最后是直接吸root的style，估计性能下降一个档次了
 - 另外office列表的圈圈是能隧字体的改变而改变大小的，web无能为力
+- 在VSCode里的代码，很多是 & n b s p ; 的非断行空白，改成空格符了，希望使用中不会因为nbsp出现错误，在onenote里贴过来的东西反倒是很多回车塞在tag间，在前几天写的paste.js里消除回车开头的东西了
 
 20-05-03
 - ON也不支持colgroup给table设的样式，旗鼓相当的对手

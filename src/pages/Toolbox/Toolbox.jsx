@@ -9,27 +9,34 @@ import dateformat from 'dateformat';
 import Input from '@/components/Input';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 import { useRouterContext } from '@/App';
+import { CSSTransition } from 'react-transition-group';
 const Toolbox = _ => {
-    const [page, setPage] = useState(0);
-
-    let Compo;
-    if (page === 0) {
-        Compo = ToolboxIndex;
-    } else {
-        Compo = pagesMap.get(page)[0];
-    }
+    const [sub, setSub] = useState(false);
+    const [page, setPage] = useState(1);
+    const Compo = pagesMap.get(page)[0];
 
     return (
         <div className="page-toolbox">
-            {
-                page === 0 ?
-                    <Compo setPage={setPage} /> :
-                    (
-                        <ToolboxFxFrame back={_ => setPage(0)}>
-                            <Compo back={_ => setPage(0)} />
-                        </ToolboxFxFrame>
-                    )
-            }
+            <CSSTransition
+                classNames="ani-toolbox-index"
+                in={!sub}
+                timeout={300}
+                unmountOnExit
+            >
+                <ToolboxIndex setPage={i => { setPage(i); setSub(true) }} />
+            </CSSTransition>
+
+            <CSSTransition
+                classNames="ani-toolbox-frame"
+                in={sub}
+                timeout={300}
+                unmountOnExit
+            >
+                <ToolboxFxFrame back={_ => setSub(false)}>
+                    <Compo back={_ => setSub(false)} />
+                </ToolboxFxFrame>
+
+            </CSSTransition>
         </div>
     );
 }
@@ -62,7 +69,7 @@ const ToolboxIndex = ({ setPage }) => {
 const ToolboxFxFrame = ({ back, children }) => {
     return (
         <div className="tools-frame">
-            <nav><Button type="plain" full onClick={back}><LeftOutlined /></Button></nav>
+            <nav><Button full onClick={back}><LeftOutlined /></Button></nav>
             <div>
                 {children}
             </div>

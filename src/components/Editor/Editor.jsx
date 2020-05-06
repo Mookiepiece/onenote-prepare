@@ -34,7 +34,7 @@ export const SlateEditor = ({ value, setValue, readOnly, showToolbar, children }
                 <Button onClick={_ => setDebug(true)} style={{ alignSelf: 'start' }} >
                     <QuestionOutlined />
                 </Button>
-                <Dialog visible={debug} setVisible={setDebug}>
+                <Dialog full visible={debug} setVisible={setDebug}>
                     <div style={{ whiteSpace: 'pre-wrap',overflow:'auto' }}>
                         {JSON.stringify(value, null, 4)}
                     </div>
@@ -64,7 +64,7 @@ export const ReadOnlySlateEditor = ({ value, setValue, showToolbar = false, chil
                 <Button onClick={_ => setDebug(true)} style={{ alignSelf: 'start' }} >
                     <QuestionOutlined />
                 </Button>
-                <Dialog visible={debug} setVisible={setDebug}>
+                <Dialog full visible={debug} setVisible={setDebug}>
                     <div style={{ whiteSpace: 'pre-wrap',overflow:'auto' }}>
                         {JSON.stringify(value, null, 4)}
                     </div>

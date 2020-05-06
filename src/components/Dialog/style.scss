@@ -95,6 +95,7 @@
   bottom: 0;
   right: 0;
   width: 39%;
+  flex-direction: column;
 
   box-shadow: var(--gray-4) 2px 2px 5px 3px;
 
@@ -134,37 +135,37 @@
 .ani-dialog-enter {
   transform: scale(0.1);
   opacity: 0;
-  transition: transform 0.3s cubic-bezier(0.1, 1, 0.5, 1), opacity 0.3s;
 }
 .ani-dialog-enter-active {
   transform: translate(0);
   opacity: 1;
+  transition: transform 0.3s cubic-bezier(0.1, 1, 0.5, 1), opacity 0.3s;
 }
 .ani-dialog-exit {
   transform: translate(0);
   opacity: 1;
-  transition: transform 0.3s cubic-bezier(0.8, 0.1, 0.1, 0.8), opacity 0.3s;
 }
 .ani-dialog-exit-active {
   transform: scale(0.8);
   opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.8, 0.1, 0.1, 0.8), opacity 0.3s;
 }
 
 .ani-aside-dialog-enter {
   transform: translate(500px);
   opacity: 0.5;
-  transition: transform 0.3s cubic-bezier(0.1, 1, 0.5, 1), opacity 0.3s;
 }
 .ani-aside-dialog-enter-active {
   transform: translate(0);
   opacity: 1;
+  transition: transform 0.3s cubic-bezier(0.1, 1, 0.5, 1), opacity 0.3s;
 }
 .ani-aside-dialog-exit {
   transform: translate(0);
   opacity: 1;
-  transition: transform 0.3s cubic-bezier(0.8, 0.1, 0.1, 0.8), opacity 0.3s;
 }
 .ani-aside-dialog-exit-active {
   transform: translate(500px);
   opacity: 0.5;
+  transition: transform 0.3s cubic-bezier(0.8, 0.1, 0.1, 0.8), opacity 0.3s;
 }
