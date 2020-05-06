@@ -8,7 +8,8 @@ import {
     CloseOutlined,
     BorderOutlined,
     CheckSquareOutlined,
-    PlusCircleOutlined
+    PlusCircleOutlined,
+    CopyOutlined
 } from '@ant-design/icons';
 
 import { MGet } from '../transforms';
@@ -23,6 +24,7 @@ import { connect } from 'react-redux';
 import ActionTypes from '@/redux/actions';
 
 import './style.scss';
+import { TinyEmitter, EVENTS } from '@/utils';
 
 const applyChange = (editor, state, setSlateValue) => {
     applyMatcher(editor, state)
@@ -145,10 +147,57 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
                     onClick={_ => dispatch({ type: ActionTypes.APPLY })}
                     style={{ marginBottom: 12, display: readOnly && state.v.result.nodes.length !== 0 ? null : 'none' }}
                 >应用规则</Button>
+                <Button
+                    onClick={e => {
+                        e.preventDefault();
+                        TinyEmitter.emit(EVENTS.CLIPBOARD_COPY)
+                    }}
+                    style={{ display: !readOnly ? null : 'none' }}
+                >复制<CopyOutlined /></Button>
             </div>
         </aside>
     )
 }
+
+TinyEmitter.on(EVENTS.CLIPBOARD_COPY, data => {
+    let workbench = document.getElementById('workbench');
+
+    let editable = workbench.firstElementChild.firstElementChild.nextElementSibling.firstElementChild;
+
+    let div = document.createElement('div');
+    div.style.position = 'absolute';
+    div.style.width = "100%";
+    div.style.height = "100%";
+    div.style.zIndex = '1000000';
+    div.style.backgroundColor = "powderblue";
+    div.style.top = '0';
+    div.style.left = '0';
+    div.className = "slate-normalize-clipboard";
+
+    document.body.appendChild(div);
+
+    // 炫技行为请勿模仿
+    let observer = new MutationObserver(mutationsList => {
+        // mutation observer is a micro task
+        // which means... before the next render process, we had already completed our copy and removed that
+        // but... execCommand is also a micro task? or means that it is sync 
+
+        observer.disconnect();
+
+        var selection = window.getSelection();
+        var range = document.createRange();
+        range.selectNodeContents(div);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        document.execCommand('copy');
+        document.body.removeChild(div);
+    });
+
+    observer.observe(div, { childList: true });
+
+    div.innerHTML = editable.innerHTML;
+});
 
 const TransformCard = ({ v, onClose, onTogglePreview, onInput, onMatch, onOpenDialog }) => {
     let color = v.isApplied ? 'applied' : 'unused';

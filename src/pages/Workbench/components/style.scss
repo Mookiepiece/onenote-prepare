@@ -18,9 +18,10 @@
   height: 64px;
 
   padding-top: 12px;
+
   > button {
-    position: relative;
-    left: 12px;
+    margin-bottom: 12px;
+    margin-left: 12px;
     width: calc(100% - 24px);
   }
 }

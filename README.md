@@ -24,6 +24,12 @@ in developing...so slow
 <img src="https://github.com/Mookiepiece/pre-onenote/blob/master/docs/tableCraft.jpg" alt="use onenote tables to simulate background-color" width="50%">
 
 ## 开发随笔
+20-05-06
+- 发现pre标签的fontFamily默认是monospace，要想办法覆盖它，设置成inherit，完了，office直接照搬，不论是unset,inherit,还是var(--default-font-family)
+- 这也不能怪office，估计微软是很讨厌web和浏览器了（狗头）
+- 样式覆盖问题本来是想开iframe就不会样式污染，顺便练习跨源通信，还是算了。最后是直接吸root的style，估计性能下降一个档次了
+- 另外office列表的圈圈是能隧字体的改变而改变大小的，web无能为力
+
 20-05-03
 - ON也不支持colgroup给table设的样式，旗鼓相当的对手
 - 测试认为表格从网页粘贴到ON里，需要border-style:none;才会隐藏边框。那粘贴出来的xhtml为什么是border:0???

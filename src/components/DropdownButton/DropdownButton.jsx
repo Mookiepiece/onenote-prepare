@@ -11,7 +11,7 @@ const DropdownButton = ({
     value,
     width,
     dropdownWidth = 260,
-    dropdownHeight = 220,
+    dropdownHeight = 320,
     renderButton,
     beforeClick,
     trigger = 'click',

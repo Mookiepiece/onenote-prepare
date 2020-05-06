@@ -7,6 +7,7 @@ import { TinyEmitter, EVENTS } from '@/utils/index';
 import { DropdownButtonSelect } from '@/components/DropdownButton';
 import Button from '@/components/MkButton';
 import deserializeX from './paste';
+import { SLATE_DEFAULTS } from '@/utils/userSettings';
 
 export const createEditor = () => withPasteHTML(withPlaceholders(withTablesLists(withHistory(withReact(_createEditor())))));
 export const createNoHistoryEditor = () => withPlaceholders(withTablesLists(withReact(_createEditor())));
@@ -270,12 +271,13 @@ export const computeLeafStyleAndClassName = (leaf) => {
     if (leaf.fontFamily) {
         style = { ...style, fontFamily: leaf.fontFamily };
     } else {
-        style = { ...style, fontFamily: 'var(--slate-default-font-family)' };
+        console.log(SLATE_DEFAULTS,SLATE_DEFAULTS.FONT_FAMILY);
+        style = { ...style, fontFamily: SLATE_DEFAULTS.FONT_FAMILY };
     }
     if (leaf.fontSize) {
         style = { ...style, fontSize: leaf.fontSize + 'pt' };
     } else {
-        style = { ...style, fontSize: 'var(--slate-default-font-size)' };
+        style = { ...style, fontSize: SLATE_DEFAULTS.FONT_SIZE+'pt' };
     }
 
     // matched text ✨

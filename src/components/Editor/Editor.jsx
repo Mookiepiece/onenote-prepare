@@ -21,19 +21,21 @@ export const SlateEditor = ({ value, setValue, readOnly, showToolbar, children }
         <Slate editor={editor} value={value} onChange={value => setValue(value)}>
             <div className="slate">
                 {toolbar}
-                <Editable
-                    readOnly={readOnly}
-                    className="slate-editable"
-                    renderElement={renderElement}
-                    renderLeaf={renderLeaf}
-                    placeholder="Enter some rich text…"
-                    onKeyDown={handleKeydown}
-                />
+                <div className="slate-editable-container">
+                    <Editable
+                        readOnly={readOnly}
+                        className="slate-editable"
+                        renderElement={renderElement}
+                        renderLeaf={renderLeaf}
+                        placeholder="Enter some rich text…"
+                        onKeyDown={handleKeydown}
+                    />
+                </div>
                 <Button onClick={_ => setDebug(true)} style={{ alignSelf: 'start' }} >
                     <QuestionOutlined />
                 </Button>
                 <Dialog visible={debug} setVisible={setDebug}>
-                    <div style={{ whiteSpace: 'pre-wrap' }}>
+                    <div style={{ whiteSpace: 'pre-wrap',overflow:'auto' }}>
                         {JSON.stringify(value, null, 4)}
                     </div>
                 </Dialog>
@@ -51,17 +53,19 @@ export const ReadOnlySlateEditor = ({ value, setValue, showToolbar = false, chil
         <Slate editor={editor} value={value} onChange={value => setValue(value)}>
             <div className="slate">
                 {showToolbar ? <Toolbar readOnly /> : null}
-                <Editable
-                    readOnly
-                    className="slate-editable"
-                    renderElement={renderElement}
-                    renderLeaf={renderLeaf}
-                />
+                <div className="slate-editable-container">
+                    <Editable
+                        readOnly
+                        className="slate-editable"
+                        renderElement={renderElement}
+                        renderLeaf={renderLeaf}
+                    />
+                </div>
                 <Button onClick={_ => setDebug(true)} style={{ alignSelf: 'start' }} >
                     <QuestionOutlined />
                 </Button>
                 <Dialog visible={debug} setVisible={setDebug}>
-                    <div style={{ whiteSpace: 'pre-wrap' }}>
+                    <div style={{ whiteSpace: 'pre-wrap',overflow:'auto' }}>
                         {JSON.stringify(value, null, 4)}
                     </div>
                 </Dialog>
