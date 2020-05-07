@@ -40,7 +40,7 @@ const Dialog = ({
                     classNames='ani-dialog-bg'
                     unmountOnExit={unmountOnExit}
                 >
-                    <div className={`dialog-bg dialog-bg-no-poiner-event ${visible ? '' : 'hidden'}`}
+                    <div className={`dialog-bg dialog-bg-on-frame ${visible ? '' : 'hidden'}`}
                         onMouseDown={_ => {
                             setVisible(false);
                         }}

@@ -1,8 +1,7 @@
-@import "@/styles/classes.scss";
-@import "@/styles/default.scss";
+@import "@/styles/var.scss";
 
 .workbench {
-  @extend %clearfix;
+  display: flow-root;
   $aside-width: 40%;
   position: relative;
 

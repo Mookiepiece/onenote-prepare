@@ -1,4 +1,4 @@
-@import "~@/styles/default";
+@import "@/styles/var.scss";
 
 .dialog-container {
   position: fixed;
@@ -16,19 +16,19 @@
   transition: all 0.3s;
 }
 
-.dialog-bg:not(.dialog-bg-no-poiner-event) {
-  top: 32px;
+.dialog-bg:not(.dialog-bg-on-frame) {
+  top: $app-frame-height;
   left: 0;
   right: 0;
   bottom: 0;
 }
 
-.dialog-bg-no-poiner-event {
+.dialog-bg-on-frame {
   pointer-events: none;
   top: 0;
   left: 0;
   right: 0;
-  height: 32px;
+  height: $app-frame-height;
 }
 
 //dialog: dialog-default & aside-dialog

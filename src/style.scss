@@ -1,16 +1,16 @@
 /* app */
-
-@import "@/styles/default.scss";
+@import "@/styles/var.scss";
 
 #app {
   & > nav {
     position: absolute;
-    z-index: 90;
     top: 0;
     left: 0;
     width: 64px;
     height: 100%;
-
+    z-index: 90;
+    background-color: var(--gray-1);
+    
     padding-top: $app-frame-height;
 
     box-shadow: var(--gray-4) 0 0 4px 2px;
@@ -33,17 +33,19 @@
     position: absolute;
     top: 32px;
     left: 0;
-    width:64px;
-    height:64px;
+    width: 64px;
+    height: 64px;
     object-fit: contain;
+    z-index: 95;
   }
+
   .page {
     position: absolute;
     top: 0;
     left: 64px;
     right: 0;
     bottom: 0;
-
+  
     & > div {
       position: absolute;
       top: 0;
