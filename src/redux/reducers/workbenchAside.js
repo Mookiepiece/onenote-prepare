@@ -1,7 +1,7 @@
 import ActionTypes from '../actions';
 import { v4 as uuid } from 'uuid';
 import { alt, deepCopy } from '@/utils';
-import DB from '@/store/indexedDB';
+import IndexDB from '@/store/indexedDB';
 
 function altMemory(state, action) {
     let { memory } = state;
@@ -27,7 +27,7 @@ function altMemory(state, action) {
             throw new Error('[pre-onenote] redux');
     }
 
-    DB.history(memory);
+    IndexDB.history(memory);
     return memory;
 }
 

@@ -14,11 +14,9 @@ function getDB() {
             request.onupgradeneeded = function (event) {
                 _db = event.target.result;
                 let objectStore;
-                if (!db.objectStoreNames.contains('history')) {
+                if (!_db.objectStoreNames.contains('history')) {
                     objectStore = _db.createObjectStore('history', { autoIncrement: true });
                 }
-
-                resolve(_db);
             }
 
             request.onerror = function (event) {
@@ -65,8 +63,8 @@ async function history(value) {
     })
 }
 
-const DB = {
+const IndexDB = {
     history,
 };
 
-export default DB;
+export default IndexDB;

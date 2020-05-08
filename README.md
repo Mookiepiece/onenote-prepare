@@ -1,5 +1,5 @@
 # pre-onenote
-format and preprocess texts to beautify OneNote
+Color and format text/html to beautify OneNote
 
 in developing...so slow
 

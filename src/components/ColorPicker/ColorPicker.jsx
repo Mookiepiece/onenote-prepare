@@ -38,7 +38,6 @@ export const useMouseDrag = (minX,minY,maxX,maxY) => {
         ]);
     };
 
-    console.log(mousePosition);
     const removeListener = (e) => {
         document.removeEventListener('mousemove', getMousePosition);
         document.removeEventListener('mouseup', removeListener);

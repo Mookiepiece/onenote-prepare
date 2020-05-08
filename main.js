@@ -1,16 +1,10 @@
-'use strict'
-
-// import { app, BrowserWindow, ipcMain } from 'electron'
-// import * as path from 'path'
-// import { format as formatUrl } from 'url'
 const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const { format } = require('url');
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
+const isDevelopment = process.env&&process.env.NODE_ENV === 'development'
 
-// global reference to mainWindow (necessary to prevent window from being garbage collected)
-let mainWindow
+let mainWindow;
 
 function createMainWindow() {
   const window = new BrowserWindow({
@@ -27,12 +21,13 @@ function createMainWindow() {
   }
 
   if (isDevelopment) {
-    BrowserWindow.addDevToolsExtension("C:/Users/Mookiepiece/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.6.0_0")
+    // windows, load react devtools
+    BrowserWindow.addDevToolsExtension(path.resolve(process.env.LOCALAPPDATA +"/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.6.0_0"))
     window.loadURL(`http://localhost:9001`)
   }
   else {
     window.loadURL(format({
-      pathname: path.join(__dirname, 'index.html'),
+      pathname: path.join(__dirname, './dist/index.html'),
       protocol: 'file',
       slashes: true
     }))

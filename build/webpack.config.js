@@ -1,28 +1,15 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const merge = require('webpack-merge');
 
-module.exports = {
-    mode: "development",
-    devtool: "cheap-module-eval-source-map",
-    target:'electron-renderer',
-    output: {
-        // path: path.resolve(__dirname, "../dist"),
-        // filename: "js/[name]/[name]-bundle.js",
-        // chunkFilename: "js/[name]/[name]-bundle.js",
-    },
+const config = {
+    target: 'electron-renderer',
     resolve: {
         extensions: ['.js', '.jsx'],
         alias: {
             '@': path.resolve(__dirname, '../src'),
         }
-    },
-    devServer: {
-        historyApiFallback: true,
-        disableHostCheck: true,
-        overlay: true,
-        port: 9001,
-        hot: true,
     },
     module: {
         rules: [
@@ -41,7 +28,7 @@ module.exports = {
                     {
                         loader: MiniCssExtractPlugin.loader,
                         options: {
-                            hmr: process.env.NODE_ENV==="development"
+                            hmr: process.env.NODE_ENV === "development"
                         }
                     },
                     'css-loader',
@@ -53,7 +40,7 @@ module.exports = {
                     {
                         loader: MiniCssExtractPlugin.loader,
                         options: {
-                            hmr: process.env.NODE_ENV==="development"
+                            hmr: process.env.NODE_ENV === "development"
                         }
                     },
                     'css-loader',
@@ -83,6 +70,18 @@ module.exports = {
             },
         ]
     },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    chunks: "initial",
+                    name: "vendor",
+                    test: /[\\/]node_modules[\\/]/,
+                }
+            }
+        },
+        runtimeChunk: true
+    },
     plugins: [
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, '../src/index.html')
@@ -90,3 +89,5 @@ module.exports = {
         new MiniCssExtractPlugin()
     ]
 }
+
+module.exports = $ => merge(config, $);
