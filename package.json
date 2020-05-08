@@ -17,7 +17,7 @@
     "pack": "electron-builder"
   },
   "build": {
-    "appId": "OneNotePreprocessor",
+    "appId": "pre-onenote",
     "files":[
       "./dist",
       "./main.js",
@@ -35,7 +35,8 @@
     "nsis": {
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,
-      "perMachine": false
+      "perMachine": false,
+      "createDesktopShortcut":false
     }
   },
   "dependencies": {
