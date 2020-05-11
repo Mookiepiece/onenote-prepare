@@ -68,6 +68,9 @@
 
 .dialog-select-transform {
   @include pick-one-dialog(".dialog-select-transform-option");
+  .dialog-select-transform-option>div{
+    transform: scale(.5);
+  }
 }
 
 .dialog-style-picker {

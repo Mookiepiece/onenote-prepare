@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Dialog from "@/components/Dialog";
 
 import { M } from '../transforms';
@@ -11,7 +11,7 @@ const MatchPickerDialog = ({ visible, setVisible, onSelect, onApply }) => {
                 {
                     M.map((match, i) => (
                         <div className="dialog-select-transform-option" onClick={_ => onApply(i)} key={i}>
-                            <div></div>
+                            <SVG icon={match.icon} />
                             <h6>{match.title}</h6>
                             <p>{match.desc}</p>
                         </div>
@@ -21,5 +21,17 @@ const MatchPickerDialog = ({ visible, setVisible, onSelect, onApply }) => {
         </Dialog>
     )
 };
+
+const SVG = ({ icon }) => {
+    const ref = useRef();
+    useEffect(_ => {
+        ref.current.innerHTML = icon;
+    }, []);
+
+    return (
+        <div ref={ref}>
+        </div>
+    );
+}
 
 export default MatchPickerDialog;
