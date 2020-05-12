@@ -1,5 +1,25 @@
 @import "@/styles/var.scss";
 
-.page-settings{
-    margin-top:$app-frame-height;
+.page-settings {
+    margin-top: $app-frame-height;
+
+    padding-left: 36px;
+    padding-right: 36px;
+
+    overflow: auto;
+
+    > p {
+        margin:24px 0;
+        font-weight: 700;
+        position: relative;
+        &::after {
+            content:'';
+            position: absolute;
+            top:50%;
+            transform: translate(50px,-50%);
+            width: calc(100% - 100px);
+            height:1px;
+            background-color: var(--gray-4);
+        }
+    }
 }
