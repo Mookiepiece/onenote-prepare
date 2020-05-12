@@ -3,13 +3,13 @@ import { SketchPicker } from 'react-color';
 import Input from '@/components/Input';
 import { SLATE_DEFAULTS, fontFamilyOptions, fontSizeOptions } from '@/utils/userSettings';
 import { DropdownButtonSelect } from '@/components/DropdownButton';
-
 import './style.scss';
 
 import AJAX from '@/utils/ajax';
 import Button from '@/components/MkButton';
 import Dialog from '@/components/Dialog';
 import { remote, shell } from 'electron';
+import { LinkOutlined } from '@ant-design/icons';
 
 const Settings = _ => {
     const [slateFontFamily, _setSlateFontFamily] = useState(SLATE_DEFAULTS.FONT_FAMILY);
@@ -61,11 +61,7 @@ const Settings = _ => {
     );
 }
 
-
 const InfoPanel = () => {
-
-
-
     return (
         <div className="form-like">
             <span></span>
@@ -73,15 +69,17 @@ const InfoPanel = () => {
             <span></span>
             <FeedbackButton />
             <span></span>
-            <Button
-                full
-                onClick={_ => shell.openExternal('http://www.whiteswallow.ink/preonenote/docs')}
-            >前往pre-onenote官网</Button>
+            <div>
+                <Button
+                    onClick={_ => shell.openExternal('http://www.whiteswallow.ink/preonenote/docs')}
+                >前往pre-onenote官网<LinkOutlined /></Button>
+            </div>
             <span></span>
-            <Button
-                full
-                onClick={_ => shell.openExternal('https://www.github.com/Mookiepiece/pre-onenote')}
-            >前往github项目</Button>
+            <div>
+                <Button
+                    onClick={_ => shell.openExternal('https://www.github.com/Mookiepiece/pre-onenote')}
+                >前往github项目<LinkOutlined /></Button>
+            </div>
         </div>
     )
 }
@@ -89,35 +87,48 @@ const InfoPanel = () => {
 var version = remote.app.getVersion();
 const VersionButton = () => {
     const [value, setValue] = useState({ status: 'ready', result: '' });
+    const [message, setMessage] = useState(`当前版本${version}`);
 
     let versionButton;
     switch (value.status) {
         case 'ready':
-            versionButton = (<Button full onClick={_ => AJAX.version()
-                .then(result => setValue({ status: 'resolved', result }))
-                .catch(e => setValue({ status: 'rejected', result: '' }))
-            }>检查版本</Button>);
+            versionButton = (
+                <Button onClick={_ => {
+                    setValue({ status: 'pending', result:'' });
+                    AJAX.version()
+                        .then(result => {
+                            setValue({ status: 'resolved', result });
+                            setMessage(`当前版本${version},最新版本${result}`);
+                        })
+                        .catch(e => setValue({ status: 'rejected', result: '' }))
+                }}>检查版本</Button>
+            );
             break;
         case 'pending':
-            versionButton = (<Button full disabled>检查中...</Button>);
+            versionButton = (<Button disabled>检查中...</Button>);
             break;
         case 'resolved':
             if (version === value.result) {
-                versionButton = (<Button full disabled>版本最新</Button>);
+                versionButton = (<Button disabled>版本最新</Button>);
             } else {
-                versionButton = (<Button full onClick={_ => {
+                versionButton = (<Button onClick={_ => {
                     shell.openExternal('http://www.whiteswallow.ink/preonenote/docs');
-                }}>{`当前版本${version},最新版本${value.result},点击前往官网`}</Button>);
+                }}>下载新版<LinkOutlined /></Button>);
             }
             break;
         case 'rejected':
-            versionButton = (<Button full disabled>网络错误</Button>);
+            versionButton = (<Button disabled>网络错误</Button>);
             break;
         default:
             throw new Error('[ajax] ?');
     }
 
-    return versionButton;
+    return (
+        <div style={{ display: 'flex' }}>
+            {versionButton}
+            <p>{message}</p>
+        </div>
+    );
 }
 
 const FeedbackButton = () => {
@@ -129,7 +140,7 @@ const FeedbackButton = () => {
 
     return (
         <div>
-            <Button full onClick={_ => setVisible(true)}>意见反馈</Button>
+            <Button onClick={_ => setVisible(true)}>意见反馈</Button>
             <Dialog visible={visible} setVisible={setVisible}>
                 <div>
                     <p>意见反馈</p>

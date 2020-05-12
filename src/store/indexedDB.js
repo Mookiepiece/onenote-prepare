@@ -1,7 +1,4 @@
-
-
 let _db = undefined;
-
 function getDB() {
     if (_db === undefined) {
         return new Promise((resolve, reject) => {
@@ -14,8 +11,8 @@ function getDB() {
             request.onupgradeneeded = function (event) {
                 _db = event.target.result;
                 let objectStore;
-                if (!_db.objectStoreNames.contains('history')) {
-                    objectStore = _db.createObjectStore('history', { autoIncrement: true });
+                if (!_db.objectStoreNames.contains('cache')) {
+                    objectStore = _db.createObjectStore('cache', { keyPath: 'name' });
                 }
             }
 
@@ -27,44 +24,64 @@ function getDB() {
     } else return _db;
 }
 
-async function history(value) {
-    let objectStore = (await getDB()).transaction(['history'], 'readwrite').objectStore('history');
-
-    return new Promise((resolve, reject) => {
+async function op(name, value) {
+    let table = (await getDB()).transaction(['cache'], 'readwrite').objectStore('cache');
+    return new Promise(async (resolve, reject) => {
         if (value) {
-            const request = objectStore.clear();
-            request.onsuccess = function (event) {
-                const request = objectStore.add(value);
-                request.onsuccess = function (event) {
-                    resolve();
-                };
-                request.onerror = function (event) {
-                    console.error(event);
-                    reject();
-                };
-            };
-
-            request.onerror = function (event) {
-                console.error(event);
-                reject();
-            };
+            clear: {
+                await MD.excute(table.delete(name));
+            }
+            add: {
+                await MD.excute(table.add({ name, value }));
+            }
         } else {
-            const request = objectStore.getAll();
 
+        }
+        const result = await MD.get(name, table);
+        resolve((result && result.value) || []);
+    });
+}
+
+async function history(value) {
+    return op('history', value);
+}
+
+async function resultTemplates(value) {
+    return op('resultTemplates', value);
+}
+
+async function customStyle(value) {
+    return op('customStyle', value);
+}
+
+async function customTableStyle(value) {
+    return op('customTableStyle', value);
+}
+
+const MD = {
+    async get(key, table) {
+        const request = table.get(key);
+        await this.excute(request);
+        return request.result;
+    },
+    async excute(request) {
+        return new Promise((resolve, reject) => {
             request.onsuccess = function (event) {
-                resolve(request.result[0] || []);
+                resolve(event);
             };
 
             request.onerror = function (event) {
-                console.error(event);
-                reject();
+                reject(event);
             };
-        }
-    })
+        });
+    }
 }
 
 const IndexDB = {
     history,
+    resultTemplates,
+    customStyle,
+    customTableStyle
 };
 
 export default IndexDB;

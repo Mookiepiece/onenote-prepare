@@ -1,4 +1,5 @@
 import store from '@/store';
+import IndexDB from '@/store/indexedDB';
 
 export const fontSizeOptions = [
     8, 9, 9.5, 10, 10.5, 11, 11.5, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
@@ -33,47 +34,15 @@ export const SLATE_DEFAULTS = new Proxy({}, {
 SLATE_DEFAULTS.FONT_FAMILY = store.get('settings.slateDefaultFontFamily');
 SLATE_DEFAULTS.FONT_SIZE = store.get('settings.slateDefaultFontSize');
 
-export const mockedCustomStyles = [
-    {
-        title: 'mynode',
-        group: 'dd',
-        style: {
-            bold: false,
-            fontColor: '#3cf',
-        }
-    },
-    {
-        title: 'msda',
-        group: 'asdvv',
-        style: {
-            fontColor: '#0b6',
-            bgColor: '#eff',
-            fontFamily: '等线'
-        }
-    }
-]
+export let customStyles = [];
+IndexDB.customStyle().then(v => customStyles = v).catch(e => console.error(e));
+// TODO: prepared for loading
+export async function pushCustomStyle(value) {
+    customStyles = await IndexDB.customStyle([...customStyles, value]);
+}
 
-export const mockedCustomTableStyle = [
-    {
-        title: 'nb',
-        group: 'sasdasd',
-        image:'',
-        rules: [
-            {
-                target: ['row', 2, 1],
-                cellColor: '#ddd',
-                style: {
-                    bold:true,
-                    fontColor:'#fff'
-                },
-            },
-        ]
-    },
-]
-
-export const mockedCustomResultTemplates = [
-    {
-        title: 'yeah',
-        result: [{ children: [{ text: 'nb' }] }]
-    }
-]
+export let customTableStyles = [];
+IndexDB.customTableStyle().then(v => customTableStyles = v).catch(e => console.error(e));
+export async function pushCustomTableStyle(value) {
+    customTableStyles = await IndexDB.customTableStyle([...customTableStyles, value]);
+}

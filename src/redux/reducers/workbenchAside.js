@@ -27,7 +27,7 @@ function altMemory(state, action) {
             throw new Error('[pre-onenote] redux');
     }
 
-    IndexDB.history(memory);
+    IndexDB.history(memory).catch(e => console.error(e));
     return memory;
 }
 

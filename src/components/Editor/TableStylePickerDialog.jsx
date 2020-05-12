@@ -1,16 +1,16 @@
 import React from 'react';
 import Dialog from '@/components/Dialog';
 
-import { mockedCustomTableStyle } from '@/utils/userSettings';
+import { customTableStyles } from '@/utils/userSettings';
 
 const TableStylePickerDialog = ({ visible, setVisible, onApply }) => {
     return (
         <Dialog fullW visible={visible} setVisible={setVisible}>
             <div className="dialog-table-style-picker">
                 {
-                    mockedCustomTableStyle.map((tableStyle, i) => (
+                    customTableStyles.map((tableStyle, i) => (
                         <div className="table-style-card" onClick={_ => {
-                            onApply(i, mockedCustomTableStyle[i]);
+                            onApply(i, customTableStyles[i]);
                             setVisible(false);
                         }} key={i} >
                             <div>

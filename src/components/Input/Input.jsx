@@ -23,7 +23,7 @@ const Input = React.forwardRef(({
         <div className={className} style={{ width }}>
             <input
                 value={value}
-                onChange={e => onChange(e.target.value.substr(-maxLength))}
+                onChange={e => onChange(e.target.value.substr(0, maxLength))}
                 {...others}
                 onKeyDown={onKeyDown}
                 ref={ref}

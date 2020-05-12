@@ -1,7 +1,7 @@
 import React from 'react';
 import Dialog from '@/components/Dialog';
 
-import { mockedCustomStyles } from '@/utils/userSettings';
+import { customStyles } from '@/utils/userSettings';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 const StylePickerDialog = ({ visible, setVisible, onApply }) => {
@@ -9,9 +9,9 @@ const StylePickerDialog = ({ visible, setVisible, onApply }) => {
         <Dialog fullW visible={visible} setVisible={setVisible}>
             <div className="dialog-style-picker">
                 {
-                    mockedCustomStyles.map((leafStyle, i) => (
+                    customStyles.map((leafStyle, i) => (
                         <div className="leaf-style-card" onClick={_ => {
-                            onApply(i, mockedCustomStyles[i]);
+                            onApply(i, customStyles[i]);
                             setVisible(false);
                         }} key={i} >
                             <div>

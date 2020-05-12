@@ -33,7 +33,7 @@ import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { setArrayItem, drawImageScaled } from '@/utils';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, mockedCustomStyles, mockedCustomTableStyle } from '@/utils/userSettings';
+import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, pushCustomStyle, pushCustomTableStyle } from '@/utils/userSettings';
 import { Editor } from 'slate';
 import ActionTypes from '@/redux/actions';
 import { v4 as uuid } from 'uuid';
@@ -504,7 +504,7 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                 visible={saveTableStyleDialogVisible}
                 setVisible={setSaveTableStyleDialogVisible}
                 onApply={(title, group, image) => {
-                    mockedCustomTableStyle.push({
+                    pushCustomTableStyle({
                         title,
                         group,
                         image,
@@ -668,7 +668,7 @@ const ColorPickerButton = ({ disabled, value, onChange }) => {
                             }}
                             ref={buttonRef}
                         >
-                            <div style={{background: value}}></div>
+                            <div style={{ background: value }}></div>
                         </Button>
                     )
                 }
@@ -807,7 +807,7 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
                 visible={saveLeafStlyeDialogVisible}
                 setVisible={setSaveLeafStlyeDialogVisible}
                 onApply={(title, group) => {
-                    mockedCustomStyles.push({ title, group, style: leafStyleCache });
+                    pushCustomStyle({ title, group, style: leafStyleCache });
                 }}
             />
             <TableStyleDialog
