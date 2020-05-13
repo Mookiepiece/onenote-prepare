@@ -718,7 +718,7 @@ const HistoryDialog = connect(state => ({
     }, [index]);
 
     return (
-        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'}>
+        <Dialog fullWidth visible={visible} setVisible={setVisible} paddingBottom={'64px'}>
             <div className="history-container">
                 <div className="history-list">
                     <Button
@@ -775,7 +775,7 @@ const AddQuickTransformDialog = ({ visible, setVisible }) => {
     }, [index]);
 
     return (
-        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'}>
+        <Dialog fullWidth visible={visible} setVisible={setVisible} paddingBottom={'64px'}>
             <div className="history-container">
                 <div className="history-list">
                     {customTransforms.map((t, i) => (

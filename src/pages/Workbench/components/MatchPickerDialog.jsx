@@ -6,7 +6,7 @@ import { M } from '../transforms';
 const MatchPickerDialog = ({ visible, setVisible, onSelect, onApply }) => {
 
     return (
-        <Dialog fullW visible={visible} setVisible={setVisible}>
+        <Dialog fullWidth visible={visible} setVisible={setVisible}>
             <div className="dialog-select-transform">
                 {
                     M.map((match, i) => (

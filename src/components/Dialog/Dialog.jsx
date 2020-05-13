@@ -14,7 +14,7 @@ const Dialog = ({
     setVisible,
     children,
     full,
-    fullW,
+    fullWidth,
     paddingBottom,
     keepAlive = false,
     ...others
@@ -66,7 +66,7 @@ const Dialog = ({
                     classNames='ani-dialog'
                     unmountOnExit={unmountOnExit}
                 >
-                    <div {...others} className={`dialog dialog-default${full ? ' full' : fullW ? ' full-width' : ''}${visible ? '' : ' hidden'}`} >
+                    <div {...others} className={`dialog dialog-default${full ? ' full' : fullWidth ? ' full-width' : ''}${visible ? '' : ' hidden'}`} >
                         <div className='dialog-close-button'>
                             <Button
                                 className='dialog-close-button-inner'

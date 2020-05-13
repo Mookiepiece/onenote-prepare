@@ -6,7 +6,7 @@ import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 const StylePickerDialog = ({ visible, setVisible, onApply }) => {
     return (
-        <Dialog fullW visible={visible} setVisible={setVisible}>
+        <Dialog fullWidth visible={visible} setVisible={setVisible}>
             <div className="dialog-style-picker">
                 {
                     customStyles.map((leafStyle, i) => (

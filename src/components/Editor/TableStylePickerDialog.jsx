@@ -5,7 +5,7 @@ import { customTableStyles } from '@/utils/userSettings';
 
 const TableStylePickerDialog = ({ visible, setVisible, onApply }) => {
     return (
-        <Dialog fullW visible={visible} setVisible={setVisible}>
+        <Dialog fullWidth visible={visible} setVisible={setVisible}>
             <div className="dialog-table-style-picker">
                 {
                     customTableStyles.map((tableStyle, i) => (
