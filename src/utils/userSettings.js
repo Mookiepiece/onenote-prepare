@@ -46,3 +46,15 @@ IndexDB.customTableStyle().then(v => customTableStyles = v).catch(e => console.e
 export async function pushCustomTableStyle(value) {
     customTableStyles = await IndexDB.customTableStyle([...customTableStyles, value]);
 }
+
+export let customResultTemplates = [];
+IndexDB.customResultTemplate().then(v => customResultTemplates = v).catch(e => console.error(e));
+export async function pushCustomResultTemplate(value) {
+    customResultTemplates = await IndexDB.customResultTemplate([...customResultTemplates, value]);
+}
+
+export let customTransforms = [];
+IndexDB.customTransform().then(v => customTransforms = v).catch(e => console.error(e));
+export async function pushCustomTransform(value) {
+    customTransforms = await IndexDB.customTransform([...customTransforms, value]);
+}

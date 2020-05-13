@@ -21,18 +21,7 @@ import { DropdownButtonSelect } from '@/components/DropdownButton';
 const ResultPanel = ({ result, onResultChange }) => {
     const [dialogVisible, setDialogVisible] = useState(false);
 
-    const [value, setValue] = useState([
-        {
-            children: [
-                { text: '' },
-                {
-                    type: 'transform-placeholder',
-                    meta: { mirror: 0 },
-                    children: [{ text: '' }]
-                },
-                { text: '' }
-            ]
-        }]);
+    const [value, setValue] = useState(result.nodes);
 
     useEffect(_ => {
         !dialogVisible && onResultChange(alt.set(result, 'nodes', value));

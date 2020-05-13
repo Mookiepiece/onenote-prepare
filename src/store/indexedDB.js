@@ -46,16 +46,20 @@ async function history(value) {
     return op('history', value);
 }
 
-async function resultTemplates(value) {
-    return op('resultTemplates', value);
-}
-
 async function customStyle(value) {
     return op('customStyle', value);
 }
 
 async function customTableStyle(value) {
     return op('customTableStyle', value);
+}
+
+async function customResultTemplate(value) {
+    return op('customResultTemplate', value);
+}
+
+async function customTransform(value) {
+    return op('customTransform', value);
 }
 
 const MD = {
@@ -79,9 +83,10 @@ const MD = {
 
 const IndexDB = {
     history,
-    resultTemplates,
     customStyle,
-    customTableStyle
+    customTableStyle,
+    customResultTemplate,
+    customTransform,
 };
 
 export default IndexDB;

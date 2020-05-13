@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { withReact, useSelected, useFocused, useSlate, ReactEditor } from 'slate-react';
+import { withReact, useSelected, useFocused, useSlate, ReactEditor, useReadOnly } from 'slate-react';
 import { createEditor as _createEditor, Range, Editor, Point, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
 
@@ -157,6 +157,8 @@ const withPasteHTML = editor => {
 // WARNING: I am going to TRANSFORM ⚠
 const TransformPlaceholderElement = ({ attributes, children, element }) => {
     const editor = useSlate();
+    const readonly = useReadOnly();
+
     const selected = useSelected();
     const focused = useFocused();
 
@@ -225,7 +227,7 @@ const TransformPlaceholderElement = ({ attributes, children, element }) => {
                         ref={ref}
                         onMouseDown={event => {
                             event.preventDefault(); // slate.js
-                            setActive(!active);
+                            !readonly && setActive(!active);
                         }}
 
                     >

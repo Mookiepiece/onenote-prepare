@@ -15,7 +15,8 @@ import {
     DownOutlined,
     CloseOutlined,
     FormOutlined,
-    FolderOpenOutlined
+    FolderOpenOutlined,
+    BuildOutlined
 } from '@ant-design/icons';
 import { SketchPicker } from 'react-color';
 import { useSlate } from 'slate-react';
@@ -25,7 +26,7 @@ import Dialog from "@/components/Dialog";
 import Button from "@/components/MkButton";
 import Input from '@/components/Input';
 
-import { alt, deepCopy } from '@/utils';
+import { alt, deepCopy, TinyEmitter, EVENTS } from '@/utils';
 import { connect } from 'react-redux';
 
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
@@ -33,7 +34,8 @@ import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { setArrayItem, drawImageScaled } from '@/utils';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, pushCustomStyle, pushCustomTableStyle } from '@/utils/userSettings';
+import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, pushCustomStyle, pushCustomTableStyle, customTransforms } from '@/utils/userSettings';
+import { MFind } from '../transforms';
 import { Editor } from 'slate';
 import ActionTypes from '@/redux/actions';
 import { v4 as uuid } from 'uuid';
@@ -634,10 +636,10 @@ const SaveTableStyleDialog = ({ visible, setVisible, rules, onApply }) => {
                 </div>
             </div>
             <Button disabled={!title.trim() || !group.trim()} onClick={_ => {
-                setVisible(false);
                 setTitle('');
                 setGroup('');
                 setImage(BLANK);
+
                 onApply(title, group, image);
                 setVisible(false);
             }} full>保存</Button>
@@ -760,6 +762,59 @@ const HistoryDialog = connect(state => ({
     )
 });
 
+const AddQuickTransformDialog = ({ visible, setVisible }) => {
+    const [value, setValue] = useState([{ children: [{ text: '' }] }]);
+    const [index, setIndex] = useState(-1);
+
+    useEffect(_ => {
+        if (index === -1) {
+            setValue(deepCopy([{ children: [{ text: '' }] }]));
+        } else {
+            setValue(deepCopy(customTransforms[index].value.result.nodes));
+        }
+    }, [index]);
+
+    return (
+        <Dialog visible={visible} setVisible={setVisible} paddingBottom={'64px'}>
+            <div className="history-container">
+                <div className="history-list">
+                    {customTransforms.map((t, i) => (
+                        <Button
+                            full
+                            active={index === i}
+                            key={i}
+                            onClick={_ => setIndex(i)}>
+                            {t.title}
+                        </Button>
+                    )).reverse()}
+                </div>
+                <div className="history-preview">
+                    <ReadOnlySlateEditor value={value} setValue={setValue}>
+                        <div></div>
+                    </ReadOnlySlateEditor>
+                </div>
+            </div>
+            <div style={{ inlineSize: '160px' }}>
+                <Button
+                    disabled={index === -1}
+                    full
+                    onClick={_ => {
+                        setVisible(false);
+                        TinyEmitter.emit(EVENTS.PREPARED_TRANSFORM,{
+                            value: {
+                                ...MFind(customTransforms[index].value.id),
+                                inputs: customTransforms[index].value.inputs
+                            },
+                            result: customTransforms[index].value.result,
+                        });
+                    }}
+                    type="primary"
+                >确定</Button>
+            </div>
+        </Dialog >
+    )
+}
+
 const ExtraToolbar = ({ readOnly, setSlateValue }) => {
     const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState();
     const [leafStlyeDialogValue, setLeafStlyeDialogValue] = useState(fromStyle({}));
@@ -767,6 +822,7 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
     const [saveLeafStlyeDialogVisible, setSaveLeafStlyeDialogVisible] = useState();
     const [tableStyleDialogVisible, setTableStyleDialogVisible] = useState();
     const [historyDialogVisible, setHistoryDialogVisible] = useState();
+    const [addQuickTransformDialogVisible, setAddQuickTransformDialogVisible] = useState();
 
     const [leafStyleCache, setLeafStyleCache] = useState();
 
@@ -785,12 +841,21 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
                 }}>
                     <AppstoreAddOutlined />
                 </Button>
-                <Button className="editor-button" onMouseDown={e => {
+                <Button className="editor-button" onClick={e => {
                     // NOTE: SELECTION
                     window.getSelection().removeAllRanges();
                     setHistoryDialogVisible(true);
                 }}>
                     <HistoryOutlined />
+                </Button>
+
+            </div>
+            <div className={`editor-toolbar${readOnly ? ' editor-toolbar-disabled' : ''}`}>
+                <Button className="editor-button" onClick={e => {
+                    e.preventDefault();
+                    setAddQuickTransformDialogVisible(true);
+                }}>
+                    <BuildOutlined />
                 </Button>
             </div>
             <LeafStlyeDialog
@@ -815,6 +880,10 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
                 setVisible={setTableStyleDialogVisible}
             />
             <HistoryDialog setSlateValue={setSlateValue} visible={historyDialogVisible} setVisible={setHistoryDialogVisible} />
+            <AddQuickTransformDialog
+                visible={addQuickTransformDialogVisible}
+                setVisible={setAddQuickTransformDialogVisible}
+            />
         </>
     );
 };

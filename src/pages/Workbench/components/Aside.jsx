@@ -25,6 +25,9 @@ import ActionTypes from '@/redux/actions';
 
 import './style.scss';
 import { TinyEmitter, EVENTS } from '@/utils';
+import Dialog from '@/components/Dialog/Dialog';
+import Input from '@/components/Input';
+import { pushCustomTransform } from '@/utils/userSettings';
 
 const applyChange = (editor, state, setSlateValue) => {
     applyMatcher(editor, state)
@@ -43,12 +46,11 @@ const applyMatcher = (editor, state) => {
 
 //current 正在match，新建的话自动apply, apply已拥有
 const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
-    const editor = useSlate();
-
     const [dialogVisible, setDialogVisible] = useState(false);
-    const [dialogPushTransform, setDialogPushTransform] = useState(false);
+    const [saveRuleDialogVisible, setSaveRuleDialogVisible] = useState(false);
 
-    let dispatch = arg => _dispatch({
+    const editor = useSlate();
+    const dispatch = arg => _dispatch({
         ...arg,
         callback: {
             match: state => applyMatcher(editor, state),
@@ -58,6 +60,18 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
             slate: value => setSlateValue(value),
         }
     });
+
+    useEffect(_ => {
+        const handler = ({ value, result }) => {
+            dispatch({
+                type: ActionTypes.PUSH_MATCH_RULE,
+                value,
+                result
+            })
+        }
+        TinyEmitter.on(EVENTS.PREPARED_TRANSFORM, handler);
+        return _ => TinyEmitter.off(EVENTS.PREPARED_TRANSFORM, handler);
+    }, []);
 
     return (
         <aside>
@@ -75,17 +89,25 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
                                 // NOTE: SELECTION
                                 window.getSelection().removeAllRanges();
                                 setDialogVisible(true);
-                                setDialogPushTransform(true);
                             }}
                             style={{ marginBottom: 12 }}
-                        >添加规则</Button>
-                        :
-                        <Button
-                            full
-                            onClick={_ => dispatch({ type: ActionTypes.DELETE })}
-                            style={{ marginBottom: 12 }}
-                        >删除规则</Button>
+                        >新建替换</Button>
+                        : (
+                            <>
+                                <Button
+                                    full
+                                    onClick={_ => dispatch({ type: ActionTypes.DELETE })}
+                                    style={{ marginBottom: 12 }}
+                                >删除替换</Button>
+                                <Button
+                                    full
+                                    onClick={_ => setSaveRuleDialogVisible(true)}
+                                    style={{ marginBottom: 12 }}
+                                >保存自定义替换</Button>
+                            </>
+                        )
                 }
+                <SaveRuleDialog visible={saveRuleDialogVisible} setVisible={setSaveRuleDialogVisible} v={state.v} />
 
                 <TransitionGroup component={null}>
                     {
@@ -109,7 +131,6 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
 
                                     onOpenDialog={_ => {
                                         setDialogVisible(true);
-                                        setDialogPushTransform(false);
                                     }}
 
                                     onClose={_ => dispatch({
@@ -136,7 +157,6 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
                     dispatch({
                         type: ActionTypes.PUSH_MATCH_RULE,
                         value: MGet(i),
-                        pushTransform: dialogPushTransform
                     });
                     setDialogVisible(false);
                 }} />
@@ -146,7 +166,7 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
                     type="floating"
                     onClick={_ => dispatch({ type: ActionTypes.APPLY })}
                     style={{ marginBottom: 12, display: readOnly && state.v.result.nodes.length !== 0 ? null : 'none' }}
-                >应用规则</Button>
+                >应用替换</Button>
                 <Button
                     onClick={e => {
                         e.preventDefault();
@@ -157,6 +177,30 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
             </div>
         </aside>
     )
+}
+
+const SaveRuleDialog = ({ visible, setVisible, v }) => {
+    const [title, setTitle] = useState('');
+    return (
+        <Dialog visible={visible} setVisible={setVisible}>
+            <p>保存替换规则</p>
+            <div className="form-like">
+                <span>标题 *</span>
+                <div><Input value={title} onChange={setTitle} /></div>
+            </div>
+            <Button disabled={!title.trim()} onClick={_ => {
+                pushCustomTransform({
+                    title,
+                    value: {
+                        id: v.matches[0].id,
+                        inputs: v.matches[0].inputs,
+                        result: v.result
+                    }
+                });
+                setVisible(false);
+            }} full>保存</Button>
+        </Dialog>
+    );
 }
 
 TinyEmitter.on(EVENTS.CLIPBOARD_COPY, data => {

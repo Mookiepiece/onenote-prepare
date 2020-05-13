@@ -54,25 +54,40 @@ const workbenchAside = (state = {
                 memory: altMemory(state, action)
             };
         case ActionTypes.PUSH_MATCH_RULE: {
-            state = alt.set(state, `v`, {
-                name: action.value.title,
-                matches: [],
-                isApplied: false,
-                shouldDelete: false,
-                result: {
-                    nodes: [],
+            if (!action.result) {
+                action.result = {
+                    nodes: [
+                        {
+                            children: [
+                                { text: '' },
+                                {
+                                    type: 'transform-placeholder',
+                                    meta: { mirror: 0 },
+                                    children: [{ text: '' }]
+                                },
+                                { text: '' }
+                            ]
+                        }
+                    ], // NOTE:node原本在useEffect时间传，现在已经修正这里，因另一个操作保存自定义变换会用到
                     options: {
                         overrideStyle: false,
                         clear: false,
                         dividers: []
                     }
-                }, // nodes会在useEffect里通过INPUT事件传入
+                };
+            }
+
+            state = alt.set(state, `v`, {
+                matches: [],
+                isApplied: false,
+                shouldDelete: false,
+                result: action.result,
                 key: uuid()
             });
 
             state = alt.push(state, `v.matches`, {
-                ...action.value,
                 inputs: { ...action.value.inputs, title: action.value.title },
+                ...action.value,
                 key: uuid()
             });
 
