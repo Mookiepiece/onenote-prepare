@@ -1,6 +1,7 @@
 import store from '@/store';
 import IndexDB from '@/store/indexedDB';
 import { v4 as uuid } from 'uuid';
+import { useEffect, useState } from 'react';
 
 export const fontSizeOptions = [
     8, 9, 9.5, 10, 10.5, 11, 11.5, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
@@ -35,14 +36,28 @@ export const SLATE_DEFAULTS = new Proxy({}, {
 SLATE_DEFAULTS.FONT_FAMILY = store.get('settings.slateDefaultFontFamily');
 SLATE_DEFAULTS.FONT_SIZE = store.get('settings.slateDefaultFontSize');
 
-export let customStyles = [];
+let customStyles = [];
 IndexDB.customStyle().then(v => customStyles = v).catch(e => console.error(e));
-// TODO: prepared for loading
-export async function pushCustomStyle(value) {
-    customStyles = await IndexDB.customStyle([...customStyles, { ...value, id: uuid() }]);
-}
-export async function altCustomStyle(value) {
-    customStyles = await IndexDB.customStyle(value);
+let subs = [];
+export const useIdbCustomStyles = () => {
+    const [customStylesL, setCustomStylesL] = useState(customStyles);
+
+    useEffect(_ => {
+        subs.push(setCustomStylesL);
+        return _ => {
+            const index = subs.indexOf(setCustomStylesL);
+            subs = [...subs.slice(0, setCustomStylesL), ...subs.slice(setCustomStylesL + 1)];
+        }
+    }, []);
+
+    const setCustomStyleLA = v => {
+        IndexDB.customStyle(v).then(v => {
+            customStyles = v;
+            subs.forEach(cb => cb(customStyles));
+        }).catch(e => console.error(e));
+    }
+
+    return [customStylesL, setCustomStyleLA];
 }
 
 export let customTableStyles = [];

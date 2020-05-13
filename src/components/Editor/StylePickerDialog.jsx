@@ -1,10 +1,12 @@
 import React from 'react';
 import Dialog from '@/components/Dialog';
 
-import { customStyles } from '@/utils/userSettings';
+import { useIdbCustomStyles } from '@/utils/userSettings';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 const StylePickerDialog = ({ visible, setVisible, onApply }) => {
+    const [customStyles, setCustomStyles] = useIdbCustomStyles();
+
     return (
         <Dialog fullWidth visible={visible} setVisible={setVisible}>
             <div className="dialog-style-picker">

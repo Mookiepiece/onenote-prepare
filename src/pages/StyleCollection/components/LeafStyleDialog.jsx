@@ -20,7 +20,7 @@ import { ColorPickerButton } from '@/components/ColorPicker';
 import { setArrayItem } from '@/utils';
 import { alt } from '@/utils';
 
-import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, customStyles } from '@/utils/userSettings';
+import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions } from '@/utils/userSettings';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 import './leafStyleDialog.scss';
@@ -160,7 +160,7 @@ export function useLeafStyleEditor({ customLeafStyle, setCustomLeafStyle }) {
                 </div>
             </aside>
             <div className="sample-container slate-normalize">
-                <pre><Leaf leaf={{}}>{sampleText}</Leaf></pre>
+                <pre><Leaf leaf={{}}>示例：</Leaf></pre>
                 {
                     sampleTextEditable ?
                         <div>
@@ -174,7 +174,6 @@ export function useLeafStyleEditor({ customLeafStyle, setCustomLeafStyle }) {
                             <span onClick={_ => setSampleTextEditable(true)}><EditOutlined /></span>
                         </pre>
                 }
-                <pre><Leaf leaf={{}}>{sampleText}</Leaf></pre>
             </div>
         </div>
     )

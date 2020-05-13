@@ -26,7 +26,7 @@ import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { setArrayItem, drawImageScaled } from '@/utils';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, pushCustomStyle, pushCustomTableStyle, customTransforms } from '@/utils/userSettings';
+import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, useIdbCustomStyles, pushCustomTableStyle, customTransforms } from '@/utils/userSettings';
 import { MFind } from '../transforms';
 import { Editor } from 'slate';
 import ActionTypes from '@/redux/actions';
@@ -44,22 +44,24 @@ const TableStylePreview = ({ rules }) => {
 
     return (
         <div className="sample-container slate-normalize">
-            <span>预览行：</span>
-            <DropdownButtonSelect
-                value={tableRows}
-                width={80}
-                dropdownWidth={80}
-                options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
-                onChange={setTableRows}
-            />
-            <span>预览列：</span>
-            <DropdownButtonSelect
-                value={tableCols}
-                width={80}
-                dropdownWidth={80}
-                options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
-                onChange={setTableCols}
-            />
+            <div className="table-style-preview-configs">
+                <span>预览行：</span>
+                <DropdownButtonSelect
+                    value={tableRows}
+                    width={80}
+                    dropdownWidth={80}
+                    options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
+                    onChange={setTableRows}
+                />
+                <span>预览列：</span>
+                <DropdownButtonSelect
+                    value={tableCols}
+                    width={80}
+                    dropdownWidth={80}
+                    options={Array(20).fill(0).map((_, v) => ({ label: v + 1, value: v + 1 }))}
+                    onChange={setTableCols}
+                />
+            </div>
             <table>
                 <tbody>
                     {
@@ -556,6 +558,8 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
 
     const [leafStyleInfo, setLeafStyleInfo] = useState({ title: '', group: '' });
 
+    const [customStyles, setCustomStyles] = useIdbCustomStyles();
+
     return (
         <>
             <div className={`editor-toolbar${readOnly ? ' editor-toolbar-disabled' : ''}`}>
@@ -592,7 +596,7 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
                 visible={leafStyleDialogVisible}
                 setVisible={setLeafStyleDialogVisible}
                 onApply={(title, group, style) => {
-                    pushCustomStyle({ title, group, style });
+                    setCustomStyles([...customStyles, { title, group, style, id: uuid() }]);
                 }}
                 customLeafStyle={leafStyleDialogValue}
                 setCustomLeafStyle={setLeafStyleDialogValue}

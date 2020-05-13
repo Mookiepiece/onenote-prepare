@@ -335,6 +335,10 @@
 
     overflow: scroll;
     white-space: nowrap;
+
+    >.table-style-preview-configs{
+      margin-bottom: 48px;
+    }
   }
 }
 

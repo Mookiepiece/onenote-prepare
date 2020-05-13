@@ -6,12 +6,12 @@ import './style.scss';
 
 import Button from '@/components/MkButton';
 import { DropdownButton } from '@/components/DropdownButton';
-import { CalendarOutlined } from '@ant-design/icons';
+import { CalendarOutlined, DeleteOutlined } from '@ant-design/icons';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 import { ToolboxFxFrame } from '../Toolbox/Toolbox';
 import { LeafStyleDialog, fromStyle } from './components/LeafStyleDialog.jsx';
-import { customStyles, altCustomStyle } from '@/utils/userSettings';
+import { useIdbCustomStyles } from '@/utils/userSettings';
 import { alt } from '@/utils';
 import { v4 as uuid } from 'uuid';
 
@@ -79,6 +79,8 @@ const FxCalendarTable = () => {
     const [leafStyleInfo, setLeafStyleInfo] = useState({ title: '', group: '' });
     const [index, setIndex] = useState(-1);
 
+    const [customStyles, setCustomStyles] = useIdbCustomStyles();
+
     return (
         <div>
             <div className="dialog-style-picker">
@@ -87,15 +89,16 @@ const FxCalendarTable = () => {
                         <div
                             key={leafStyle.id}
                             className="leaf-style-card"
-                            onClick={_ => {
-                                const { title, group, style } = leafStyle;
-                                setIndex(i);
-                                setLeafStyleDialogValue(fromStyle(style));
-                                setLeafStyleInfo({ title, group });
-                                setLeafStyleDialogVisible(true);
-                            }}
                         >
-                            <div>
+                            <div
+                                onClick={_ => {
+                                    const { title, group, style } = leafStyle;
+                                    setIndex(i);
+                                    setLeafStyleDialogValue(fromStyle(style));
+                                    setLeafStyleInfo({ title, group });
+                                    setLeafStyleDialogVisible(true);
+                                }}
+                            >
                                 <span className='slate-normalize'>
                                     <Leaf leaf={{
                                         ...leafStyle.style,
@@ -110,6 +113,9 @@ const FxCalendarTable = () => {
                             </div>
                             <h6>{leafStyle.title}</h6>
                             <p>{leafStyle.group}</p>
+                            <Button full onClick={_ => {
+                                setCustomStyles(customStyles.slice(0, i).concat(customStyles.slice(i + 1)));
+                            }}><DeleteOutlined /></Button>
                         </div>
                     ))
                 }
@@ -118,9 +124,7 @@ const FxCalendarTable = () => {
                 visible={leafStyleDialogVisible}
                 setVisible={setLeafStyleDialogVisible}
                 onApply={(title, group, style) => {
-                    altCustomStyle(alt.set(customStyles, index, { title, group, style, id: uuid() })).then(
-                        _ => setIndex(-1) // refresh
-                    );
+                    setCustomStyles(alt.set(customStyles, index, { title, group, style, id: uuid() }));
                 }}
                 customLeafStyle={leafStyleDialogValue}
                 setCustomLeafStyle={setLeafStyleDialogValue}
