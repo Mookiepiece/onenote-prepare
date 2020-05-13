@@ -10,37 +10,41 @@ import Input from '@/components/Input';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 import { useRouterContext } from '@/App';
 import { CSSTransition } from 'react-transition-group';
-const Toolbox = _ => {
-    const [sub, setSub] = useState(false);
-    const [page, setPage] = useState(1);
-    const Compo = pagesMap.get(page)[0];
 
+
+const getView = (page, map) => {
+    const Page = page === 0 ? null : map.get(page)[0];
+    return (Page ? <Page back={_ => setPage(0)} /> : null);
+}
+
+const Toolbox = _ => {
+    const [page, setPage] = useState(0);
+    const view = getView(page, pagesMap);
     return (
         <div className="page-toolbox">
             <CSSTransition
                 classNames="ani-toolbox-index"
-                in={!sub}
+                in={page === 0}
                 timeout={300}
                 unmountOnExit
             >
-                <ToolboxIndex setPage={i => { setPage(i); setSub(true) }} />
+                <ToolboxIndex setPage={i => setPage(i)} />
             </CSSTransition>
 
             <CSSTransition
                 classNames="ani-toolbox-frame"
-                in={sub}
+                in={page !== 0}
                 timeout={300}
                 unmountOnExit
             >
-                <ToolboxFxFrame back={_ => setSub(false)}>
-                    <Compo back={_ => setSub(false)} />
+                <ToolboxFxFrame back={_ => setPage(0)}>
+                    {view}
                 </ToolboxFxFrame>
 
             </CSSTransition>
         </div>
     );
 }
-
 
 const ToolboxIndex = ({ setPage }) => {
     return (
@@ -66,7 +70,7 @@ const ToolboxIndex = ({ setPage }) => {
     );
 }
 
-const ToolboxFxFrame = ({ back, children }) => {
+export const ToolboxFxFrame = ({ back, children }) => {
     return (
         <div className="tools-frame">
             <nav><Button full onClick={back}><LeftOutlined /></Button></nav>
@@ -97,7 +101,6 @@ const FxCalendarTable = ({ back }) => {
     const [type, setType] = useState(0);
     const [spaceCol, setSpaceCol] = useState(false);
     const [format, setFormat] = useState('yy-mm-dd');
-    // const [spaceRow, setSpaceRow] = useState(false);
 
     const [routerValue, setRouterValue] = useRouterContext();
 

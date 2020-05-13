@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    BoldOutlined,
-    ItalicOutlined,
-    UnderlineOutlined,
-    StrikethroughOutlined,
-    FontColorsOutlined,
-    FieldStringOutlined,
-    FontSizeOutlined,
     AppstoreAddOutlined,
     EditOutlined,
     HistoryOutlined,
@@ -18,7 +11,6 @@ import {
     FolderOpenOutlined,
     BuildOutlined
 } from '@ant-design/icons';
-import { SketchPicker } from 'react-color';
 import { useSlate } from 'slate-react';
 import { ReadOnlySlateEditor } from '@/components/Editor';
 
@@ -42,222 +34,8 @@ import { v4 as uuid } from 'uuid';
 import CachedInput from '@/components/Input/cachedInput';
 import StylePickerDialog from '@/components/Editor/StylePickerDialog';
 import { computeStyleTable } from '@/components/Editor/Toolbar';
-
-const leafStylesO = [
-    ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],
-    ['italic', ItalicOutlined, '斜体', { fontStyle: 'italic' }],
-    ['underline', UnderlineOutlined, '底线', { textDecoration: 'underline' }],
-    ['strike', StrikethroughOutlined, '删除', { textDecoration: 'line-through' }],
-];
-
-const leafStyles = [
-    ['bold', true],
-    ['italic', true],
-    ['underline', true],
-    ['strike', true],
-    ['fontFamily', SLATE_DEFAULTS.FONT_FAMILY],
-    ['fontSize', SLATE_DEFAULTS.FONT_SIZE],
-    ['fontColor', '#fff'],
-    ['bgColor', '#000']
-];
-
-const fromStyle = (style) => {
-    let result = {};
-    leafStyles.forEach(([key, defaultValue]) => {
-        if (style[key] === undefined) {
-            result[key] = [false, defaultValue];
-        } else {
-            result[key] = [true, style[key]];
-        }
-    }, style);
-    return result;
-}
-
-const LeafStlyeDialog = ({ visible, setVisible, onApply, customLeafStyle, setCustomLeafStyle }) => {
-    const editor = useSlate();
-
-    const [sampleText, setSampleText] = useState('文字样式示例');
-    const [sampleTextEditable, setSampleTextEditable] = useState(false);
-
-    useEffect(_ => {
-        if (visible) {
-            const matches = [...Editor.nodes(editor, {
-                match: n => n.text !== undefined,
-                mode: 'lowest'
-            })];
-            if (matches && matches[0]) {
-                const [[node]] = matches;
-                const a = Object.keys(customLeafStyle);
-                const tt = a.reduce(
-                    (t, key) => {
-                        if (node[key] === undefined)
-                            return alt.set(t, `${key}.0`, false);
-                        return alt.set(t, key, [true, node[key]]);
-                    },
-                    customLeafStyle
-                )
-                setCustomLeafStyle(tt);
-            }
-        }
-    }, [visible]);
-
-    const computedLeafStyle = {};
-    Object.keys(customLeafStyle).forEach(key =>
-        customLeafStyle[key][0] && (computedLeafStyle[key] = customLeafStyle[key][1])
-    );
-
-    return (
-        <>
-            <Dialog visible={visible} setVisible={setVisible}>
-                <div className="leaf-style-editor">
-                    <aside>
-                        {
-                            leafStylesO.map(([name, Icon, text, style]) => {
-                                return (
-                                    <div key={name} className={`style-item`}>
-                                        <CheckboxButton
-                                            value={customLeafStyle[name][0]}
-                                            onChange={v => setCustomLeafStyle({ ...customLeafStyle, [name]: setArrayItem(customLeafStyle[name], 0, v) })}
-                                        ><span style={{ ...style, fontSize: 12 }}><Icon />{text}</span></CheckboxButton>
-                                        <Switch
-                                            value={customLeafStyle[name][1]}
-                                            onChange={v => setCustomLeafStyle({ ...customLeafStyle, [name]: setArrayItem(customLeafStyle[name], 1, v) })}
-                                            disabled={!customLeafStyle[name][0]}
-                                            inactiveColor={'var(--purple-5)'}
-                                        />
-                                    </div>
-                                )
-                            })
-                        }
-                        <div className={`style-item`}>
-                            <CheckboxButton
-                                value={customLeafStyle.fontFamily[0]}
-                                onChange={v => setCustomLeafStyle({ ...customLeafStyle, fontFamily: setArrayItem(customLeafStyle.fontFamily, 0, v) })}
-                            ><span style={{ fontFamily: '宋体', fontSize: 12 }}><FieldStringOutlined />{'字族'}</span></CheckboxButton>
-                            <DropdownButtonSelect
-                                disabled={!customLeafStyle.fontFamily[0]}
-                                value={customLeafStyle.fontFamily[1]}
-                                width={120}
-                                renderLabel={({ value, label }) => (<span style={{ fontFamily: value }}>{label}</span>)}
-                                options={
-                                    fontFamilyOptions.map(v => {
-                                        return {
-                                            label: SLATE_DEFAULTS.FONT_FAMILY === v ? v + ' (默认)' : v,
-                                            value: v
-                                        };
-                                    })
-                                }
-                                onChange={
-                                    v => setCustomLeafStyle({ ...customLeafStyle, fontFamily: setArrayItem(customLeafStyle.fontFamily, 1, v) })
-                                }
-                            />
-                        </div>
-                        <div className={`style-item`}>
-                            <CheckboxButton
-                                value={customLeafStyle.fontSize[0]}
-                                onChange={v => setCustomLeafStyle({ ...customLeafStyle, fontSize: setArrayItem(customLeafStyle.fontSize, 0, v) })}
-                            ><span style={{ fontSize: 10 }}><FontSizeOutlined />{'字号'}</span></CheckboxButton>
-                            <DropdownButtonSelect
-                                disabled={!customLeafStyle.fontSize[0]}
-                                value={customLeafStyle.fontSize[1]}
-                                width={120}
-                                options={
-                                    fontSizeOptions.map(v => {
-                                        return {
-                                            label: SLATE_DEFAULTS.FONT_SIZE === v ? v + ' (默认)' : v,
-                                            value: v
-                                        };
-                                    })
-                                }
-                                onChange={
-                                    v => setCustomLeafStyle({ ...customLeafStyle, fontSize: setArrayItem(customLeafStyle.fontSize, 1, v) })
-                                }
-                            />
-                        </div>
-                        <div className={`style-item`}>
-                            <CheckboxButton
-                                value={customLeafStyle.fontColor[0]}
-                                onChange={v => setCustomLeafStyle({ ...customLeafStyle, fontColor: setArrayItem(customLeafStyle.fontColor, 0, v) })}
-                            ><span style={{ fontSize: 12, color: 'var(--blue-5)' }}><FontColorsOutlined />{'前景'}</span></CheckboxButton>
-                            <ColorPickerButton
-                                disabled={!customLeafStyle.fontColor[0]}
-                                value={customLeafStyle.fontColor[1]}
-                                onChange={
-                                    v => setCustomLeafStyle({ ...customLeafStyle, fontColor: setArrayItem(customLeafStyle.fontColor, 1, v) })
-                                }
-                            />
-                        </div>
-                        <div className={`style-item`}>
-                            <CheckboxButton
-                                value={customLeafStyle.bgColor[0]}
-                                onChange={v => setCustomLeafStyle({ ...customLeafStyle, bgColor: setArrayItem(customLeafStyle.bgColor, 0, v) })}
-                            ><span style={{ fontSize: 12, backgroundColor: 'var(--blue-3)' }}><FontColorsOutlined />{'背景'}</span></CheckboxButton>
-                            <ColorPickerButton
-                                disabled={!customLeafStyle.bgColor[0]}
-                                value={customLeafStyle.bgColor[1]}
-                                onChange={
-                                    v => setCustomLeafStyle({ ...customLeafStyle, bgColor: setArrayItem(customLeafStyle.bgColor, 1, v) })
-                                }
-                            />
-                        </div>
-
-                        <hr />
-                        <div>
-                            <Button onClick={_ => { setVisible(false); onApply(computedLeafStyle) }} full>提交</Button>
-                        </div>
-                    </aside>
-                    <div className="sample-container slate-normalize">
-                        <pre><span>对照组</span></pre>
-                        {
-                            sampleTextEditable ?
-                                <div>
-                                    <Input full value={sampleText} onChange={setSampleText} onEnterKey={_ => setSampleTextEditable(false)} />
-                                    <br />
-                                    <Button onClick={_ => setSampleTextEditable(false)} >确定</Button>
-                                </div>
-                                :
-                                <pre className="sample">
-                                    <Leaf leaf={computedLeafStyle}>{sampleText}</Leaf>
-                                    <span onClick={_ => setSampleTextEditable(true)}><EditOutlined /></span>
-                                </pre>
-                        }
-                        <pre><span>对照组</span></pre>
-                    </div>
-                </div>
-            </Dialog>
-        </>
-    )
-};
-
-const SaveLeafStyleDialog = ({ visible, setVisible, onApply }) => {
-    const [title, setTitle] = useState('');
-    const [group, setGroup] = useState('');
-
-    return (
-        <Dialog visible={visible} setVisible={setVisible}>
-            <p>新建样式</p>
-            <hr />
-            <div className="form-like">
-                <span>标题 *</span>
-                <div>
-                    <Input full value={title} onChange={setTitle} />
-                </div>
-                <span>分组 *</span>
-                <div>
-                    <Input full value={group} onChange={setGroup} />
-                </div>
-            </div>
-            <Button disabled={!title.trim() || !group.trim()} onClick={_ => {
-                setVisible(false);
-                setTitle('');
-                setGroup('');
-                onApply(title, group);
-                setVisible(false);
-            }} full>保存</Button>
-        </Dialog>
-    )
-}
-
+import { LeafStyleDialogWithStraw, fromStyle, LeafStyleDialogNoInput } from '@/pages/StyleCollection/components/LeafStyleDialog';
+import { ColorPickerButton } from '@/components/ColorPicker';
 const TableStylePreview = ({ rules }) => {
     const [tableRows, setTableRows] = useState(5);
     const [tableCols, setTableCols] = useState(5);
@@ -307,11 +85,11 @@ const TableStylePreview = ({ rules }) => {
 const TableStyleDialog = ({ visible, setVisible }) => {
     const [rules, setRules] = useState([]);
 
-    const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState(false);
+    const [leafStyleDialogVisible, setLeafStyleDialogVisible] = useState(false);
     const [stylePickerDialogVisible, setStylePickerDialogVisible] = useState(false);
-    const [leafStlyeDialogValue, setLeafStlyeDialogValue] = useState(fromStyle({}));
+    const [leafStyleDialogValue, setLeafStyleDialogValue] = useState(fromStyle({}));
 
-    const [leafStlyeDialogOnApplyIndex, setLeafStlyeDialogOnApplyIndex] = useState([_ => _]);
+    const [leafStyleDialogOnApplyIndex, setLeafStyleDialogOnApplyIndex] = useState([_ => _]);
     const [saveTableStyleDialogVisible, setSaveTableStyleDialogVisible] = useState(false);
 
     const computedRules = rules.map(({ inputs, bg }) => ({
@@ -459,15 +237,15 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                                                     disabled={!rule.inputs.style[0]}
                                                     onClick={_ => {
                                                         setStylePickerDialogVisible(true);
-                                                        setLeafStlyeDialogOnApplyIndex(i);
+                                                        setLeafStyleDialogOnApplyIndex(i);
                                                     }}>
                                                     <Leaf leaf={{ ...rule.inputs.style[1], fontSize: undefined }}>T</Leaf>
                                                 </Button>
                                                 <Button
                                                     disabled={!rule.inputs.style[0]}
                                                     onClick={_ => {
-                                                        setLeafStlyeDialogVisible(true);
-                                                        setLeafStlyeDialogOnApplyIndex(i);
+                                                        setLeafStyleDialogVisible(true);
+                                                        setLeafStyleDialogOnApplyIndex(i);
                                                     }}>
                                                     <FormOutlined />
                                                 </Button>
@@ -483,15 +261,15 @@ const TableStyleDialog = ({ visible, setVisible }) => {
                 <StylePickerDialog
                     visible={stylePickerDialogVisible}
                     setVisible={setStylePickerDialogVisible}
-                    onApply={(i, v) => { setLeafStlyeDialogValue(fromStyle(v.style)); setLeafStlyeDialogVisible(true) }}
+                    onApply={(i, v) => { setLeafStyleDialogValue(fromStyle(v.style)); setLeafStyleDialogVisible(true) }}
                 />
-                <LeafStlyeDialog
-                    visible={leafStlyeDialogVisible}
-                    setVisible={setLeafStlyeDialogVisible}
-                    onApply={(v) => setRules(alt.set(rules, `${leafStlyeDialogOnApplyIndex}.inputs.style.1`, v))}
+                <LeafStyleDialogNoInput
+                    visible={leafStyleDialogVisible}
+                    setVisible={setLeafStyleDialogVisible}
+                    onApply={(v) => setRules(alt.set(rules, `${leafStyleDialogOnApplyIndex}.inputs.style.1`, v))}
 
-                    customLeafStyle={leafStlyeDialogValue}
-                    setCustomLeafStyle={setLeafStlyeDialogValue}
+                    customLeafStyle={leafStyleDialogValue}
+                    setCustomLeafStyle={setLeafStyleDialogValue}
                 />
             </div>
             <div style={{ inlineSize: '160px' }}>
@@ -647,53 +425,6 @@ const SaveTableStyleDialog = ({ visible, setVisible, rules, onApply }) => {
     )
 }
 
-const ColorPickerButton = ({ disabled, value, onChange }) => {
-    const [pickerActive, setPickerActive] = useState(false);
-
-    return (
-        <DropdownButton
-            active={pickerActive}
-            setActive={_ => setPickerActive(_)}
-
-            renderButton={
-                (buttonRef) => {
-                    return (
-                        <Button
-                            disabled={disabled}
-                            className={`color-picker-button${pickerActive ? " __dropdown" : ""}`}
-                            active={pickerActive}
-                            onMouseDown={event => {
-                                event.preventDefault();
-                                if (!disabled) {
-                                    setPickerActive(!pickerActive);
-                                }
-                            }}
-                            ref={buttonRef}
-                        >
-                            <div style={{ background: value }}></div>
-                        </Button>
-                    )
-                }
-            }
-
-            renderDropdown={
-                (setPickerActive) => {
-                    return (
-                        <div>
-                            <SketchPicker
-                                color={value}
-                                onChange={({ hex }) => {
-                                    onChange(hex);
-                                }}
-                            />
-                        </div>
-                    )
-                }
-            }
-        />
-    )
-}
-
 const HistoryDialog = connect(state => ({
     history: state.workbenchAside.memory
 }))(({ visible, setVisible, setSlateValue, history, dispatch }) => {
@@ -800,7 +531,7 @@ const AddQuickTransformDialog = ({ visible, setVisible }) => {
                     full
                     onClick={_ => {
                         setVisible(false);
-                        TinyEmitter.emit(EVENTS.PREPARED_TRANSFORM,{
+                        TinyEmitter.emit(EVENTS.PREPARED_TRANSFORM, {
                             value: {
                                 ...MFind(customTransforms[index].value.id),
                                 inputs: customTransforms[index].value.inputs
@@ -816,22 +547,21 @@ const AddQuickTransformDialog = ({ visible, setVisible }) => {
 }
 
 const ExtraToolbar = ({ readOnly, setSlateValue }) => {
-    const [leafStlyeDialogVisible, setLeafStlyeDialogVisible] = useState();
-    const [leafStlyeDialogValue, setLeafStlyeDialogValue] = useState(fromStyle({}));
+    const [leafStyleDialogVisible, setLeafStyleDialogVisible] = useState();
+    const [leafStyleDialogValue, setLeafStyleDialogValue] = useState(fromStyle({}));
 
-    const [saveLeafStlyeDialogVisible, setSaveLeafStlyeDialogVisible] = useState();
     const [tableStyleDialogVisible, setTableStyleDialogVisible] = useState();
     const [historyDialogVisible, setHistoryDialogVisible] = useState();
     const [addQuickTransformDialogVisible, setAddQuickTransformDialogVisible] = useState();
 
-    const [leafStyleCache, setLeafStyleCache] = useState();
+    const [leafStyleInfo, setLeafStyleInfo] = useState({ title: '', group: '' });
 
     return (
         <>
             <div className={`editor-toolbar${readOnly ? ' editor-toolbar-disabled' : ''}`}>
                 <Button className="editor-button" onMouseDown={e => {
                     e.preventDefault();
-                    setLeafStlyeDialogVisible(true);
+                    setLeafStyleDialogVisible(true);
                 }}>
                     <AppstoreAddOutlined />
                 </Button>
@@ -858,22 +588,16 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
                     <BuildOutlined />
                 </Button>
             </div>
-            <LeafStlyeDialog
-                visible={leafStlyeDialogVisible}
-                setVisible={setLeafStlyeDialogVisible}
-                onApply={leafStyle => {
-                    setLeafStyleCache(leafStyle);
-                    setSaveLeafStlyeDialogVisible(true);
+            <LeafStyleDialogWithStraw
+                visible={leafStyleDialogVisible}
+                setVisible={setLeafStyleDialogVisible}
+                onApply={(title, group, style) => {
+                    pushCustomStyle({ title, group, style });
                 }}
-                customLeafStyle={leafStlyeDialogValue}
-                setCustomLeafStyle={setLeafStlyeDialogValue}
-            />
-            <SaveLeafStyleDialog
-                visible={saveLeafStlyeDialogVisible}
-                setVisible={setSaveLeafStlyeDialogVisible}
-                onApply={(title, group) => {
-                    pushCustomStyle({ title, group, style: leafStyleCache });
-                }}
+                customLeafStyle={leafStyleDialogValue}
+                setCustomLeafStyle={setLeafStyleDialogValue}
+                info={leafStyleInfo}
+                setInfo={setLeafStyleInfo}
             />
             <TableStyleDialog
                 visible={tableStyleDialogVisible}
