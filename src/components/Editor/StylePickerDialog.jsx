@@ -15,7 +15,7 @@ const StylePickerDialog = ({ visible, setVisible, onApply }) => {
                             setVisible(false);
                         }} key={i} >
                             <div>
-                                <span>
+                                <span className='slate-normalize'>
                                     <Leaf leaf={{
                                         ...leafStyle.style,
                                         fontSize: leafStyle.style.fontSize ?

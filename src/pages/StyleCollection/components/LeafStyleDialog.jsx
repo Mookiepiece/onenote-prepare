@@ -24,6 +24,7 @@ import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, customStyles } from
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 import './leafStyleDialog.scss';
+import { Editor } from 'slate';
 
 const leafStylesO = [
     ['bold', BoldOutlined, '粗体', { fontWeight: 'bold' }],

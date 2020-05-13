@@ -13,6 +13,7 @@ import { ToolboxFxFrame } from '../Toolbox/Toolbox';
 import { LeafStyleDialog, fromStyle } from './components/LeafStyleDialog.jsx';
 import { customStyles, altCustomStyle } from '@/utils/userSettings';
 import { alt } from '@/utils';
+import { v4 as uuid } from 'uuid';
 
 const getView = (page, map) => {
     const Page = page === 0 ? null : map.get(page)[0];
@@ -87,7 +88,7 @@ const FxCalendarTable = () => {
                             key={leafStyle.id}
                             className="leaf-style-card"
                             onClick={_ => {
-                                const { title, group, style } = customStyles[i];
+                                const { title, group, style } = leafStyle;
                                 setIndex(i);
                                 setLeafStyleDialogValue(fromStyle(style));
                                 setLeafStyleInfo({ title, group });
@@ -95,7 +96,7 @@ const FxCalendarTable = () => {
                             }}
                         >
                             <div>
-                                <span>
+                                <span className='slate-normalize'>
                                     <Leaf leaf={{
                                         ...leafStyle.style,
                                         fontSize: leafStyle.style.fontSize ?
@@ -117,7 +118,7 @@ const FxCalendarTable = () => {
                 visible={leafStyleDialogVisible}
                 setVisible={setLeafStyleDialogVisible}
                 onApply={(title, group, style) => {
-                    altCustomStyle(alt.set(customStyles, index, { title, group, style })).then(
+                    altCustomStyle(alt.set(customStyles, index, { title, group, style, id: uuid() })).then(
                         _ => setIndex(-1) // refresh
                     );
                 }}
