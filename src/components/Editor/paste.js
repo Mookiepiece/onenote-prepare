@@ -269,7 +269,7 @@ const HTML = {
     }
 }
 
-function elementStyle(htmlEl, inheritedStlye) {
+function elementStyle(htmlEl, inheritedStyle) {
     let {
         font, fontWeight, fontFamily, fontSize, fontStyle, color,
         marginLeft, marginRight,
@@ -279,7 +279,7 @@ function elementStyle(htmlEl, inheritedStlye) {
 
     // UA style sheel
     if (LFSM.has(htmlEl.nodeName)) {
-        inheritedStlye = { ...inheritedStlye, ...LFSM.get(htmlEl.nodeName) };
+        inheritedStyle = { ...inheritedStyle, ...LFSM.get(htmlEl.nodeName) };
     }
 
     // border of table
@@ -288,13 +288,13 @@ function elementStyle(htmlEl, inheritedStlye) {
         /** border-style */ (borderStyle !== undefined && [undefined, 'unset', 'none'].includes(borderStyle.toLowerCase())) ||
         /** border */['unset', 'none', '0in', '0px', '0pt', '0'].some(str => border.toLowerCase().split(' ').includes(str))
     ) {
-        inheritedStlye = { ...inheritedStlye, noBorder: true };
+        inheritedStyle = { ...inheritedStyle, noBorder: true };
     } else {
-        inheritedStlye = { ...inheritedStlye, noBorder: false };
+        inheritedStyle = { ...inheritedStyle, noBorder: false };
     }
 
     // tabs - margin-left
-    let tabs = inheritedStlye.tabs ? inheritedStlye.tabs : 0;
+    let tabs = inheritedStyle.tabs ? inheritedStyle.tabs : 0;
     if (marginLeft && marginLeft !== marginRight) {
         let float = Number.parseFloat(marginLeft);
 
@@ -304,15 +304,15 @@ function elementStyle(htmlEl, inheritedStlye) {
             tabs += Math.round(float / .375);
         }
     }
-    inheritedStlye = { ...inheritedStlye, tabs };
+    inheritedStyle = { ...inheritedStyle, tabs };
 
     // cellColor for table-cell & bgColor for leaves - background
     const judgeResult = judgeInline(htmlEl);
     if ((backgroundColor || background).trim()) {
         if (judgeResult === 1) {
-            inheritedStlye = { ...inheritedStlye, bgColor: backgroundColor || background };
+            inheritedStyle = { ...inheritedStyle, bgColor: backgroundColor || background };
         } else if (judgeResult === 2) {
-            inheritedStlye = { ...inheritedStlye, cellColor: backgroundColor || background, bgColor: undefined };
+            inheritedStyle = { ...inheritedStyle, cellColor: backgroundColor || background, bgColor: undefined };
         } else if (judgeResult === 0) {
             // do nothing
         }
@@ -322,35 +322,35 @@ function elementStyle(htmlEl, inheritedStlye) {
     // TODO: font - the short word
     if (fontStyle !== undefined) {
         if (['oblique', 'italic'].includes(fontStyle)) {
-            inheritedStlye = { ...inheritedStlye, italic: true };
+            inheritedStyle = { ...inheritedStyle, italic: true };
         } else if (['normal', 'unset'].includes(fontStyle)) {
-            inheritedStlye = { ...inheritedStlye, italic: false };
+            inheritedStyle = { ...inheritedStyle, italic: false };
         }
     }
     if (fontWeight !== undefined) {
         if (['500', '600', '700', '800', '900', 'bold', 'bolder'].includes(fontWeight)) {
-            inheritedStlye = { ...inheritedStlye, bold: true };
+            inheritedStyle = { ...inheritedStyle, bold: true };
         } else if (['normal', 'unset'].includes(fontWeight)) {
-            inheritedStlye = { ...inheritedStlye, bold: false };
+            inheritedStyle = { ...inheritedStyle, bold: false };
         }
     }
     // if (fontSize !== undefined) {
     //     //TODO
-    //     inheritedStlye = { ...inheritedStlye, fontSize };
+    //     inheritedStyle = { ...inheritedStyle, fontSize };
     //     if (['unset'].includes(fontSize)) {
-    //         inheritedStlye = { ...inheritedStlye, fontSize: undefined };
+    //         inheritedStyle = { ...inheritedStyle, fontSize: undefined };
     //     }
     // }
     // if (fontFamily !== undefined) {
-    //     inheritedStlye = { ...inheritedStlye, fontFamily };
+    //     inheritedStyle = { ...inheritedStyle, fontFamily };
     //     if (['unset'].includes(fontFamily)) {
-    //         inheritedStlye = { ...inheritedStlye, fontFamily: undefined };
+    //         inheritedStyle = { ...inheritedStyle, fontFamily: undefined };
     //     }
     // }
     if (color !== undefined) {
-        inheritedStlye = { ...inheritedStlye, fontColor: color };
+        inheritedStyle = { ...inheritedStyle, fontColor: color };
         if (['unset'].includes(color)) {
-            inheritedStlye = { ...inheritedStlye, fontColor: undefined };
+            inheritedStyle = { ...inheritedStyle, fontColor: undefined };
         }
     }
 
@@ -358,23 +358,23 @@ function elementStyle(htmlEl, inheritedStlye) {
     let textDecorationItems = [textDecorationLine.split(' ')] || textDecoration.split(' ');
     if (textDecoration !== undefined) {
         if (['underline'].includes(textDecorationItems)) {
-            inheritedStlye = { ...inheritedStlye, underline: true };
+            inheritedStyle = { ...inheritedStyle, underline: true };
         } else {
-            inheritedStlye = { ...inheritedStlye, underline: false };
+            inheritedStyle = { ...inheritedStyle, underline: false };
         }
 
         if (['line-through'].includes(textDecorationItems)) {
-            inheritedStlye = { ...inheritedStlye, underline: true };
+            inheritedStyle = { ...inheritedStyle, underline: true };
         } else {
-            inheritedStlye = { ...inheritedStlye, underline: false };
+            inheritedStyle = { ...inheritedStyle, underline: false };
         }
     }
 
-    return inheritedStlye;
+    return inheritedStyle;
 }
 
-function eatCSS(el, inheritedStlye, style) {
-    style = { ...inheritedStlye, ...style };
+function eatCSS(el, inheritedStyle, style) {
+    style = { ...inheritedStyle, ...style };
     if (Text.isText(el)) {
         return eatCSSLeaf(el, style);
     } else {

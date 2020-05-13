@@ -70,7 +70,7 @@
 
 .ani-toolbox-index-enter {
     z-index: 1;
-    transform: scale(0.1);
+    // transform: scale(0.1);
     opacity: 0;
 }
 .ani-toolbox-index-enter-active {
@@ -104,6 +104,6 @@
     transition: transform 0.3s cubic-bezier(0.8, 0.1, 0.1, 0.8), opacity 0.3s;
 }
 .ani-toolbox-frame-exit-active {
-    transform: scale(0.8);
-    opacity: 0;
+    transform: translate(100%);
+    opacity: 1;
 }

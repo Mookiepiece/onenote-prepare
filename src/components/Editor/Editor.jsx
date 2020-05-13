@@ -27,7 +27,6 @@ export const SlateEditor = ({ value, setValue, readOnly, showToolbar, children }
                         className="slate-editable"
                         renderElement={renderElement}
                         renderLeaf={renderLeaf}
-                        placeholder="Enter some rich text…"
                         onKeyDown={handleKeydown}
                     />
                 </div>
