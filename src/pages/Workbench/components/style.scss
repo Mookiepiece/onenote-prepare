@@ -68,8 +68,8 @@
 
 .dialog-select-transform {
   @include pick-one-dialog(".dialog-select-transform-option");
-  .dialog-select-transform-option>div{
-    transform: scale(.5);
+  .dialog-select-transform-option > div {
+    transform: scale(0.5);
   }
 }
 
@@ -208,6 +208,11 @@
   position: relative;
   margin-left: 12px;
   overflow-y: auto;
+}
+
+.dialog-bottom-panel {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .match-item-enter {

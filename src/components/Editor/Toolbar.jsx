@@ -495,7 +495,7 @@ const LeafStyleButton = () => {
                     setStylePickerDialogVisible(true);
                 }}
             >
-                <FontColorsOutlined />
+                <FontSizeOutlined />
             </Button>
             <StylePickerDialog
                 onApply={(_, { style }) => {

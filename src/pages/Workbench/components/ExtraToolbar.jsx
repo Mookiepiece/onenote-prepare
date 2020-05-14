@@ -86,10 +86,10 @@ const HistoryDialog = connect(state => ({
                     </ReadOnlySlateEditor>
                 </div>
             </div>
-            <div style={{ inlineSize: '160px' }}>
+            <div className="dialog-bottom-panel">
                 <Button
                     disabled={index === -1}
-                    full
+                    style={{ inlineSize: '160px' }}
                     onClick={_ => {
                         setVisible(false);
                         setSlateValue(value);
@@ -139,10 +139,19 @@ const AddQuickTransformDialog = ({ visible, setVisible }) => {
                     </ReadOnlySlateEditor>
                 </div>
             </div>
-            <div style={{ inlineSize: '160px' }}>
+            <div className="dialog-bottom-panel">
                 <Button
+                    style={{ inlineSize: '160px' }}
                     disabled={index === -1}
-                    full
+                    onClick={_ => {
+                        setCustomTransforms(customTransforms.slice(0, index).concat(customTransforms.slice(index + 1)));
+                        resetIndex();
+                        resetValue();
+                    }}
+                >删除</Button>
+                <Button
+                    style={{ inlineSize: '160px' }}
+                    disabled={index === -1}
                     onClick={_ => {
                         setVisible(false);
                         TinyEmitter.emit(EVENTS.PREPARED_TRANSFORM, {
@@ -155,15 +164,6 @@ const AddQuickTransformDialog = ({ visible, setVisible }) => {
                     }}
                     type="primary"
                 >确定</Button>
-                <Button
-                    disabled={index === -1}
-                    full
-                    onClick={_ => {
-                        setCustomTransforms(customTransforms.slice(0, index).concat(customTransforms.slice(index + 1)));
-                        resetIndex();
-                        resetValue();
-                    }}
-                >删除</Button>
             </div>
         </Dialog>
     )

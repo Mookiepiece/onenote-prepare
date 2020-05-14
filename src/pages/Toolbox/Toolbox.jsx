@@ -54,12 +54,10 @@ const ToolboxIndex = ({ setPage }) => {
                     [...pagesMap.entries()].map(([k, [Compo, title, desc, Icon]]) => {
                         return (
                             <Button key={k} onClick={_ => setPage(k)}>
-                                <div>
+                                <div className="tool-info">
                                     <Icon />
-                                    <div>
-                                        <h6>{title}</h6>
-                                        <p>{desc}</p>
-                                    </div>
+                                    <h6>{title}</h6>
+                                    <p>{desc}</p>
                                 </div>
                             </Button>
                         )
@@ -354,7 +352,7 @@ const FxCalendarTable = ({ back }) => {
 }
 
 const pagesMap = new Map([
-    [FxCalendarTable, '日历表格', '生成日历表格', CalendarOutlined]
+    [FxCalendarTable, '日历', '生成日历表格', CalendarOutlined]
 ].map((v, i) => [i + 1, v])
 )
 

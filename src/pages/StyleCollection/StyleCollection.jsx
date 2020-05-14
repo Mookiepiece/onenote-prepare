@@ -6,7 +6,7 @@ import './style.scss';
 
 import Button from '@/components/MkButton';
 import { DropdownButton } from '@/components/DropdownButton';
-import { CalendarOutlined, DeleteOutlined } from '@ant-design/icons';
+import { CalendarOutlined, DeleteOutlined, FontSizeOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 import { ToolboxFxFrame } from '../Toolbox/Toolbox';
@@ -58,12 +58,10 @@ const SCIndex = ({ setPage }) => {
                     [...pagesMap.entries()].map(([k, [Compo, title, desc, Icon]]) => {
                         return (
                             <Button key={k} onClick={_ => setPage(k)}>
-                                <div>
+                                <div className="tool-info">
                                     <Icon />
-                                    <div>
-                                        <h6>{title}</h6>
-                                        <p>{desc}</p>
-                                    </div>
+                                    <h6>{title}</h6>
+                                    <p>{desc}</p>
                                 </div>
                             </Button>
                         )
@@ -189,8 +187,8 @@ const TableStylePanel = () => {
 }
 
 const pagesMap = new Map([
-    [FontStylePanel, '文字样式管理', '/', CalendarOutlined],
-    [TableStylePanel, '表格样式管理', '/', CalendarOutlined],
+    [FontStylePanel, '文字样式管理', ' ', FontSizeOutlined],
+    [TableStylePanel, '表格样式管理', ' ', CreditCardOutlined],
 ].map((v, i) => [i + 1, v])
 )
 
