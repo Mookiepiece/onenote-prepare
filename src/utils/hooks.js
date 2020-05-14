@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { alt } from './index';
 
 export function useDeepState(info, setInfo, path) {
     const value = path.split('.').reduce((info, key) => info[key], info);
