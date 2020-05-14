@@ -39,7 +39,12 @@ SLATE_DEFAULTS.FONT_SIZE = store.get('settings.slateDefaultFontSize');
 function IdbCacheApiFactory(name) {
     let values = [];
     let listeners = [];
-    IndexDB[name]().then(v => values = v).catch(e => console.error(e));
+
+    // #0 init
+    IndexDB[name]().then(v => {
+        values = v;
+        listeners.forEach(callback => callback(values));
+    }).catch(e => console.error(e));
 
     return _ => {
         const [localValue, setLocalValue] = useState(values);
@@ -53,6 +58,7 @@ function IdbCacheApiFactory(name) {
         }, []);
 
         const setValue = v => {
+            // #0 set value then refresh
             IndexDB[name](v).then(v => {
                 values = v;
                 listeners.forEach(callback => callback(values));
@@ -64,9 +70,4 @@ function IdbCacheApiFactory(name) {
 }
 export const useIdbCustomStyles = IdbCacheApiFactory('customStyle');
 export const useIdbCustomTableStyles = IdbCacheApiFactory('customTableStyle');
-
-export let customTransforms = [];
-IndexDB.customTransform().then(v => customTransforms = v).catch(e => console.error(e));
-export async function pushCustomTransform(value) {
-    customTransforms = await IndexDB.customTransform([...customTransforms, { ...value, id: uuid() }]);
-}
+export const useIdbCustomTransforms = IdbCacheApiFactory('customTransform');

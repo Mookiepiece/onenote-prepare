@@ -1,15 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-    AppstoreAddOutlined,
-    EditOutlined,
-    HistoryOutlined,
     PlusOutlined,
     UpOutlined,
     DownOutlined,
     CloseOutlined,
     FormOutlined,
     FolderOpenOutlined,
-    BuildOutlined
 } from '@ant-design/icons';
 
 import Dialog from "@/components/Dialog";
@@ -17,18 +13,18 @@ import Button from "@/components/MkButton";
 import Input from '@/components/Input';
 
 import { alt } from '@/utils';
+import { useDeepState, useReState } from '@/utils/hooks';
 
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { setArrayItem, drawImageScaled } from '@/utils';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import { fontFamilyOptions, SLATE_DEFAULTS, fontSizeOptions, useIdbCustomStyles, pushCustomTableStyle, customTransforms } from '@/utils/userSettings';
 import { v4 as uuid } from 'uuid';
 import CachedInput from '@/components/Input/cachedInput';
 import StylePickerDialog from '@/components/Editor/StylePickerDialog';
 import { computeStyleTable } from '@/components/Editor/Toolbar';
-import { LeafStyleDialogWithStraw, fromComputedLeafStyle, LeafStyleDialogNoInput } from '@/pages/StyleCollection/components/LeafStyleDialog';
+import { fromComputedLeafStyle, LeafStyleDialogNoInput } from '@/pages/StyleCollection/components/LeafStyleDialog';
 import { ColorPickerButton } from '@/components/ColorPicker';
 
 import './tableStyleDialog.scss';
@@ -191,12 +187,6 @@ const FileInput = ({ value, onChange = _ => _, ...rest }) => {
     )
 }
 
-function useDeepState(info, setInfo, path) {
-    const value = path.split('.').reduce((info, key) => info[key], info);
-    const setValue = v => setInfo(alt.set(info, path, v));
-    return [value, setValue];
-}
-
 const SaveTableStyleDialog = ({ visible, setVisible, info, setInfo, onApply }) => {
     const [title, setTitle] = useDeepState(info, setInfo, 'title');
     const [group, setGroup] = useDeepState(info, setInfo, 'group');
@@ -230,14 +220,6 @@ const SaveTableStyleDialog = ({ visible, setVisible, info, setInfo, onApply }) =
             }} full>保存</Button>
         </Dialog>
     )
-}
-
-function useReState(init) {
-    const [value, setValue] = useState(init);
-    const resetValue = _ => {
-        setValue(init)
-    }
-    return [value, setValue, resetValue];
 }
 
 export const AdvancedTableStyleDialog = ({ visible, setVisible, onApply }) => {

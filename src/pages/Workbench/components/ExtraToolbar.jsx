@@ -26,15 +26,16 @@ import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { setArrayItem, drawImageScaled } from '@/utils';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import { useIdbCustomStyles, useIdbCustomTableStyles, customTransforms } from '@/utils/userSettings';
+import { useIdbCustomStyles, useIdbCustomTableStyles, customTransforms, useIdbCustomTransforms } from '@/utils/userSettings';
 import { MFind } from '../transforms';
 import { Editor } from 'slate';
 import ActionTypes from '@/redux/actions';
 import { v4 as uuid } from 'uuid';
 import StylePickerDialog from '@/components/Editor/StylePickerDialog';
 import { computeStyleTable } from '@/components/Editor/Toolbar';
-import { LeafStyleDialogWithStraw, fromComputedLeafStyle, LeafStyleDialogNoInput } from '@/pages/StyleCollection/components/LeafStyleDialog';
+import { LeafStyleDialogWithStraw, fromComputedLeafStyle } from '@/pages/StyleCollection/components/LeafStyleDialog';
 import { AdvancedTableStyleDialog } from '@/pages/StyleCollection/components/TableStyleDialog';
+import { useReState } from '@/utils/hooks';
 
 const HistoryDialog = connect(state => ({
     history: state.workbenchAside.memory
@@ -105,8 +106,10 @@ const HistoryDialog = connect(state => ({
 });
 
 const AddQuickTransformDialog = ({ visible, setVisible }) => {
-    const [value, setValue] = useState([{ children: [{ text: '' }] }]);
-    const [index, setIndex] = useState(-1);
+    const [value, setValue, resetValue] = useReState([{ children: [{ text: '' }] }]);
+    const [index, setIndex, resetIndex] = useReState(-1);
+
+    const [customTransforms, setCustomTransforms] = useIdbCustomTransforms();
 
     useEffect(_ => {
         if (index === -1) {
@@ -152,6 +155,15 @@ const AddQuickTransformDialog = ({ visible, setVisible }) => {
                     }}
                     type="primary"
                 >确定</Button>
+                <Button
+                    disabled={index === -1}
+                    full
+                    onClick={_ => {
+                        setCustomTransforms(customTransforms.slice(0, index).concat(customTransforms.slice(index + 1)));
+                        resetIndex();
+                        resetValue();
+                    }}
+                >删除</Button>
             </div>
         </Dialog>
     )

@@ -27,7 +27,7 @@ import './style.scss';
 import { TinyEmitter, EVENTS } from '@/utils';
 import Dialog from '@/components/Dialog/Dialog';
 import Input from '@/components/Input';
-import { pushCustomTransform } from '@/utils/userSettings';
+import { pushCustomTransform, useIdbCustomTransforms } from '@/utils/userSettings';
 
 const applyChange = (editor, state, setSlateValue) => {
     applyMatcher(editor, state)
@@ -181,6 +181,9 @@ const Aside = ({ setSlateValue, readOnly, state, dispatch: _dispatch }) => {
 
 const SaveRuleDialog = ({ visible, setVisible, v }) => {
     const [title, setTitle] = useState('');
+
+    const [customTransforms, setCustomTransforms] = useIdbCustomTransforms();
+
     return (
         <Dialog visible={visible} setVisible={setVisible}>
             <p>保存替换规则</p>
@@ -189,14 +192,14 @@ const SaveRuleDialog = ({ visible, setVisible, v }) => {
                 <div><Input value={title} onChange={setTitle} /></div>
             </div>
             <Button disabled={!title.trim()} onClick={_ => {
-                pushCustomTransform({
+                setCustomTransforms([...customTransforms, {
                     title,
                     value: {
                         id: v.matches[0].id,
                         inputs: v.matches[0].inputs,
                         result: v.result
                     }
-                });
+                }]);
                 setVisible(false);
             }} full>保存</Button>
         </Dialog>
