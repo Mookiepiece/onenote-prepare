@@ -36,41 +36,34 @@ export const SLATE_DEFAULTS = new Proxy({}, {
 SLATE_DEFAULTS.FONT_FAMILY = store.get('settings.slateDefaultFontFamily');
 SLATE_DEFAULTS.FONT_SIZE = store.get('settings.slateDefaultFontSize');
 
-let customStyles = [];
-IndexDB.customStyle().then(v => customStyles = v).catch(e => console.error(e));
-let subs = [];
-export const useIdbCustomStyles = () => {
-    const [customStylesL, setCustomStylesL] = useState(customStyles);
+function IdbCacheApiFactory(name) {
+    let values = [];
+    let listeners = [];
+    IndexDB[name]().then(v => values = v).catch(e => console.error(e));
 
-    useEffect(_ => {
-        subs.push(setCustomStylesL);
-        return _ => {
-            const index = subs.indexOf(setCustomStylesL);
-            subs = [...subs.slice(0, setCustomStylesL), ...subs.slice(setCustomStylesL + 1)];
+    return _ => {
+        const [localValue, setLocalValue] = useState(values);
+
+        useEffect(_ => {
+            listeners.push(setLocalValue);
+            return _ => {
+                const index = listeners.indexOf(setLocalValue);
+                listeners = [...listeners.slice(0, index), ...listeners.slice(index + 1)];
+            }
+        }, []);
+
+        const setValue = v => {
+            IndexDB[name](v).then(v => {
+                values = v;
+                listeners.forEach(callback => callback(values));
+            }).catch(e => console.error(e));
         }
-    }, []);
 
-    const setCustomStyleLA = v => {
-        IndexDB.customStyle(v).then(v => {
-            customStyles = v;
-            subs.forEach(cb => cb(customStyles));
-        }).catch(e => console.error(e));
+        return [localValue, setValue];
     }
-
-    return [customStylesL, setCustomStyleLA];
 }
-
-export let customTableStyles = [];
-IndexDB.customTableStyle().then(v => customTableStyles = v).catch(e => console.error(e));
-export async function pushCustomTableStyle(value) {
-    customTableStyles = await IndexDB.customTableStyle([...customTableStyles, { ...value, id: uuid() }]);
-}
-
-export let customResultTemplates = [];
-IndexDB.customResultTemplate().then(v => customResultTemplates = v).catch(e => console.error(e));
-export async function pushCustomResultTemplate(value) {
-    customResultTemplates = await IndexDB.customResultTemplate([...customResultTemplates, { ...value, id: uuid() }]);
-}
+export const useIdbCustomStyles = IdbCacheApiFactory('customStyle');
+export const useIdbCustomTableStyles = IdbCacheApiFactory('customTableStyle');
 
 export let customTransforms = [];
 IndexDB.customTransform().then(v => customTransforms = v).catch(e => console.error(e));

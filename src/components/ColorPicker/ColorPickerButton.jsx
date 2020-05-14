@@ -1,7 +1,7 @@
 import React,{useState} from 'react';
 import Button from "@/components/MkButton";
 import { SketchPicker } from 'react-color';
-import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
+import { DropdownButton } from '@/components/DropdownButton';
 
 const ColorPickerButton = ({ disabled, value, onChange }) => {
     const [pickerActive, setPickerActive] = useState(false);

@@ -54,10 +54,6 @@ async function customTableStyle(value) {
     return op('customTableStyle', value);
 }
 
-async function customResultTemplate(value) {
-    return op('customResultTemplate', value);
-}
-
 async function customTransform(value) {
     return op('customTransform', value);
 }
@@ -85,7 +81,6 @@ const IndexDB = {
     history,
     customStyle,
     customTableStyle,
-    customResultTemplate,
     customTransform,
 };
 

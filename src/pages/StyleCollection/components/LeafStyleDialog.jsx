@@ -44,7 +44,7 @@ const leafStyles = [
     ['bgColor', '#000']
 ];
 
-export const fromStyle = (style) => {
+export const fromComputedLeafStyle = (style) => {
     let result = {};
     leafStyles.forEach(([key, defaultValue]) => {
         if (style[key] === undefined) {

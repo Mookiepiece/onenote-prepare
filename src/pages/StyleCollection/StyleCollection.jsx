@@ -10,19 +10,20 @@ import { CalendarOutlined, DeleteOutlined } from '@ant-design/icons';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
 
 import { ToolboxFxFrame } from '../Toolbox/Toolbox';
-import { LeafStyleDialog, fromStyle } from './components/LeafStyleDialog.jsx';
-import { useIdbCustomStyles } from '@/utils/userSettings';
+import { LeafStyleDialog, fromComputedLeafStyle } from './components/LeafStyleDialog.jsx';
+import { BaseTableStyleDialog, BLANK, fromComputedTableRules } from './components/TableStyleDialog.jsx';
+import { useIdbCustomStyles, useIdbCustomTableStyles, } from '@/utils/userSettings';
 import { alt } from '@/utils';
 import { v4 as uuid } from 'uuid';
 
-const getView = (page, map) => {
+const getView = (page, setPage, map) => {
     const Page = page === 0 ? null : map.get(page)[0];
     return (Page ? <Page back={_ => setPage(0)} /> : null);
 }
 
 const SC = _ => {
     const [page, setPage] = useState(0);
-    const view = getView(page, pagesMap);
+    const view = getView(page, setPage, pagesMap);
     return (
         <div className="page-toolbox">
             <CSSTransition
@@ -73,9 +74,9 @@ const SCIndex = ({ setPage }) => {
     );
 }
 
-const FxCalendarTable = () => {
+const FontStylePanel = () => {
     const [leafStyleDialogVisible, setLeafStyleDialogVisible] = useState();
-    const [leafStyleDialogValue, setLeafStyleDialogValue] = useState(fromStyle({}));
+    const [leafStyleDialogValue, setLeafStyleDialogValue] = useState(fromComputedLeafStyle({}));
     const [leafStyleInfo, setLeafStyleInfo] = useState({ title: '', group: '' });
     const [index, setIndex] = useState(-1);
 
@@ -94,7 +95,7 @@ const FxCalendarTable = () => {
                                 onClick={_ => {
                                     const { title, group, style } = leafStyle;
                                     setIndex(i);
-                                    setLeafStyleDialogValue(fromStyle(style));
+                                    setLeafStyleDialogValue(fromComputedLeafStyle(style));
                                     setLeafStyleInfo({ title, group });
                                     setLeafStyleDialogVisible(true);
                                 }}
@@ -135,8 +136,61 @@ const FxCalendarTable = () => {
     )
 }
 
+const TableStylePanel = () => {
+    const [visible, setVisible] = useState();
+    const [rules, setRules] = useState([]);
+    const [info, setInfo] = useState({ title: '', group: '', image: BLANK });
+    const [index, setIndex] = useState(-1);
+
+    const [customTableStyles, setCustomTableStyles] = useIdbCustomTableStyles();
+
+    return (
+        <div>
+            <div className="dialog-table-style-picker">
+                {
+                    customTableStyles.map((tableStyle, i) => (
+                        <div
+                            className="table-style-card"
+                            key={i}
+                        >
+                            <div
+                                onClick={_ => {
+                                    const { title, group, image, rules } = tableStyle;
+                                    setIndex(i);
+                                    setRules(fromComputedTableRules(rules));
+                                    setInfo({ title, group, image });
+                                    setVisible(true);
+                                }}
+                            >
+                                <img src={tableStyle.image} />
+                            </div>
+                            <h6>{tableStyle.title}</h6>
+                            <p>{tableStyle.group}</p>
+                            <Button full onClick={_ => {
+                                setCustomTableStyles(customTableStyles.slice(0, i).concat(customTableStyles.slice(i + 1)));
+                            }}><DeleteOutlined /></Button>
+                        </div>
+                    ))
+                }
+            </div>
+            <BaseTableStyleDialog
+                visible={visible}
+                setVisible={setVisible}
+                onApply={(v) => {
+                    setCustomTableStyles(alt.set(customTableStyles, index, { ...v, id: uuid() }));
+                }}
+                rules={rules}
+                setRules={setRules}
+                info={info}
+                setInfo={setInfo}
+            />
+        </div>
+    )
+}
+
 const pagesMap = new Map([
-    [FxCalendarTable, '文字样式管理', '/', CalendarOutlined]
+    [FontStylePanel, '文字样式管理', '/', CalendarOutlined],
+    [TableStylePanel, '表格样式管理', '/', CalendarOutlined],
 ].map((v, i) => [i + 1, v])
 )
 

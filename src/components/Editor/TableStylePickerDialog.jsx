@@ -1,9 +1,11 @@
 import React from 'react';
 import Dialog from '@/components/Dialog';
 
-import { customTableStyles } from '@/utils/userSettings';
+import { useIdbCustomTableStyles } from '@/utils/userSettings';
 
 const TableStylePickerDialog = ({ visible, setVisible, onApply }) => {
+    const [customTableStyles, setCustomTableStyles] = useIdbCustomTableStyles();
+
     return (
         <Dialog fullWidth visible={visible} setVisible={setVisible}>
             <div className="dialog-table-style-picker">

@@ -12,14 +12,14 @@ import { useRouterContext } from '@/App';
 import { CSSTransition } from 'react-transition-group';
 
 
-const getView = (page, map) => {
+const getView = (page, setPage, map) => {
     const Page = page === 0 ? null : map.get(page)[0];
     return (Page ? <Page back={_ => setPage(0)} /> : null);
 }
 
 const Toolbox = _ => {
     const [page, setPage] = useState(0);
-    const view = getView(page, pagesMap);
+    const view = getView(page, setPage, pagesMap);
     return (
         <div className="page-toolbox">
             <CSSTransition
