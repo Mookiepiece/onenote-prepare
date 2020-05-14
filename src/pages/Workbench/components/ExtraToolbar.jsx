@@ -153,7 +153,7 @@ const AddQuickTransformDialog = ({ visible, setVisible }) => {
                     type="primary"
                 >确定</Button>
             </div>
-        </Dialog >
+        </Dialog>
     )
 }
 

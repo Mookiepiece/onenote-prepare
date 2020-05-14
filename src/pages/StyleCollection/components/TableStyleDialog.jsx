@@ -31,6 +31,8 @@ import { computeStyleTable } from '@/components/Editor/Toolbar';
 import { LeafStyleDialogWithStraw, fromComputedLeafStyle, LeafStyleDialogNoInput } from '@/pages/StyleCollection/components/LeafStyleDialog';
 import { ColorPickerButton } from '@/components/ColorPicker';
 
+import './tableStyleDialog.scss';
+
 export const BLANK = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII='
 
 const TableStylePreview = ({ rules }) => {

@@ -92,71 +92,6 @@
     }
   }
 }
-.image-input {
-  width: 200px;
-  height: 200px;
-}
-
-.image-input-button {
-  border: 1px solid var(--gray-4);
-  transition: all 0.1s;
-
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-
-  &:hover,
-  &:focus {
-    border-color: var(--blue-5);
-  }
-
-  & + div {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    text-align: center;
-    pointer-events: none;
-    > * {
-      color: var(--gray-6);
-
-      font-size: 48px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  }
-  & ~ canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-  }
-
-  ~ span {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-
-    color: var(--gray-6);
-    user-select: none;
-  }
-  ~ .file-input {
-    position: absolute;
-    bottom: 4px;
-    left: 4px;
-
-    .mk-button:not(:hover) {
-      background-color: transparent;
-    }
-  }
-}
 
 .dialog-table-style-picker {
   @include pick-one-dialog(".table-style-card");
@@ -168,18 +103,6 @@
         object-fit: cover;
       }
     }
-  }
-}
-
-.color-picker-button {
-  width: 32px;
-  height: 32px;
-  padding: 8px;
-  position: relative;
-  > div {
-    width: 100%;
-    height: 100%;
-    border: 1px dashed var(--gray-8);
   }
 }
 
@@ -285,61 +208,6 @@
   position: relative;
   margin-left: 12px;
   overflow-y: auto;
-}
-
-.table-style-editor {
-  height: calc(100% - 64px);
-  margin-bottom: 24px;
-
-  > aside {
-    padding: 8px;
-    float: left;
-    overflow: auto;
-    box-shadow: var(--gray-4) 0 0 4px 2px;
-    width: 400px;
-    max-height: 100%;
-
-    .table-style-list {
-      > div {
-        display: flow-root;
-        position: relative;
-        margin: 8px;
-        border: 1px solid var(--gray-4);
-
-        > button {
-          position: absolute;
-          top: 0;
-          right: 0;
-        }
-
-        > div:nth-child(2) {
-          float: left;
-          width: 40px;
-          button {
-            height: 60px;
-            &.disabled {
-              opacity: 0;
-            }
-          }
-        }
-        > div:nth-child(3) {
-          display: flow-root;
-        }
-      }
-    }
-  }
-
-  > .sample-container {
-    margin-left: 424px;
-    min-width: 200px;
-
-    overflow: scroll;
-    white-space: nowrap;
-
-    >.table-style-preview-configs{
-      margin-bottom: 48px;
-    }
-  }
 }
 
 .match-item-enter {
