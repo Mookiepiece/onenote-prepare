@@ -2,7 +2,8 @@ const path = require('path');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const { format } = require('url');
 
-const isDevelopment = process.env&&process.env.NODE_ENV === 'development'
+// NOTE: in packed app, there's no NODE_ENV in process
+const isDevelopment = process.env.NODE_ENV === 'development'
 
 let mainWindow;
 

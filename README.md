@@ -1,15 +1,17 @@
 # pre-onenote
-Color and format text/html to beautify OneNote
+color and format text/html to beautify OneNote
 
-in developing...so slow
+in developing... still a long way to go
 
 格式化待粘贴到OneNote的文本
 
-正在开发中...
+临时使用手册：www.whiteswallows.ink/preonenote/docs
+
+仍然在改进...
 
 ## 动机
 
-个人写过自认为不丑的OneNote笔记，习惯在笔记中套用自己的一套格式，但是OneNote for Windows10 中还是暂时不支持自定义格式化，故打算写个网页预处理文本样式，再复制到OneNote中，事实上Office的ppt等等都将可以使用它做富文本样式变换。其实在WORD的替换功能里有更成熟的文本样式替换功能，但缺乏对目标样式的管理
+打算写个网页预处理文本样式，再复制到OneNote中，官网可见使用说明，事实上Office的ppt等等都将可以使用它做富文本样式变换。其实在WORD的替换功能里有更成熟的文本样式替换功能，但缺乏对目标样式的管理
 
 用例一：网页的重点标记不符合主题，我们复制需要的内容粘贴进来，标记所有粗体，替换为一个主题样式，再粘贴进其它软件
 

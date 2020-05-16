@@ -90,8 +90,6 @@ const Toolbar = ({ readOnly }) => {
             <div className="toolbar-group">
                 <LeafStyleButton />
                 <TableStyleButton />
-                <ActionButton />
-                <ActionButtonX />
                 <DeleteButton />
             </div>
         </div>
@@ -373,43 +371,8 @@ const TableButtonGroup = () => {
 
 // NOTE: Editor.nodes(editor,{at}), the 'at' option means all nodes lays on the way from outer to that 'at' path and all nodes inside 'at'
 
-const ActionButton = () => {
-    const editor = useSlate();
-    return (
-        <Button
-            className="editor-button"
-            onMouseDown={
-                event => {
-                    event.preventDefault();
-                    // getSelection(editor);
-                }
-            }
-        >
-            <CaretRightOutlined />
-        </Button >
-    )
-}
-
 //NOTE:Transform.insertNodes如果给的是point是不会删除内容，给range会删除range里的内容
 //如果range给的小也没问题
-
-const ActionButtonX = () => {
-    const editor = useSlate();
-    return (
-        <Button
-            className="editor-button"
-            onMouseDown={
-                event => {
-                    event.preventDefault();
-                    putSelection(editor);
-
-                }
-            }
-        >
-            <CaretRightOutlined />
-        </Button>
-    )
-}
 
 const ColorButton = ({ format, icon }) => {
     const editor = useSlate();

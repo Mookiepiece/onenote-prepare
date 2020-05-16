@@ -303,20 +303,14 @@ const Element = (props) => {
     attributes = { ...attributes, style, className };
 
     switch (element.type) {
-        //richtext
-        case 'block-quote':
-            return <blockquote {...attributes}>{children}</blockquote>;
-        case 'heading-one':
-            return <h1 {...attributes}>{children}</h1>;
-        case 'heading-two':
-            return <h2 {...attributes}>{children}</h2>;
+        // 
         case 'bulleted-list':
             return <ul {...attributes}>{children}</ul>;
         case 'numbered-list':
             return <ol {...attributes}>{children}</ol>;
         case 'list-item':
             return <li {...attributes}>{children}</li>;
-        //table
+        // table
         case 'table':
             if (element.noBorder) {
                 attributes.className += ' no-border';
