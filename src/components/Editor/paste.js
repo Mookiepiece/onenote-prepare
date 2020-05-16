@@ -12,7 +12,6 @@ import { matchType } from "./utils";
 // TODO: npm i -S css-color-keywords, rgb? hsl?  
 // TODO: not support text node with '\n' in web case, but ON has '\n' for blank node
 
-
 /** https://htmlreference.io/  */
 
 const LF_NORMAL = [
@@ -66,8 +65,6 @@ const ELSM = new Map([
 
 const defaulta = _ => ({ type: 'paragraph', children: [{ text: '' }] });
 
-// words
-// ---
 // el: elements
 // node: text、elements、attributes, even comments
 
@@ -95,6 +92,16 @@ function deserializeFragmentX(children, css) {
         if (judgeResult === 1) { // TEXT_NODEs, inline elements will be binded into a anonymous paragraph
             let leaves = [children[i]];
 
+            /**
+             *  <div>
+             *      blabla  - 1
+             *      bilibili - 2
+             *      <div>
+             *          ...
+             *      </div>
+             *  </div>
+             *  in this case, 1&2 will be pushed into a signle anonymous paragraph
+             */
             for (i++; i < children.length; i++) {
                 if (!judgeInline(children[i])) {
                     break;
@@ -108,7 +115,7 @@ function deserializeFragmentX(children, css) {
                 type: 'paragraph',
                 children: deserializeLeaves(leaves, css)
             }, css));
-        } else if (judgeResult === 2) { // block-level element: table, list, div
+        } else if (judgeResult === 2) { // block-level elements: table, list, div
 
             let css0 = elementStyle(children[i], css);
 
@@ -117,11 +124,13 @@ function deserializeFragmentX(children, css) {
             } else if (['LI', 'DT'].includes(children[i].nodeName)) {
                 ans.push(deserializeListX(children[i], css0));
             } else {
-                ans.push(deserializeFragmentX(HTML.childNodes(children[i]), css0)); // DIV does not matters, we just deep into inline
+                // DIVs does not matters, we need deep into the last div which contains inline leaves
+                // we divide lines by the last divs
+                ans.push(deserializeFragmentX(HTML.childNodes(children[i]), css0));
             }
 
         } else if (judgeResult === 0) {
-            // invalid node, do nothing, please refer to function judgeInline
+            // invalid node, do nothing
         }
     }
     // if (!ans.length) ans = [defaulta()] // TODO: no empty
@@ -214,9 +223,9 @@ function deserializeListX(el, css) {
  * @example
  * <div> 
  *   'aaa' 
- *   <div>
+ *   <span>
  *      'bbb'
- *   </div>
+ *   </span>
  * </div>
  * returns: [{text:'aaa'}, {text:'bbb'}]
  * 
@@ -270,37 +279,59 @@ const HTML = {
 }
 
 function elementStyle(htmlEl, inheritedStyle) {
-    let {
+    // NOTE: CSS will computed into inline CSS when copy into clipboard, no className
+    const {
         font, fontWeight, fontFamily, fontSize, fontStyle, color,
         marginLeft, marginRight,
-        border, borderWidth, borderStyle, borderColor, textDecoration, textDecorationLine,
+        textDecoration, textDecorationLine,
         backgroundColor, background
     } = htmlEl.style;
 
-    // UA style sheel
+    // UA style sheet
     if (LFSM.has(htmlEl.nodeName)) {
         inheritedStyle = { ...inheritedStyle, ...LFSM.get(htmlEl.nodeName) };
     }
 
-    // border of table
-    if (
-        /** border-width */ Number.parseFloat(borderWidth) === 0 ||
-        /** border-style */ (borderStyle !== undefined && [undefined, 'unset', 'none'].includes(borderStyle.toLowerCase())) ||
-        /** border */['unset', 'none', '0in', '0px', '0pt', '0'].some(str => border.toLowerCase().split(' ').includes(str))
-    ) {
-        inheritedStyle = { ...inheritedStyle, noBorder: true };
-    } else {
-        inheritedStyle = { ...inheritedStyle, noBorder: false };
+    // table only: border
+    if (htmlEl.nodeName === 'TABLE') {
+        let td;
+        try {
+            let tbody = htmlEl.firstElementChild;
+
+            // table - tbody(or caption) - tr - td
+            while (tbody !== null && !['TBODY', 'THEAD', 'TFOOT'].includes(tbody.nodeName)) {
+                tbody = tbody.nextElementSibling;
+            }
+
+            if (['TBODY', 'THEAD', 'TFOOT'].includes(tbody.nodeName)) {
+                td = tbody.firstElementChild.firstElementChild;
+            }
+        } catch (e) {
+            // will got exception when table unreconized: tbody/tr/td undefined
+        }
+        console.log(htmlEl,td);
+        if (td && ['TD', 'TH'].includes(td.nodeName)) {
+            const { border, borderWidth, borderStyle } = td.style;
+            if (
+                /** border-width */ Number.parseFloat(borderWidth) === 0 ||
+                /** border-style */ (borderStyle !== undefined && ['unset', 'none'].includes(borderStyle.toLowerCase())) ||
+                /** border */ ['unset', 'none', '0in', '0px', '0pt', '0'].some(str => border.toLowerCase().split(' ').includes(str))
+            ) {
+                inheritedStyle = { ...inheritedStyle, noBorder: true };
+            } else {
+                inheritedStyle = { ...inheritedStyle, noBorder: false };
+            }
+        }
     }
 
-    // tabs - margin-left
+    // tabs -> margin-left
     let tabs = inheritedStyle.tabs ? inheritedStyle.tabs : 0;
     if (marginLeft && marginLeft !== marginRight) {
         let float = Number.parseFloat(marginLeft);
 
-        if (marginLeft.toLowerCase().endsWith('px')) {
+        if (marginLeft.toLowerCase().endsWith('px')) { // from web
             tabs += Math.round(float / 100);
-        } else if (marginLeft.toLowerCase().endsWith('in')) {
+        } else if (marginLeft.toLowerCase().endsWith('in')) { // from onenote
             tabs += Math.round(float / .375);
         }
     }
@@ -334,8 +365,12 @@ function elementStyle(htmlEl, inheritedStyle) {
             inheritedStyle = { ...inheritedStyle, bold: false };
         }
     }
+
+    // TODO: not support fontSize & fontFamily
+    // fontSize may with px unit, not pt unit, cannot transform
+    // fontFamily is an long string
+
     // if (fontSize !== undefined) {
-    //     //TODO
     //     inheritedStyle = { ...inheritedStyle, fontSize };
     //     if (['unset'].includes(fontSize)) {
     //         inheritedStyle = { ...inheritedStyle, fontSize: undefined };
@@ -347,6 +382,7 @@ function elementStyle(htmlEl, inheritedStyle) {
     //         inheritedStyle = { ...inheritedStyle, fontFamily: undefined };
     //     }
     // }
+
     if (color !== undefined) {
         inheritedStyle = { ...inheritedStyle, fontColor: color };
         if (['unset'].includes(color)) {
