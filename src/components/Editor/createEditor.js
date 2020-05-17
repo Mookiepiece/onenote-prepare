@@ -136,13 +136,27 @@ const withPlaceholders = editor => {
 const withPasteHTML = editor => {
     const { insertData } = editor;
     editor.insertData = data => {
-        const html = data.getData('text/html')
+        const html = data.getData('text/html');
 
         if (html) {
             const parsed = new DOMParser().parseFromString(html.replace(/\u160/g, ' '), 'text/html');
             const fragment = deserializeX(parsed.body).children;
-            Transforms.insertNodes(editor, fragment)
-            return
+
+            // if focusing on an empty line, delete that empty line after paste
+            const { selection } = editor;
+            if (Range.isCollapsed(selection)) {
+                const { anchor } = selection;
+                const { path } = anchor;
+                let [pre] = Editor.node(editor, path.slice(0, -1));
+                if (pre.children.length === 1 && pre.children[0].text === '') {
+                    Transforms.insertNodes(editor, fragment);
+                    Transforms.removeNodes(editor, { at: path.slice(0, -1) });
+                    return;
+                }
+            }
+
+            Transforms.insertNodes(editor, fragment);
+            return;
         }
 
         insertData(data);
