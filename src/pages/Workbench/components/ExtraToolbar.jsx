@@ -18,7 +18,7 @@ import { MFind } from '../transforms';
 import ActionTypes from '@/redux/actions';
 import { v4 as uuid } from 'uuid';
 import { LeafStyleDialogWithStraw, fromComputedLeafStyle } from '@/pages/StyleCollection/components/LeafStyleDialog';
-import { AdvancedTableStyleDialog } from '@/pages/StyleCollection/components/TableStyleDialog';
+import { TableStyleDialogWithState } from '@/pages/StyleCollection/components/TableStyleDialog';
 import { useReState } from '@/utils/hooks';
 import ToolButton from '@/components/Button/ToolButton';
 
@@ -210,7 +210,7 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
                 info={leafStyleInfo}
                 setInfo={setLeafStyleInfo}
             />
-            <AdvancedTableStyleDialog
+            <TableStyleDialogWithState
                 visible={tableStyleDialogVisible}
                 setVisible={setTableStyleDialogVisible}
                 onApply={v => {

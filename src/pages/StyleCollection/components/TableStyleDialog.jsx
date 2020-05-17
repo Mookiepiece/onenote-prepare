@@ -222,7 +222,7 @@ const SaveTableStyleDialog = ({ visible, setVisible, info, setInfo, onApply }) =
     )
 }
 
-export const AdvancedTableStyleDialog = ({ visible, setVisible, onApply }) => {
+export const TableStyleDialogWithState = ({ visible, setVisible, onApply }) => {
     const [rules, setRules, resetRules] = useReState([]);
     const [info, setInfo, resetInfo] = useReState({
         title: '',

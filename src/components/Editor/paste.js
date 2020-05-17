@@ -54,12 +54,9 @@ let EL_DIVS = [
 ]
 
 const ELSM = new Map([
-    ...EL_DIVS.map(v => [v, { type: 'paragraph' }]),
+    ...EL_DIVS.map(v => [v, {}]),
 
-    ['TABLE', { type: 'table' }],
-    ['TR', { type: 'table-row' }],
-    ['TH', { type: 'table-row' }],
-    ['TD', { type: 'table-cell' }],
+    ['PRE', { whiteSpace: true }]
 ]);
 
 const defaulta = _ => ({ type: 'paragraph', children: [{ text: '' }] });
@@ -116,7 +113,9 @@ function deserializeFragmentX(children, css) {
             const leafNodes = deserializeLeaves(leaves, css);
 
             // whiteSpace: prevent blank line
-            if (!whiteSpace && leafNodes.some(({ text }) => !RegExpOfAllBlank.test(text))) {
+            if (!whiteSpace && leafNodes.every(({ text }) => RegExpOfAllBlank.test(text))) {
+                // 
+            } else {
                 ans.push(eatCSS({
                     type: 'paragraph',
                     children: leafNodes
@@ -176,6 +175,9 @@ function deserializeTableX(el, css) {
             let tdNodes = HTML.childNodes(trNode);
 
             tdValid = tdValid && tdNodes.every(n => ['TH', 'TD'].includes(n.nodeName));
+            if (!tdValid)
+                return null;
+
             maxTdsLen = Math.max(tdNodes.length, maxTdsLen);
 
             // tr/tbody 's style, only backgroundColor for td (ah, we have backgound inherit approach!)
@@ -192,19 +194,18 @@ function deserializeTableX(el, css) {
                 })
             }
         });
+        if (!tdValid) return defaulta(); // INVALID td / th
 
         // anti-alias
         trs = trs.map(tr => {
-            let tdLeft = Array(maxTdsLen - tr.children.length).fill(0).map(
+            let extraTd = Array(maxTdsLen - tr.children.length).fill(0).map(
                 _ => eatCSS({ type: 'table-cell', children: [{ type: 'paragraph', children: [{ text: '' }] }] }, css) // trCSS not accessable
             );
             return {
                 ...tr,
-                children: [...tr.children, ...tdLeft]
+                children: [...tr.children, ...extraTd]
             }
         })
-
-        if (!tdValid) return defaulta(); // INVALID td / th
 
         return eatCSS({
             type: 'table',
@@ -333,6 +334,9 @@ function elementStyle(htmlEl, inheritedStyle) {
     if (LFSM.has(htmlEl.nodeName)) {
         inheritedStyle = { ...inheritedStyle, ...LFSM.get(htmlEl.nodeName) };
     }
+    if (ELSM.has(htmlEl.nodeName)) {
+        inheritedStyle = { ...inheritedStyle, ...ELSM.get(htmlEl.nodeName) };
+    }
 
     // table only: border
     if (htmlEl.nodeName === 'TABLE') {
@@ -351,7 +355,7 @@ function elementStyle(htmlEl, inheritedStyle) {
         } catch (e) {
             // will got exception when table unreconized: tbody/tr/td undefined
         }
-        console.log(htmlEl, td);
+
         if (td && ['TD', 'TH'].includes(td.nodeName)) {
             const { border, borderWidth, borderStyle } = td.style;
             if (
