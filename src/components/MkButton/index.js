@@ -1,4 +1,4 @@
 import './style.scss';
-import MkButton from './MkButton';
+import Button from './Button';
 
-export default MkButton;
+export default Button;

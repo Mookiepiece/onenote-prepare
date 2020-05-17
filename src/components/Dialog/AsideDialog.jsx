@@ -2,7 +2,7 @@ import React from 'react';
 import { Portal } from '@/components/util';
 import { CSSTransition } from 'react-transition-group';
 
-import Button from '@/components/MkButton';
+import Button from '@/components/Button';
 
 import {
     RightOutlined

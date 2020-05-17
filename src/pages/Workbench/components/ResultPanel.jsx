@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 
 import { TinyEmitter, EVENTS } from '@/utils/index';
-import Button from "@/components/MkButton";
+import Button from "@/components/Button";
 import Dialog from '@/components/Dialog';
 import { SlateEditor } from '@/components/Editor';
 import { Switch } from '@/components/Switch';

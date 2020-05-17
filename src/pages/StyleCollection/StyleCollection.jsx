@@ -4,7 +4,7 @@ import { CSSTransition } from 'react-transition-group';
 
 import './style.scss';
 
-import Button from '@/components/MkButton';
+import Button from '@/components/Button';
 import { DropdownButton } from '@/components/DropdownButton';
 import { CalendarOutlined, DeleteOutlined, FontSizeOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { renderLeaf as Leaf } from '@/components/Editor/createEditor';

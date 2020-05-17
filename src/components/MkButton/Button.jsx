@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MkButton = React.forwardRef(({
+const Button = React.forwardRef(({
     className = "",
     type = "default",
     active,
@@ -58,4 +58,4 @@ const MkButton = React.forwardRef(({
     )
 })
 
-export default MkButton;
+export default Button;

@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 
 import Dialog from "@/components/Dialog";
-import Button from "@/components/MkButton";
+import Button from "@/components/Button";
 import Input from '@/components/Input';
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
@@ -65,8 +65,7 @@ export function useLeafStyleEditor({ customLeafStyle, setCustomLeafStyle }) {
         customLeafStyle[key][0] && (computedLeafStyle[key] = customLeafStyle[key][1])
     );
 
-    // const leafStyleEditor = (<div>asdsa</div>);
-    const LeafStyleEditor = _ => (
+    const leafStyleEditor = (
         <div className="leaf-style-editor">
             <aside>
                 {
@@ -177,7 +176,7 @@ export function useLeafStyleEditor({ customLeafStyle, setCustomLeafStyle }) {
             </div>
         </div>
     )
-    return [computedLeafStyle, LeafStyleEditor];
+    return [computedLeafStyle, leafStyleEditor];
 };
 
 export const LeafStyleInfo = ({ info, setInfo, onApply }) => {
@@ -208,11 +207,11 @@ export const LeafStyleInfo = ({ info, setInfo, onApply }) => {
 };
 
 export function LeafStyleDialogNoInput({ visible, setVisible, onApply, customLeafStyle, setCustomLeafStyle }) {
-    const [computedLeafStyle, LeafStyleEditor] = useLeafStyleEditor({ customLeafStyle, setCustomLeafStyle });
+    const [computedLeafStyle, leafStyleEditor] = useLeafStyleEditor({ customLeafStyle, setCustomLeafStyle });
 
     return (
         <Dialog visible={visible} setVisible={setVisible}>
-            <LeafStyleEditor />
+            {leafStyleEditor}
             <Button
                 onClick={_ => {
                     onApply(computedLeafStyle);
@@ -224,11 +223,11 @@ export function LeafStyleDialogNoInput({ visible, setVisible, onApply, customLea
 }
 
 export function LeafStyleDialog({ visible, setVisible, onApply, customLeafStyle, setCustomLeafStyle, info, setInfo }) {
-    const [computedLeafStyle, LeafStyleEditor] = useLeafStyleEditor({ customLeafStyle, setCustomLeafStyle });
+    const [computedLeafStyle, leafStyleEditor] = useLeafStyleEditor({ customLeafStyle, setCustomLeafStyle });
 
     return (
         <Dialog visible={visible} setVisible={setVisible}>
-            <LeafStyleEditor />
+            {leafStyleEditor}
             <LeafStyleInfo
                 info={info}
                 setInfo={setInfo}

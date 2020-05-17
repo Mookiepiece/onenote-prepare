@@ -4,7 +4,7 @@ import { Editor, Transforms, Range, Text, Path, Location, Point } from 'slate';
 import { SketchPicker } from 'react-color';
 
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import Button from '@/components/MkButton';
+import Button from '@/components/Button';
 
 import {
     BoldOutlined,
@@ -400,6 +400,8 @@ const ColorButton = ({ format, icon }) => {
                 active={pickerActive}
                 setActive={v => {
                     setPickerActive(v);
+
+                    // auto excute when close dropdown
                     if (v === false) {
                         getSelection(editor);
                         toggleMark(editor, format, color);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Portal } from '@/components/util';
 import { CSSTransition } from 'react-transition-group';
 import { CloseOutlined } from '@ant-design/icons';
-import Button from '../MkButton';
+import Button from '../Button';
 
 // every visible dialog will have z-index great than the prev visible one, reduce z-index when invisible
 // z-index dropdown(1100) > dialog(1000+), so do not let 100+ dialog shows at the same time

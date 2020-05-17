@@ -15,7 +15,7 @@ import {
 import { MGet } from '../transforms';
 import { applyMatch, clearUp, applyRender } from '../transforms/slateEffects';
 
-import Button from "@/components/MkButton";
+import Button from "@/components/Button";
 import ExtraToolbar from './ExtraToolbar';
 import MatchPickerDialog from './MatchPickerDialog';
 import ResultPanel from './ResultPanel';
@@ -27,7 +27,7 @@ import './style.scss';
 import { TinyEmitter, EVENTS } from '@/utils';
 import Dialog from '@/components/Dialog/Dialog';
 import Input from '@/components/Input';
-import { pushCustomTransform, useIdbCustomTransforms } from '@/utils/userSettings';
+import { pushCustomTransform, useIdbCustomTransforms, SLATE_DEFAULTS } from '@/utils/userSettings';
 
 const applyChange = (editor, state, setSlateValue) => {
     applyMatcher(editor, state)
@@ -223,12 +223,7 @@ TinyEmitter.on(EVENTS.CLIPBOARD_COPY, data => {
 
     document.body.appendChild(div);
 
-    // 炫技行为请勿模仿
     let observer = new MutationObserver(mutationsList => {
-        // mutation observer is a micro task
-        // which means... before the next render process, we had already completed our copy and removed that
-        // but... execCommand is also a micro task? or means that it is sync 
-
         observer.disconnect();
 
         var selection = window.getSelection();
@@ -243,7 +238,9 @@ TinyEmitter.on(EVENTS.CLIPBOARD_COPY, data => {
 
     observer.observe(div, { childList: true });
 
-    div.innerHTML = editable.innerHTML;
+    div.innerHTML = editable.innerHTML
+        .replace(/var\(--slate-default-font-family\)/g,`'${SLATE_DEFAULTS.FONT_FAMILY}'`)
+        .replace(/var\(--slate-default-font-size\)/g,`${SLATE_DEFAULTS.FONT_SIZE}pt`);
 });
 
 const TransformCard = ({ v, onClose, onTogglePreview, onInput, onMatch, onOpenDialog }) => {

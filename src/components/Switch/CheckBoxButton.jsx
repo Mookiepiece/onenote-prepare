@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Button from '@/components/MkButton';
+import Button from '@/components/Button';
 
 const CheckboxButton = ({
     value,

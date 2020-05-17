@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 
 import Input from '@/components/Input';
-import Button from "@/components/MkButton";
+import Button from "@/components/Button";
 import { Switch, CheckboxButton } from '@/components/Switch';
 import Dialog from "@/components/Dialog";
 import AsideDialog from "@/components/Dialog/asideDialog";

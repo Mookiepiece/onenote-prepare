@@ -6,7 +6,7 @@ import { DropdownButtonSelect } from '@/components/DropdownButton';
 import './style.scss';
 
 import AJAX from '@/utils/ajax';
-import Button from '@/components/MkButton';
+import Button from '@/components/Button';
 import Dialog from '@/components/Dialog';
 import { remote, shell } from 'electron';
 import { LinkOutlined } from '@ant-design/icons';

@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { useEffect, useState } from 'react';
 
 export const fontSizeOptions = [
-    8, 9, 9.5, 10, 10.5, 11, 11.5, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    6, 8, 9, 9.5, 10, 10.5, 11, 11.5, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
 ]
 
 export const fontFamilyOptions = [

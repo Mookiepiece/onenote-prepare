@@ -3,7 +3,7 @@ import './style.scss';
 import { BlockOutlined, BorderOutlined, CloseOutlined, MinusOutlined } from '@ant-design/icons'
 
 import { remote } from 'electron';
-import Button from '@/components/MkButton';
+import Button from '@/components/Button';
 
 let currentWindow = remote.getCurrentWindow();
 

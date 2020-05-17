@@ -5,9 +5,8 @@ import { withHistory } from 'slate-history';
 
 import { TinyEmitter, EVENTS } from '@/utils/index';
 import { DropdownButtonSelect } from '@/components/DropdownButton';
-import Button from '@/components/MkButton';
+import Button from '@/components/Button';
 import deserializeX from './paste';
-import { SLATE_DEFAULTS } from '@/utils/userSettings';
 
 export const createEditor = () => withPasteHTML(withPlaceholders(withTablesLists(withHistory(withReact(_createEditor())))));
 export const createNoHistoryEditor = () => withPlaceholders(withTablesLists(withReact(_createEditor())));
@@ -15,7 +14,7 @@ export const createNoHistoryEditor = () => withPlaceholders(withTablesLists(with
 const withTablesLists = editor => {
     const { deleteBackward, deleteForward, insertBreak, normalizeNode } = editor;
 
-    // editor.insertBreak = 
+    // TODO: editor.insertBreak = 
 
     editor.deleteBackward = unit => {
         const { selection } = editor;
@@ -140,9 +139,8 @@ const withPasteHTML = editor => {
         const html = data.getData('text/html')
 
         if (html) {
-            const parsed = new DOMParser().parseFromString(html.replace(/\u160/g,' '), 'text/html');
+            const parsed = new DOMParser().parseFromString(html.replace(/\u160/g, ' '), 'text/html');
             const fragment = deserializeX(parsed.body).children;
-            console.log("[debug]",deserializeX(parsed.body).children);
             Transforms.insertNodes(editor, fragment)
             return
         }
@@ -272,12 +270,12 @@ export const computeLeafStyleAndClassName = (leaf) => {
     if (leaf.fontFamily) {
         style = { ...style, fontFamily: leaf.fontFamily };
     } else {
-        style = { ...style, fontFamily: SLATE_DEFAULTS.FONT_FAMILY };
+        style = { ...style, fontFamily: 'var(--slate-default-font-family)' };
     }
     if (leaf.fontSize) {
         style = { ...style, fontSize: leaf.fontSize + 'pt' };
     } else {
-        style = { ...style, fontSize: SLATE_DEFAULTS.FONT_SIZE+'pt' };
+        style = { ...style, fontSize: 'var(--slate-default-font-size)' };
     }
 
     // matched text ✨

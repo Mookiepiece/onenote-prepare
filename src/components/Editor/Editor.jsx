@@ -5,7 +5,7 @@ import Toolbar from './Toolbar';
 import { createEditor, renderElement, renderLeaf, createNoHistoryEditor } from './createEditor.js';
 import higherOrderKeydownHandler from './hotkeys';
 import Dialog from '../Dialog';
-import Button from '../MkButton';
+import Button from '../Button';
 import { QuestionOutlined } from '@ant-design/icons';
 
 export const SlateEditor = ({ value, setValue, readOnly, showToolbar, children }) => {

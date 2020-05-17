@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 
 import Dialog from "@/components/Dialog";
-import Button from "@/components/MkButton";
+import Button from "@/components/Button";
 import Input from '@/components/Input';
 
 import { alt } from '@/utils';

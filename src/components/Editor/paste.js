@@ -1,7 +1,6 @@
 /**
  * wangEditor的实现是强行正则后直接插入，会导致很多不存在的标签如aside、artcle存在
  * 显然slatejs对数据结构是很严格的，而且必须转JSON
- * 这里的函数我是开空标签一个个实验的，单看可能就理解不来
  * 
  * ON某种情况下会复制出ul嵌套ul的列表，解决方法暂时是只看li不看ul（歪打正着？）已计入README
  */
@@ -369,19 +368,6 @@ function elementStyle(htmlEl, inheritedStyle) {
     // TODO: not support fontSize & fontFamily
     // fontSize may with px unit, not pt unit, cannot transform
     // fontFamily is an long string
-
-    // if (fontSize !== undefined) {
-    //     inheritedStyle = { ...inheritedStyle, fontSize };
-    //     if (['unset'].includes(fontSize)) {
-    //         inheritedStyle = { ...inheritedStyle, fontSize: undefined };
-    //     }
-    // }
-    // if (fontFamily !== undefined) {
-    //     inheritedStyle = { ...inheritedStyle, fontFamily };
-    //     if (['unset'].includes(fontFamily)) {
-    //         inheritedStyle = { ...inheritedStyle, fontFamily: undefined };
-    //     }
-    // }
 
     if (color !== undefined) {
         inheritedStyle = { ...inheritedStyle, fontColor: color };

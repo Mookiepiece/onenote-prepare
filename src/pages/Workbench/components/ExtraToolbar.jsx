@@ -15,7 +15,7 @@ import { useSlate } from 'slate-react';
 import { ReadOnlySlateEditor } from '@/components/Editor';
 
 import Dialog from "@/components/Dialog";
-import Button from "@/components/MkButton";
+import Button from "@/components/Button";
 import Input from '@/components/Input';
 
 import { alt, deepCopy, TinyEmitter, EVENTS } from '@/utils';

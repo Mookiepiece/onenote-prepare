@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './style.scss';
-import Button from '@/components/MkButton';
+import Button from '@/components/Button';
 import { LeftOutlined, CalendarOutlined } from '@ant-design/icons';
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import { Switch } from '@/components/Switch';

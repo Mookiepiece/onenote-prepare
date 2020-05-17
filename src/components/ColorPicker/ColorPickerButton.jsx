@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import Button from "@/components/MkButton";
+import Button from "@/components/Button";
 import { SketchPicker } from 'react-color';
 import { DropdownButton } from '@/components/DropdownButton';
 

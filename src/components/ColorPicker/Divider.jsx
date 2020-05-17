@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useMouseDrag } from "./ColorPicker";
-import Button from '../MkButton';
+import Button from '../Button';
 
 export const Divider = ({ value, onChange }) => {
     let [ref, mousePosition, handleMouseDown, mouseDown] = useMouseDrag(0, 0, 400, 10);
