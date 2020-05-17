@@ -64,6 +64,8 @@ const ELSM = new Map([
 
 const defaulta = _ => ({ type: 'paragraph', children: [{ text: '' }] });
 
+const RegExpOfAllBlank = /^[ \n]*$/;
+
 // el: elements
 // node: text、elements、attributes, even comments
 
@@ -78,12 +80,13 @@ const defaulta = _ => ({ type: 'paragraph', children: [{ text: '' }] });
 function deserializeX(el) { // need element, not text
     return {
         type: 'root',
-        children: deserializeFragmentX(HTML.childNodes(el), {})
+        children: deserializeFragmentX(HTML.childNodes(el, { notBlank: false }), {})
     }
 }
 
 function deserializeFragmentX(children, css) {
     let ans = [];
+    const { whiteSpace = false } = css;
 
     for (let i = 0; i < children.length; i++) {
         const judgeResult = judgeInline(children[i]);
@@ -102,18 +105,24 @@ function deserializeFragmentX(children, css) {
              *  in this case, 1&2 will be pushed into a signle anonymous paragraph
              */
             for (i++; i < children.length; i++) {
-                if (!judgeInline(children[i])) {
+                if (judgeInline(children[i]) !== 1) {
                     break;
                 }
                 leaves.push(children[i]);
             }
             i--;
 
-            // anonymous paragraph
-            ans.push(eatCSS({
-                type: 'paragraph',
-                children: deserializeLeaves(leaves, css)
-            }, css));
+            // anonymous paragraph or nothing when whitespace enabled but this is blank line
+            const leafNodes = deserializeLeaves(leaves, css);
+
+            // whiteSpace: prevent blank line
+            if (!whiteSpace && leafNodes.some(({ text }) => !RegExpOfAllBlank.test(text))) {
+                ans.push(eatCSS({
+                    type: 'paragraph',
+                    children: leafNodes
+                }, css));
+            }
+
         } else if (judgeResult === 2) { // block-level elements: table, list, div
 
             let css0 = elementStyle(children[i], css);
@@ -125,14 +134,14 @@ function deserializeFragmentX(children, css) {
             } else {
                 // DIVs does not matters, we need deep into the last div which contains inline leaves
                 // we divide lines by the last divs
-                ans.push(deserializeFragmentX(HTML.childNodes(children[i]), css0));
+                ans.push(deserializeFragmentX(HTML.childNodes(children[i], { notBlank: false }), css0));
             }
 
         } else if (judgeResult === 0) {
             // invalid node, do nothing
         }
     }
-    // if (!ans.length) ans = [defaulta()] // TODO: no empty
+    if (!ans.length) ans = [defaulta()] // TODO: no empty, no, may be should allow empty when blank space
     return ans.flat();
 }
 
@@ -230,23 +239,53 @@ function deserializeListX(el, css) {
  * 
  * @param {NodeList|Array} childNodes 
  */
-function deserializeLeaves(childNodes, css) {
+function _deserializeLeaves(childNodes, css) {
     if (!childNodes.length) return [{ text: '' }];
 
     return childNodes.map(leaf => { // note that if we pass [] to deserializeLeaves, map function will not excuted and return [] and it works well
         if (leaf.nodeType === Node.TEXT_NODE) {
-            return eatCSS({
+            return [[eatCSS({
                 text: leaf.textContent
-            }, css);
+            }, css), css]]; // not flatted *2, will return array [node, css]
         } else {
             let css0 = elementStyle(leaf, css);
-            return deserializeLeaves(HTML.childNodes(leaf), css0); // not flatted *1, 
+            return _deserializeLeaves(HTML.childNodes(leaf, { notBlank: false }), css0); // not flatted *1, 
         }
     }).flat(); // flat *1
 }
 
+function deserializeLeaves(childNodes, css) {
+    const notTrimedResult = _deserializeLeaves(childNodes, css);
+
+    // whiteSpace: trim blank leaves
+    // NOTE: every span could have different whiteSpace, should use leafCss to calculate whiteSpace
+    const trimedResult = notTrimedResult.map(([leaf, leafCss], index, arr) => {
+        const { whiteSpace = false } = leafCss;
+
+        let { text } = leaf;
+        if (!whiteSpace) {
+            // for first or last leaf, trim blanks on start or end, like what browser did
+            if (index === 0) {
+                text = text.replace(/^[ \n]*/g, '');
+            }
+            if (index === arr.length - 1) {
+                text = text.replace(/[ \n]*$/g, '');
+            }
+            // for central leaves, collapse blank into one, like what browser did
+            text = text.replace(/[ \n]+/g, ' ');
+        }
+        text = text.replace(/\u00A0/g /** nbsp; */, ' ');
+        return {
+            ...leaf,
+            text
+        }
+    });
+
+    return trimedResult;
+}
+
 function judgeInline(htmlEl) {
-    if (htmlEl.nodeType === Node.TEXT_NODE && HTML.notBlank(htmlEl)) {
+    if (htmlEl.nodeType === Node.TEXT_NODE) {
         return 1;
     } else if (htmlEl.nodeType !== Node.ELEMENT_NODE) { // unreconized node type
         return 0;
@@ -269,8 +308,11 @@ function judgeInline(htmlEl) {
 }
 
 const HTML = {
-    childNodes(htmlEl) {
-        return [...htmlEl.childNodes].filter(this.notBlank);
+    childNodes(htmlEl, options = { notBlank: true }) {
+        if (options.notBlank) {
+            return [...htmlEl.childNodes].filter(this.notBlank);
+        }
+        return [...htmlEl.childNodes];
     },
     notBlank(n) {
         return !(n.nodeType === Node.TEXT_NODE && n.textContent.trim() === "" && n.textContent[0] === '\n');
@@ -283,7 +325,8 @@ function elementStyle(htmlEl, inheritedStyle) {
         font, fontWeight, fontFamily, fontSize, fontStyle, color,
         marginLeft, marginRight,
         textDecoration, textDecorationLine,
-        backgroundColor, background
+        backgroundColor, background,
+        whiteSpace
     } = htmlEl.style;
 
     // UA style sheet
@@ -308,19 +351,28 @@ function elementStyle(htmlEl, inheritedStyle) {
         } catch (e) {
             // will got exception when table unreconized: tbody/tr/td undefined
         }
-        console.log(htmlEl,td);
+        console.log(htmlEl, td);
         if (td && ['TD', 'TH'].includes(td.nodeName)) {
             const { border, borderWidth, borderStyle } = td.style;
             if (
                 /** border-width */ Number.parseFloat(borderWidth) === 0 ||
                 /** border-style */ (borderStyle !== undefined && ['unset', 'none'].includes(borderStyle.toLowerCase())) ||
-                /** border */ ['unset', 'none', '0in', '0px', '0pt', '0'].some(str => border.toLowerCase().split(' ').includes(str))
+                /** border */['unset', 'none', '0in', '0px', '0pt', '0'].some(str => border.toLowerCase().split(' ').includes(str))
             ) {
                 inheritedStyle = { ...inheritedStyle, noBorder: true };
             } else {
                 inheritedStyle = { ...inheritedStyle, noBorder: false };
             }
         }
+    }
+
+    // white-space affects whether enter(\n) and space will preserve
+    // we do nothing on Spaces, because Spaces will auto reduce when copy
+    // should deal with New-Lines
+    if (['pre-wrap', 'break-spaces', 'pre-line'].includes(whiteSpace.toLowerCase())) {
+        inheritedStyle = { ...inheritedStyle, whiteSpace: true };
+    } else if (['unset', 'normal'].includes(whiteSpace.toLowerCase())) {
+        inheritedStyle = { ...inheritedStyle, whiteSpace: false };
     }
 
     // tabs -> margin-left

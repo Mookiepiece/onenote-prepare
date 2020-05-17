@@ -523,9 +523,7 @@ const TableStyleButton = () => {
             </ToolButton>
             <TableStylePickerDialog
                 onApply={(_, { rules }) => {
-                    const selection = getSelection(editor);
                     const [table, tablePath] = matches[0];
-                    console.log("[debug]matches", matches);
                     let tableRows = table.children.length, tableCols = table.children[0].children.length;
 
                     const computedStyleTable = computeStyleTable(rules, tableRows, tableCols);

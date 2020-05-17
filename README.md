@@ -26,6 +26,9 @@ in developing... still a long way to go
 <img src="https://github.com/Mookiepiece/pre-onenote/blob/master/docs/tableCraft.jpg" alt="use onenote tables to simulate background-color" width="50%">
 
 ## 开发随笔
+20-05-17
+- 从ON粘贴出来的shift+enter会转义成br
+
 20-05-06
 - 发现pre标签的fontFamily默认是monospace，要想办法覆盖它，设置成inherit，完了，office直接照搬，不论是unset,inherit,还是var(--default-font-family)
 - 这也不能怪office，估计微软是很讨厌web和浏览器了（狗头）
