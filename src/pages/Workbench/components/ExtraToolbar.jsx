@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     AppstoreAddOutlined,
-    EditOutlined,
     HistoryOutlined,
-    PlusOutlined,
-    UpOutlined,
-    DownOutlined,
-    CloseOutlined,
-    FormOutlined,
-    FolderOpenOutlined,
     BuildOutlined
 } from '@ant-design/icons';
 import { useSlate } from 'slate-react';
@@ -16,26 +9,18 @@ import { ReadOnlySlateEditor } from '@/components/Editor';
 
 import Dialog from "@/components/Dialog";
 import Button from "@/components/Button";
-import Input from '@/components/Input';
 
 import { alt, deepCopy, TinyEmitter, EVENTS } from '@/utils';
 import { connect } from 'react-redux';
 
-import { renderLeaf as Leaf } from '@/components/Editor/createEditor';
-
-import { Switch, CheckboxButton } from '@/components/Switch';
-import { setArrayItem, drawImageScaled } from '@/utils';
-import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import { useIdbCustomStyles, useIdbCustomTableStyles, customTransforms, useIdbCustomTransforms } from '@/utils/userSettings';
+import { useIdbCustomStyles, useIdbCustomTableStyles, useIdbCustomTransforms } from '@/utils/userSettings';
 import { MFind } from '../transforms';
-import { Editor } from 'slate';
 import ActionTypes from '@/redux/actions';
 import { v4 as uuid } from 'uuid';
-import StylePickerDialog from '@/components/Editor/StylePickerDialog';
-import { computeStyleTable } from '@/components/Editor/Toolbar';
 import { LeafStyleDialogWithStraw, fromComputedLeafStyle } from '@/pages/StyleCollection/components/LeafStyleDialog';
 import { AdvancedTableStyleDialog } from '@/pages/StyleCollection/components/TableStyleDialog';
 import { useReState } from '@/utils/hooks';
+import ToolButton from '@/components/Button/ToolButton';
 
 const HistoryDialog = connect(state => ({
     history: state.workbenchAside.memory
@@ -184,34 +169,35 @@ const ExtraToolbar = ({ readOnly, setSlateValue }) => {
     return (
         <>
             <div className={`editor-toolbar${readOnly ? ' editor-toolbar-disabled' : ''}`}>
-                <Button className="editor-button" onMouseDown={e => {
+                <ToolButton title="新建文字样式" onMouseDown={e => {
                     e.preventDefault();
                     setLeafStyleDialogVisible(true);
-                }}>
+                }}
+                >
                     <AppstoreAddOutlined />
-                </Button>
-                <Button className="editor-button" onMouseDown={e => {
+                </ToolButton>
+                <ToolButton title="新建表格样式" onMouseDown={e => {
                     e.preventDefault();
                     setTableStyleDialogVisible(true);
                 }}>
                     <AppstoreAddOutlined />
-                </Button>
-                <Button className="editor-button" onClick={e => {
+                </ToolButton>
+                <ToolButton title="历史回溯" onClick={e => {
                     // NOTE: SELECTION
                     window.getSelection().removeAllRanges();
                     setHistoryDialogVisible(true);
                 }}>
                     <HistoryOutlined />
-                </Button>
+                </ToolButton>
 
             </div>
             <div className={`editor-toolbar${readOnly ? ' editor-toolbar-disabled' : ''}`}>
-                <Button className="editor-button" onClick={e => {
+                <ToolButton title="预设变换" onClick={e => {
                     e.preventDefault();
                     setAddQuickTransformDialogVisible(true);
                 }}>
                     <BuildOutlined />
-                </Button>
+                </ToolButton>
             </div>
             <LeafStyleDialogWithStraw
                 visible={leafStyleDialogVisible}

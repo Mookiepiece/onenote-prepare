@@ -17,6 +17,7 @@ import { alt } from '@/utils';
 import StylePickerDialog from '@/components/Editor/StylePickerDialog';
 import { Divider } from '@/components/ColorPicker/Divider';
 import { DropdownButtonSelect } from '@/components/DropdownButton';
+import ToolButton from '@/components/Button/ToolButton';
 
 const ResultPanel = ({ result, onResultChange }) => {
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -152,13 +153,12 @@ const ExtraToolbar = () => {
     return (
         <>
             <div className="editor-toolbar">
-                <Button className="editor-button"
-                    onMouseDown={e => {
-                        e.preventDefault();
-                        insertTransformPlaceholder(editor);
-                    }}>
+                <ToolButton title="添加占位块" onMouseDown={e => {
+                    e.preventDefault();
+                    insertTransformPlaceholder(editor);
+                }}>
                     <ApiOutlined />
-                </Button>
+                </ToolButton>
             </div>
         </>
     );

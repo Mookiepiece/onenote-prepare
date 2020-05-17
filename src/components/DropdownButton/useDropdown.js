@@ -2,43 +2,28 @@ import { useState, useRef, useEffect } from 'react';
 import { closest } from '@/components/util';
 
 /**
- * 
- * @param {*} panelActive 
- * @param {*} setPanelActive 
- * @param {String} eventName trigger
+ * get a relative position for poper
+ * @param {*} visible 
+ * @param {*} position 
  */
-const useDropdown = (panelActive, setPanelActive, eventName = 'click', position = '↘') => {
-    const buttonRef = useRef();
+export const usePosition = (position = '↘', inControl = true) => {
+    const ref = useRef();
     let top = null;
     let left = null;
     let transform = '';
 
-    //click anywhere to hide dropdown
-    useEffect(_ => {
-        if (panelActive) {
-            const handler = event => {
-                const delegateTarget = closest(event.target, '.__dropdown');
-                if (delegateTarget) {
-                    return;
-                }
-                setPanelActive(false);
-                document.body.removeEventListener(eventName, handler);
-            }
-
-            document.body.addEventListener(eventName, handler);
-            return _ => {
-                document.body.removeEventListener(eventName, handler);
-            }
-        }
-    }, [panelActive, setPanelActive]);
-
-    if (panelActive) {
-        const rect = buttonRef.current.getBoundingClientRect();
+    if (inControl && ref.current) {
+        const rect = ref.current.getBoundingClientRect();
 
         switch (position) {
             case '↘':
                 top = rect.bottom;
                 left = rect.left;
+                break;
+            case '↓':
+                top = rect.bottom;
+                left = rect.right - rect.width / 2;
+                transform += 'translateX(-50%)';
                 break;
             case '↙':
                 top = rect.bottom;
@@ -58,7 +43,38 @@ const useDropdown = (panelActive, setPanelActive, eventName = 'click', position 
         }
     }
 
-    return [buttonRef, top, left, transform];
+    return [ref, top, left, transform];
+}
+
+/**
+ * 
+ * @param {*} panelActive 
+ * @param {*} setPanelActive 
+ * @param {String} eventName trigger
+ */
+const useDropdown = (panelActive, setPanelActive, eventName = 'click', position) => {
+    //click anywhere to hide dropdown
+    useEffect(_ => {
+        if (panelActive) {
+            const handler = event => {
+                const delegateTarget = closest(event.target, '.__dropdown');
+                if (delegateTarget) {
+                    return;
+                }
+                setPanelActive(false);
+                document.body.removeEventListener(eventName, handler);
+            }
+
+            document.body.addEventListener(eventName, handler);
+            return _ => {
+                document.body.removeEventListener(eventName, handler);
+            }
+        }
+    }, [panelActive, setPanelActive]);
+
+    const [ref, top, left, transform] = usePosition(position);
+
+    return [ref, top, left, transform];
 }
 
 export default useDropdown;

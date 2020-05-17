@@ -41,6 +41,7 @@ import { toggleBlock, toggleMark, isMarkActive, isBlockActive, getMarkActiveSet,
 import { fontSizeOptions, fontFamilyOptions, SLATE_DEFAULTS } from '@/utils/userSettings';
 import StylePickerDialog from './StylePickerDialog';
 import TableStylePickerDialog from './TableStylePickerDialog';
+import ToolButton from '../Button/ToolButton';
 
 const Toolbar = ({ readOnly }) => {
 
@@ -50,20 +51,14 @@ const Toolbar = ({ readOnly }) => {
                 <FontComponent />
                 <FontSizeComponent />
             </div>
-            {/* <div className="toolbar-group">
-
-                <BlockButton format="heading-one" icon={FontSizeOutlined} />
-                <BlockButton format="heading-two" icon={FontSizeOutlined} />
-                <BlockButton format="block-quote" icon={ContainerOutlined} />
-            </div> */}
             <div className="toolbar-group">
-                <BlockButton format="numbered-list" icon={OrderedListOutlined} />
-                <BlockButton format="bulleted-list" icon={UnorderedListOutlined} />
+                <BlockButton format="numbered-list" title="有序列表(Ctrl+/)" icon={OrderedListOutlined} />
+                <BlockButton format="bulleted-list" title="无序列表(Ctrl+.)" icon={UnorderedListOutlined} />
             </div>
             <div className="toolbar-group">
-                <BlockButton formatKey="align" format="left" icon={AlignLeftOutlined} />
-                <BlockButton formatKey="align" format="center" icon={AlignCenterOutlined} />
-                <BlockButton formatKey="align" format="right" icon={AlignRightOutlined} />
+                <BlockButton formatKey="align" format="left" title="左对齐(Ctrl+L)" icon={AlignLeftOutlined} />
+                <BlockButton formatKey="align" format="center" title="居中对齐(Ctrl+E)" icon={AlignCenterOutlined} />
+                <BlockButton formatKey="align" format="right" title="右对齐(Ctrl+R)" icon={AlignRightOutlined} />
             </div>
             <div className="toolbar-group">
                 <TableButton />
@@ -71,18 +66,20 @@ const Toolbar = ({ readOnly }) => {
                 <TableBorderButton />
             </div>
             <div className="toolbar-group">
-                <MarkButton format="bold" icon={BoldOutlined} />
-                <MarkButton format="italic" icon={ItalicOutlined} />
-                <MarkButton format="underline" icon={UnderlineOutlined} />
-                <MarkButton format="strike" icon={StrikethroughOutlined} />
+                <MarkButton format="bold" title="粗体(Ctrl+B)" icon={BoldOutlined} />
+                <MarkButton format="italic" title="斜体(Ctrl+I)" icon={ItalicOutlined} />
+                <MarkButton format="underline" title="下划线(Ctrl+U)" icon={UnderlineOutlined} />
+                <MarkButton format="strike" title="删除线" icon={StrikethroughOutlined} />
             </div>
             <div className="toolbar-group">
                 <ColorButton
                     format="fontColor"
+                    title="前景色"
                     icon={FontColorsOutlined}
-                />
+                    />
                 <ColorButton
                     format="bgColor"
+                    title="背景色"
                     icon={BgColorsOutlined}
                 />
                 <TableColorButton />
@@ -99,8 +96,8 @@ const Toolbar = ({ readOnly }) => {
 const DeleteButton = () => {
     const editor = useSlate();
     return (
-        <Button
-            className="editor-button"
+        <ToolButton
+            title="清空全部"
             onMouseDown={
                 event => {
                     event.preventDefault();
@@ -113,16 +110,16 @@ const DeleteButton = () => {
             }
         >
             <DeleteOutlined />
-        </Button>
+        </ToolButton>
     )
 }
 
-const BlockButton = ({ formatKey = "type", format, icon }) => {
+const BlockButton = ({ formatKey = "type", format, title, icon }) => {
     const editor = useSlate();
     const Icon = icon;
     return (
-        <Button
-            className="editor-button"
+        <ToolButton
+            title={title}
             onMouseDown={event => {
                 event.preventDefault();
                 toggleBlock(editor, formatKey, format);
@@ -130,17 +127,17 @@ const BlockButton = ({ formatKey = "type", format, icon }) => {
             active={isBlockActive(editor, formatKey, format)}
         >
             <Icon />
-        </Button>
+        </ToolButton>
     );
 }
 
-const MarkButton = ({ format, icon }) => {
+const MarkButton = ({ format, title, icon }) => {
     const editor = useSlate();
     const Icon = icon;
 
     return (
-        <Button
-            className="editor-button"
+        <ToolButton
+            title={title}
             onMouseDown={event => {
                 event.preventDefault();
                 toggleMark(editor, format);
@@ -148,15 +145,15 @@ const MarkButton = ({ format, icon }) => {
             active={isMarkActive(editor, format)}
         >
             <Icon />
-        </Button>
+        </ToolButton>
     );
 }
 
 const TableButton = () => {
     const editor = useSlate();
     return (
-        <Button
-            className="editor-button"
+        <ToolButton
+            title="创建表格"
             onMouseDown={
                 event => {
                     event.preventDefault();
@@ -168,7 +165,7 @@ const TableButton = () => {
             }
         >
             <TableOutlined />
-        </Button>
+        </ToolButton>
     )
 }
 
@@ -285,96 +282,68 @@ const TableButtonGroup = () => {
     const disabled = matches.length === 0;
     const match = matches[0];
 
+    const handleClickAdvanced = (index) => {
+        return event => {
+            event.preventDefault();
+            getInsertRowHandlers(editor, match)[index]();
+        }
+    }
+
     return (
         <>
-            <Button
-                className="editor-button"
+            <ToolButton
+                title="在上方插入"
                 disabled={disabled}
-                onMouseDown={
-                    event => {
-                        event.preventDefault();
-                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight] = getInsertRowHandlers(editor, match);
-                        insertRowAbove && insertRowAbove();
-                    }
-                }
+                onMouseDown={handleClickAdvanced(0)}
             >
                 <InsertRowAboveOutlined />
-            </Button>
-            <Button
-                className="editor-button"
+            </ToolButton>
+            <ToolButton
+                title="在下方插入"
                 disabled={disabled}
-                onMouseDown={
-                    event => {
-                        event.preventDefault();
-                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight] = getInsertRowHandlers(editor, match);
-                        insertRowBelow && insertRowBelow();
-                    }
-                }
+                onMouseDown={handleClickAdvanced(1)}
             >
                 <InsertRowBelowOutlined />
-            </Button>
-            <Button
-                className="editor-button"
+            </ToolButton>
+            <ToolButton
+                title="在左侧插入"
                 disabled={disabled}
-                onMouseDown={
-                    event => {
-                        event.preventDefault();
-                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight] = getInsertRowHandlers(editor, match);
-                        insertRowLeft && insertRowLeft();
-                    }
-                }
+                onMouseDown={handleClickAdvanced(2)}
             >
                 <InsertRowLeftOutlined />
-            </Button>
-            <Button
-                className="editor-button"
+            </ToolButton>
+            <ToolButton
+                title="在右侧插入"
                 disabled={disabled}
-                onMouseDown={
-                    event => {
-                        event.preventDefault();
-                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight] = getInsertRowHandlers(editor, match);
-                        insertRowRight && insertRowRight();
-                    }
-                }
+                onMouseDown={handleClickAdvanced(3)}
             >
                 <InsertRowRightOutlined />
-            </Button>
-            <Button
-                className="editor-button"
+            </ToolButton>
+            <ToolButton
+                title="删除列"
                 disabled={disabled}
-                onMouseDown={
-                    event => {
-                        event.preventDefault();
-                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight, deleteColumn] = getInsertRowHandlers(editor, match);
-                        deleteColumn && deleteColumn();
-                    }
-                }
+                onMouseDown={handleClickAdvanced(4)}
             >
                 <DeleteColumnOutlined />
-            </Button>
-            <Button
-                className="editor-button"
+            </ToolButton>
+            <ToolButton
+                title="删除行"
                 disabled={disabled}
-                onMouseDown={
-                    event => {
-                        event.preventDefault();
-                        let [insertRowAbove, insertRowBelow, insertRowLeft, insertRowRight, deleteColumn, deleteRow] = getInsertRowHandlers(editor, match);
-                        deleteRow && deleteRow();
-                    }
-                }
+                onMouseDown={handleClickAdvanced(5)}
             >
                 <DeleteRowOutlined />
-            </Button>
+            </ToolButton>
         </>
     )
 }
 
-// NOTE: Editor.nodes(editor,{at}), the 'at' option means all nodes lays on the way from outer to that 'at' path and all nodes inside 'at'
+// NOTE: Editor.nodes(editor,{at}), with 'at' option will result to
+// return all ancestor nodes from root to that path and all nodes inside 'at'
 
 //NOTE:Transform.insertNodes如果给的是point是不会删除内容，给range会删除range里的内容
 //如果range给的小也没问题
 
-const ColorButton = ({ format, icon }) => {
+const ColorButton = ({ format, title, icon }) => {
     const editor = useSlate();
     const [pickerActive, setPickerActive] = useState(false);
     const [color, setColor] = useState('#f90');
@@ -383,8 +352,9 @@ const ColorButton = ({ format, icon }) => {
 
     return (
         <>
-            <Button
-                className="editor-button editor-button-color"
+            <ToolButton
+                title={title}
+                className="editor-button-color"
                 active={isMarkActive(editor, format, color)}
                 onMouseDown={event => {
                     event.preventDefault();
@@ -393,7 +363,7 @@ const ColorButton = ({ format, icon }) => {
                 }}>
                 <div style={{ background: color }}></div>
                 <Icon />
-            </Button>
+            </ToolButton>
 
             <DropdownButton
                 trigger='mousedown'
@@ -408,26 +378,22 @@ const ColorButton = ({ format, icon }) => {
                     }
                 }}
 
-                renderButton={
-                    (buttonRef) => {
-                        return (
-                            <Button
-                                className={`editor-button editor-button-color-r ${pickerActive ? "__dropdown" : ""}`}
-                                active={pickerActive}
-                                onMouseDown={event => {
-                                    event.preventDefault();
-                                    if (!pickerActive) {
-                                        putSelection(editor);
-                                    }
-                                    setPickerActive(!pickerActive);
-                                }}
-                                ref={buttonRef}
-                            >
-                                <SwapRightOutlined />
-                            </Button>
-                        )
-                    }
-                }
+                renderButton={positionRef => (
+                    <ToolButton
+                        className={`editor-button-color-r ${pickerActive ? "__dropdown" : ""}`}
+                        active={pickerActive}
+                        onMouseDown={event => {
+                            event.preventDefault();
+                            if (!pickerActive) {
+                                putSelection(editor);
+                            }
+                            setPickerActive(!pickerActive);
+                        }}
+                        ref={positionRef}
+                    >
+                        <SwapRightOutlined />
+                    </ToolButton>
+                )}
 
                 renderDropdown={
                     (setPickerActive) => {
@@ -452,8 +418,8 @@ const LeafStyleButton = () => {
 
     return (
         <>
-            <Button
-                className="editor-button"
+            <ToolButton
+                title="应用文字样式"
                 onMouseDown={event => {
                     event.preventDefault();
                     putSelection(editor);
@@ -461,7 +427,7 @@ const LeafStyleButton = () => {
                 }}
             >
                 <FontSizeOutlined />
-            </Button>
+            </ToolButton>
             <StylePickerDialog
                 onApply={(_, { style }) => {
                     const selection = getSelection(editor);
@@ -544,8 +510,8 @@ const TableStyleButton = () => {
 
     return (
         <>
-            <Button
-                className="editor-button"
+            <ToolButton
+                title="应用表格样式"
                 disabled={disabled}
                 onMouseDown={event => {
                     event.preventDefault();
@@ -554,12 +520,12 @@ const TableStyleButton = () => {
                 }}
             >
                 <CreditCardOutlined />
-            </Button>
+            </ToolButton>
             <TableStylePickerDialog
                 onApply={(_, { rules }) => {
                     const selection = getSelection(editor);
                     const [table, tablePath] = matches[0];
-                    console.log("[debug]matches",matches);
+                    console.log("[debug]matches", matches);
                     let tableRows = table.children.length, tableCols = table.children[0].children.length;
 
                     const computedStyleTable = computeStyleTable(rules, tableRows, tableCols);
@@ -610,9 +576,9 @@ const TableBorderButton = () => {
 
     return (
         <>
-            <Button
+            <ToolButton
+                title="隐藏边框"
                 disabled={disabled}
-                className="editor-button"
                 active={table && table.noBorder}
                 onMouseDown={event => {
                     event.preventDefault();
@@ -623,7 +589,7 @@ const TableBorderButton = () => {
                     });
                 }}>
                 <BorderlessTableOutlined />
-            </Button>
+            </ToolButton>
         </>
     )
 }
@@ -667,9 +633,10 @@ const TableColorButton = () => {
 
     return (
         <>
-            <Button
+            <ToolButton
+                title="单元格背景色"
                 disabled={disabled}
-                className="editor-button editor-button-color"
+                className="editor-button-color"
                 active={isMarkActive()}
                 onMouseDown={event => {
                     event.preventDefault();
@@ -678,7 +645,7 @@ const TableColorButton = () => {
                 }}>
                 <div style={{ background: color }}></div>
                 <TableOutlined />
-            </Button>
+            </ToolButton>
 
             <DropdownButton
                 trigger='mousedown'
@@ -690,27 +657,23 @@ const TableColorButton = () => {
                         toggleMark();
                     }
                 }}
-
-                renderButton={(buttonRef) => {
-                    return (
-                        <Button
-                            disabled={disabled}
-                            className={`editor-button editor-button-color-r ${pickerActive ? "__dropdown" : ""}`}
-                            active={pickerActive}
-                            onMouseDown={event => {
-                                event.preventDefault();
-                                if (!pickerActive) {
-                                    putSelection(editor);
-                                }
-                                setPickerActive(!pickerActive);
-                            }}
-                            ref={buttonRef}
-                        >
-                            <SwapRightOutlined />
-                        </Button>
-                    )
-                }}
-
+                renderButton={positionRef => (
+                    <ToolButton
+                        disabled={disabled}
+                        className={`editor-button-color-r ${pickerActive ? "__dropdown" : ""}`}
+                        active={pickerActive}
+                        onMouseDown={event => {
+                            event.preventDefault();
+                            if (!pickerActive) {
+                                putSelection(editor);
+                            }
+                            setPickerActive(!pickerActive);
+                        }}
+                        ref={positionRef}
+                    >
+                        <SwapRightOutlined />
+                    </ToolButton>
+                )}
                 renderDropdown={(setPickerActive) => {
                     return (
                         <div>
