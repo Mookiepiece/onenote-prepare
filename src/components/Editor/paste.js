@@ -240,7 +240,7 @@ function deserializeListX(el, css) {
  * @param {NodeList|Array} childNodes 
  */
 function _deserializeLeaves(childNodes, css) {
-    if (!childNodes.length) return [{ text: '' }];
+    if (!childNodes.length) return [[{ text: '' }, css]]; // not flatted *2, will return array [node, css]
 
     return childNodes.map(leaf => { // note that if we pass [] to deserializeLeaves, map function will not excuted and return [] and it works well
         if (leaf.nodeType === Node.TEXT_NODE) {
