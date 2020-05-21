@@ -94,7 +94,7 @@ const VersionButton = () => {
         case 'ready':
             versionButton = (
                 <Button onClick={_ => {
-                    setValue({ status: 'pending', result:'' });
+                    setValue({ status: 'pending', result: '' });
                     AJAX.version()
                         .then(result => {
                             setValue({ status: 'resolved', result });

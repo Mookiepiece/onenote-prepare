@@ -23,7 +23,7 @@ function createMainWindow() {
 
   if (isDevelopment) {
     // windows, load react devtools
-    BrowserWindow.addDevToolsExtension(path.resolve(process.env.LOCALAPPDATA +"/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.6.0_0"))
+    BrowserWindow.addDevToolsExtension(path.resolve(process.env.LOCALAPPDATA +"/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.7.0_0"))
     window.loadURL(`http://localhost:9001`)
   }
   else {

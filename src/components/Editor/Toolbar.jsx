@@ -42,6 +42,7 @@ import { fontSizeOptions, fontFamilyOptions, SLATE_DEFAULTS } from '@/utils/user
 import StylePickerDialog from './StylePickerDialog';
 import TableStylePickerDialog from './TableStylePickerDialog';
 import ToolButton from '../Button/ToolButton';
+import { ColorPickerTabs } from '../ColorPicker/ColorPickerButton';
 
 const Toolbar = ({ readOnly }) => {
 
@@ -76,7 +77,7 @@ const Toolbar = ({ readOnly }) => {
                     format="fontColor"
                     title="前景色"
                     icon={FontColorsOutlined}
-                    />
+                />
                 <ColorButton
                     format="bgColor"
                     title="背景色"
@@ -366,6 +367,8 @@ const ColorButton = ({ format, title, icon }) => {
             </ToolButton>
 
             <DropdownButton
+                dropdownWidth={null}
+                dropdownHeight={null}
                 trigger='mousedown'
                 active={pickerActive}
                 setActive={v => {
@@ -394,19 +397,13 @@ const ColorButton = ({ format, title, icon }) => {
                         <SwapRightOutlined />
                     </ToolButton>
                 )}
-
-                renderDropdown={
-                    (setPickerActive) => {
-                        return (
-                            <div>
-                                <SketchPicker
-                                    color={color}
-                                    onChange={({ hex }) => setColor(hex)}
-                                />
-                            </div>
-                        )
-                    }
-                }
+                renderDropdown={(setPickerActive) => {
+                    return (
+                        <div>
+                            <ColorPickerTabs value={color} onChange={setColor} />
+                        </div>
+                    )
+                }}
             />
         </>
     )
@@ -646,6 +643,8 @@ const TableColorButton = () => {
             </ToolButton>
 
             <DropdownButton
+                dropdownWidth={null}
+                dropdownHeight={null}
                 trigger='mousedown'
                 active={pickerActive}
                 setActive={v => {
@@ -675,10 +674,7 @@ const TableColorButton = () => {
                 renderDropdown={(setPickerActive) => {
                     return (
                         <div>
-                            <SketchPicker
-                                color={color}
-                                onChange={({ hex }) => setColor(hex)}
-                            />
+                            <ColorPickerTabs value={color} onChange={setColor} />
                         </div>
                     )
                 }}

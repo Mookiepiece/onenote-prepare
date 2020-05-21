@@ -16,7 +16,7 @@ import Button from "@/components/Button";
 import Input from '@/components/Input';
 import { Switch, CheckboxButton } from '@/components/Switch';
 import { DropdownButton, DropdownButtonSelect } from '@/components/DropdownButton';
-import { ColorPickerButton } from '@/components/ColorPicker';
+import { ColorPickerButton } from '@/components';
 import { setArrayItem } from '@/utils';
 import { alt } from '@/utils';
 

@@ -1,15 +1,20 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import Button from "@/components/Button";
-import { SketchPicker } from 'react-color';
+import { SketchPicker, TwitterPicker, ChromePicker } from 'react-color';
 import { DropdownButton } from '@/components/DropdownButton';
+import { Tabs, MoreOfficeColorPicker, OfficeColorPicker } from '..';
 
-const ColorPickerButton = ({ disabled, value, onChange }) => {
+import './colorPickerButton.scss';
+
+export default ({ disabled, value, onChange }) => {
     const [pickerActive, setPickerActive] = useState(false);
 
     return (
         <DropdownButton
             active={pickerActive}
             setActive={_ => setPickerActive(_)}
+            dropdownWidth={null}
+            dropdownHeight={null}
 
             renderButton={
                 (buttonRef) => {
@@ -35,14 +40,7 @@ const ColorPickerButton = ({ disabled, value, onChange }) => {
             renderDropdown={
                 (setPickerActive) => {
                     return (
-                        <div>
-                            <SketchPicker
-                                color={value}
-                                onChange={({ hex }) => {
-                                    onChange(hex);
-                                }}
-                            />
-                        </div>
+                        <ColorPickerTabs value={value} onChange={onChange} />
                     )
                 }
             }
@@ -50,4 +48,29 @@ const ColorPickerButton = ({ disabled, value, onChange }) => {
     )
 }
 
-export default ColorPickerButton;
+export function ColorPickerTabs({ value, onChange }) {
+    return (
+        <Tabs
+            onlyone
+            panels={
+                [
+                    [-1, "yes", (
+                        <OfficeColorPicker value={value} onChange={onChange} />
+                    )],
+                    [0, "额外", (
+                        <MoreOfficeColorPicker value={value} onChange={onChange} />
+                    )],
+                    [1, "RGB", (
+                        <ChromePicker
+                            disableAlpha
+                            color={value}
+                            onChange={({ hex }) => {
+                                onChange(hex);
+                            }}
+                        />
+                    )],
+                ]
+            }
+        />
+    )
+}

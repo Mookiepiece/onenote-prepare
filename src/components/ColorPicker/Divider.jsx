@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useMouseDrag } from "./ColorPicker";
 import Button from '@/components/Button';
 
+import './divider.scss';
+
 export const Divider = ({ value, onChange }) => {
-    let [ref, mousePosition, handleMouseDown, mouseDown] = useMouseDrag(0, 0, 400, 10);
+    let [ref, mousePosition, isMouseDown] = useMouseDrag(0, 0, 400, 10);
 
     let v = Math.round(mousePosition[0] / 40);
 
@@ -23,15 +25,14 @@ export const Divider = ({ value, onChange }) => {
                             <div className="line"
                                 style={{
                                     '--circle-left': position + 'px',
-                                    '--number-display': mouseDown ? '1' : '0',
+                                    '--number-display': isMouseDown ? '1' : '0',
                                     '--disabled-length': disabledLength * 40 + 'px'
                                 }}
                                 ref={ref}
-                                onMouseDown={handleMouseDown}
                             >
 
                                 <div className="line-disable" ></div>
-                                <div className="circle" data-uuz={v !== disabledLength + 1 && laDV !== undefined ? laDV + 1 + "-" + displayV : displayV}></div>
+                                <div className="circle" data-drag-hint={v !== disabledLength + 1 && laDV !== undefined ? laDV + 1 + "-" + displayV : displayV}></div>
                             </div>
                         </div>
                         <Button style={{marginLeft:'24px'}} type="primary" onClick={_ => onChange([...value, displayV])}>打断</Button>

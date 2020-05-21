@@ -18,7 +18,7 @@
   },
   "build": {
     "appId": "pre-onenote",
-    "files":[
+    "files": [
       "./dist",
       "./main.js",
       "./build/icon.png",
@@ -26,7 +26,7 @@
     ],
     "directories": {
       "buildResources": "res",
-      "output":"release"
+      "output": "release"
     },
     "win": {
       "target": "nsis",
@@ -36,12 +36,13 @@
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,
       "perMachine": false,
-      "createDesktopShortcut":false
+      "createDesktopShortcut": false
     }
   },
   "dependencies": {
     "@ant-design/icons": "^4.0.2",
     "@wojtekmaj/react-daterange-picker": "^3.0.0",
+    "classnames": "^2.2.6",
     "dateformat": "^3.0.3",
     "electron-store": "^5.1.1",
     "is-hotkey": "^0.1.6",

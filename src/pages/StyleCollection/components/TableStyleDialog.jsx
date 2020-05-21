@@ -25,7 +25,7 @@ import CachedInput from '@/components/Input/cachedInput';
 import StylePickerDialog from '@/components/Editor/StylePickerDialog';
 import { computeStyleTable } from '@/components/Editor/Toolbar';
 import { fromComputedLeafStyle, LeafStyleDialogNoInput } from '@/pages/StyleCollection/components/LeafStyleDialog';
-import { ColorPickerButton } from '@/components/ColorPicker';
+import { ColorPickerButton } from '@/components';
 
 import './tableStyleDialog.scss';
 

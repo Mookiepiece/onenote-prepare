@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 
+import './colorPicker.scss';
+
 const boundary = (v, min, max) => {
     return Math.min(Math.max(v, min), max);
 }
 
 const ColorPicker = ({ value, onChange }) => {
 
-    let [gradientBackgroundRef, mousePosition, handleMouseDown] = useMouseDrag(0,0,200,200);
+    let [gradientBackgroundRef, mousePosition] = useMouseDrag(0, 0, 200, 200);
 
     return (
         <div role="input" className="color-picker">
@@ -18,7 +20,6 @@ const ColorPicker = ({ value, onChange }) => {
                     '--circle-color': 'red'
                 }}
                 ref={gradientBackgroundRef}
-                onMouseDown={handleMouseDown}
             ></div>
             <div className="gradient-hue"></div>
 
@@ -26,15 +27,15 @@ const ColorPicker = ({ value, onChange }) => {
     )
 }
 
-export const useMouseDrag = (minX,minY,maxX,maxY) => {
+export const useMouseDrag = (minX, minY, maxX, maxY) => {
     let [mousePosition, setMousePosition] = useState([0, 0]);
     let [mouseDown, setMouseDown] = useState(false);
-    let gradientBackgroundRef = useRef();
+    let ref = useRef();
 
     const getMousePosition = (e) => {
         setMousePosition([
-            boundary(e.clientX - gradientBackgroundRef.current.getBoundingClientRect().left, minX, maxX),
-            boundary(e.clientY - gradientBackgroundRef.current.getBoundingClientRect().top, minY, maxY)
+            boundary(e.clientX - ref.current.getBoundingClientRect().left, minX, maxX),
+            boundary(e.clientY - ref.current.getBoundingClientRect().top, minY, maxY)
         ]);
     };
 
@@ -53,9 +54,13 @@ export const useMouseDrag = (minX,minY,maxX,maxY) => {
             document.removeEventListener('mousemove', getMousePosition);
             document.removeEventListener('mouseup', removeListener);
         }
-    });
+    },[mouseDown]);
 
-    return [gradientBackgroundRef, mousePosition, e => { getMousePosition(e); setMouseDown(true); },mouseDown];
+    useEffect(_ => {
+        ref.current.addEventListener('mousedown', e => { getMousePosition(e); setMouseDown(true); });
+    }, []);
+
+    return [ref, mousePosition, mouseDown];
 }
 
 export default ColorPicker;
